@@ -8,19 +8,23 @@ import 'package:flutter/material.dart';
 class AppTheme {
   AppTheme._();
 
-  static const Color _primaryColor = Color(0xFF1A237E);
-  static const Color _secondaryColor = Color(0xFFFFD700);
+  /// Navy blue — the primary brand colour.
+  static const Color primaryColor = Color(0xFF1A237E);
+
+  /// Gold — the secondary accent colour.
+  static const Color secondaryColor = Color(0xFFFFD700);
+
   static const Color _surfaceColor = Color(0xFFFAFAF7);
   static const Color _errorColor = Color(0xFFB71C1C);
 
   static ThemeData get lightTheme {
     final colorScheme = ColorScheme(
       brightness: Brightness.light,
-      primary: _primaryColor,
+      primary: primaryColor,
       onPrimary: Colors.white,
       primaryContainer: const Color(0xFF3949AB),
       onPrimaryContainer: Colors.white,
-      secondary: _secondaryColor,
+      secondary: secondaryColor,
       onSecondary: const Color(0xFF1A1A1A),
       secondaryContainer: const Color(0xFFFFF9C4),
       onSecondaryContainer: const Color(0xFF1A1A1A),
@@ -35,14 +39,14 @@ class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: _surfaceColor,
       appBarTheme: const AppBarTheme(
-        backgroundColor: _primaryColor,
+        backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: _primaryColor,
+          backgroundColor: primaryColor,
           foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 48),
           shape: RoundedRectangleBorder(
@@ -56,7 +60,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: _primaryColor, width: 2),
+          borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         filled: true,
         fillColor: Colors.white,
