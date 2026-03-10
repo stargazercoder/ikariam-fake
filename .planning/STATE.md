@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-foundation-01-PLAN.md
-last_updated: "2026-03-10T23:26:00.194Z"
-last_activity: 2026-03-11 — Plan 01-00 complete, test infrastructure created
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-03-10T23:31:58Z"
+last_activity: 2026-03-11 — Plan 01-02 complete, auth system with GoRouter guards implemented
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
-  percent: 4
+  completed_plans: 3
+  percent: 8
 ---
 
 # Project State
@@ -26,31 +26,32 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 ## Current Position
 
 Phase: 1 of 6 (Foundation)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: Executing
-Last activity: 2026-03-11 — Plan 01-00 complete, test infrastructure created
+Last activity: 2026-03-11 — Plan 01-02 complete, auth system with GoRouter guards implemented
 
-Progress: [█░░░░░░░░░] 4%
+Progress: [█░░░░░░░░░] 8%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 15 min
-- Total execution time: 0.25 hours
+- Total plans completed: 3
+- Average duration: 12 min
+- Total execution time: 0.60 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation | 1/4 | 15 min | 15 min |
+| 1. Foundation | 3/4 | ~36 min | 12 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-00 (15 min)
-- Trend: Baseline established
+- Last 5 plans: 01-00 (15 min), 01-01 (17 min), 01-02 (4 min)
+- Trend: Accelerating
 
 *Updated after each plan completion*
 | Phase 01-foundation P01 | 17 | 2 tasks | 13 files |
+| Phase 01-foundation P02 | 4 | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,9 @@ Recent decisions affecting current work:
 - [01-00] Test scaffolding pattern: all requirement-mapped tests created as skipped stubs before production code exists
 - [Phase 01-foundation]: riverpod_generator omitted from pubspec: incompatible with flutter_test pinned deps in Dart 3.10.1 (analyzer ^9.0.0 conflict); to be added when SDK supports it
 - [Phase 01-foundation]: Supabase DB verification via docker exec supabase_db_ikariam psql (psql not in PATH on Windows)
+- [01-02] Manual Riverpod providers used throughout (no @riverpod code-gen): riverpod_generator still requires analyzer ^9.0.0, incompatible with Dart 3.10.1
+- [01-02] GoRouter created once per app lifetime; _RouterNotifier bridges Riverpod state changes to refreshListenable — router never recreated on auth change
+- [01-02] ProfileRepository.updateProfile uses direct client write (exception to Edge Function rule): profiles is a player-preferences table with profiles_update_own RLS policy
 
 ### Pending Todos
 
@@ -80,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T23:26:00.192Z
-Stopped at: Completed 01-foundation-01-PLAN.md
+Last session: 2026-03-10T23:31:58Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
