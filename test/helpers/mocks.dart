@@ -1,24 +1,23 @@
 // Mock classes for unit testing.
 //
-// These mocks will be replaced with real implementations once the supabase_flutter
-// and go_router packages are added in Plan 01-01.
-//
-// Future imports (uncomment after Plan 01-01):
-// import 'package:supabase_flutter/supabase_flutter.dart';
-// import 'package:go_router/go_router.dart';
-// import 'package:mocktail/mocktail.dart';
-//
-// class MockSupabaseClient extends Mock implements SupabaseClient {}
-// class MockGoRouter extends Mock implements GoRouter {}
-//
-// Placeholder stubs so the file compiles before packages are available.
+// These stubs are used across the test suite to isolate units under test
+// from real Supabase/GoRouter implementations.
 
-/// Placeholder for MockSupabaseClient.
-/// Replace with: class MockSupabaseClient extends Mock implements SupabaseClient {}
-/// once supabase_flutter is added to pubspec.yaml in Plan 01-01.
-class MockSupabaseClientStub {}
+import 'package:go_router/go_router.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Placeholder for MockGoRouter.
-/// Replace with: class MockGoRouter extends Mock implements GoRouter {}
-/// once go_router is added to pubspec.yaml in Plan 01-01.
-class MockGoRouterStub {}
+import 'package:ikariam/features/auth/data/auth_repository.dart';
+import 'package:ikariam/features/profile/data/profile_repository.dart';
+
+/// Mock for [SupabaseClient]. Use in tests that call [supabaseClient].
+class MockSupabaseClient extends Mock implements SupabaseClient {}
+
+/// Mock for [GoRouter]. Use in tests that verify navigation calls.
+class MockGoRouter extends Mock implements GoRouter {}
+
+/// Mock for [AuthRepository]. Use in widget tests that trigger sign-in/sign-up.
+class MockAuthRepository extends Mock implements AuthRepository {}
+
+/// Mock for [ProfileRepository]. Use in widget tests that read/update profiles.
+class MockProfileRepository extends Mock implements ProfileRepository {}
