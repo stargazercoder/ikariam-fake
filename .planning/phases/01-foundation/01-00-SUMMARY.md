@@ -145,6 +145,19 @@ None — no external service configuration required for this plan.
 - Plan 01-01 should complete mocks.dart by replacing stub classes with real `Mock implements` classes after adding supabase_flutter and go_router
 - test/helpers/test_helpers.dart has a commented-out `createTestProviderScope` that should be uncommented after Plan 01-01 adds flutter_riverpod
 
+## Self-Check: PASSED
+
+- FOUND: test/helpers/mocks.dart
+- FOUND: test/helpers/test_helpers.dart
+- FOUND: test/unit/profile_validation_test.dart
+- FOUND: test/unit/auth_persistence_test.dart
+- FOUND: integration_test/auth_test.dart
+- FOUND: integration_test/city_placement_test.dart
+- FOUND: integration_test/rls_test.dart
+- FOUND: .planning/phases/01-foundation/01-00-SUMMARY.md
+- FOUND commit: 260cbcc (feat: test infrastructure)
+- FOUND commit: 8dd9615 (docs: plan metadata)
+
 ---
 
 *Phase: 01-foundation*
