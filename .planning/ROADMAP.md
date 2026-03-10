@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can create a display name and avatar for their player profile
   4. A city is automatically placed on an island the first time a new player logs in — no manual action required
   5. All database tables have RLS enabled at migration time and no Flutter client can directly write to any game-state table
-**Plans:** 4 plans
+**Plans:** 2/4 plans executed
 
 Plans:
 - [x] 01-00-PLAN.md — Wave 0: Test infrastructure scaffolds, mock helpers, and skeleton test files for all phase requirements
@@ -102,7 +102,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/4 | Executing | - |
+| 1. Foundation | 2/4 | In Progress|  |
 | 2. Core Economy | 0/TBD | Not started | - |
 | 3. World Map | 0/TBD | Not started | - |
 | 4. Military | 0/TBD | Not started | - |

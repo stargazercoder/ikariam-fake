@@ -12,7 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **AUTH-01**: User can sign up with email and password via Supabase Auth
 - [ ] **AUTH-02**: User can log in and session persists across browser refresh
 - [ ] **AUTH-03**: User can create player profile with display name and avatar
-- [ ] **AUTH-04**: User gets a city automatically placed on an island on first login
+- [x] **AUTH-04**: User gets a city automatically placed on an island on first login
 
 ### Resources
 
@@ -56,8 +56,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Infrastructure
 
 - [ ] **INFR-01**: Flutter web shows splash screen during CanvasKit load instead of blank page
-- [ ] **INFR-02**: All game state mutations run server-side (no client-side calculations)
-- [ ] **INFR-03**: RLS (Row Level Security) enabled on every database table from creation
+- [x] **INFR-02**: All game state mutations run server-side (no client-side calculations)
+- [x] **INFR-03**: RLS (Row Level Security) enabled on every database table from creation
 
 ## v2 Requirements
 
@@ -124,9 +124,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-01 | Phase 1 | Pending |
 | AUTH-02 | Phase 1 | Pending |
 | AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| INFR-02 | Phase 1 | Pending |
-| INFR-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Complete |
+| INFR-02 | Phase 1 | Complete |
+| INFR-03 | Phase 1 | Complete |
 | RSRC-01 | Phase 2 | Pending |
 | RSRC-02 | Phase 2 | Pending |
 | RSRC-03 | Phase 2 | Pending |
