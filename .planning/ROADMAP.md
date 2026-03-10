@@ -12,7 +12,7 @@ Six phases take this game from a blank Flutter project to a playable multiplayer
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Auth, database schema with RLS, server-authority contract, and Flutter/Supabase project scaffold
+- [x] **Phase 1: Foundation** - Auth, database schema with RLS, server-authority contract, and Flutter/Supabase project scaffold (completed 2026-03-10)
 - [ ] **Phase 2: Core Economy** - Resource production via pg_cron, warehouse limits, buildings system, and single-slot upgrade queue
 - [ ] **Phase 3: World Map** - 2D grid world map, island view, city view, and auto city placement on first login
 - [ ] **Phase 4: Military** - Land and naval unit training, dispatch system, and unit unlock requirements
@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can create a display name and avatar for their player profile
   4. A city is automatically placed on an island the first time a new player logs in — no manual action required
   5. All database tables have RLS enabled at migration time and no Flutter client can directly write to any game-state table
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 - [x] 01-00-PLAN.md — Wave 0: Test infrastructure scaffolds, mock helpers, and skeleton test files for all phase requirements
@@ -102,7 +102,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 3/4 | In Progress|  |
+| 1. Foundation | 4/4 | Complete   | 2026-03-10 |
 | 2. Core Economy | 0/TBD | Not started | - |
 | 3. World Map | 0/TBD | Not started | - |
 | 4. Military | 0/TBD | Not started | - |

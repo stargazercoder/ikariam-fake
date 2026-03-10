@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-03-10T23:31:58Z"
+stopped_at: Completed 01-03-PLAN.md (Tasks 1+2) — awaiting human-verify checkpoint (Task 3)
+last_updated: "2026-03-10T23:40:23.002Z"
 last_activity: 2026-03-11 — Plan 01-02 complete, auth system with GoRouter guards implemented
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
   percent: 8
 ---
 
@@ -52,6 +52,7 @@ Progress: [█░░░░░░░░░] 8%
 *Updated after each plan completion*
 | Phase 01-foundation P01 | 17 | 2 tasks | 13 files |
 | Phase 01-foundation P02 | 4 | 2 tasks | 12 files |
+| Phase 01-foundation P03 | 4 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ Recent decisions affecting current work:
 - [01-02] Manual Riverpod providers used throughout (no @riverpod code-gen): riverpod_generator still requires analyzer ^9.0.0, incompatible with Dart 3.10.1
 - [01-02] GoRouter created once per app lifetime; _RouterNotifier bridges Riverpod state changes to refreshListenable — router never recreated on auth change
 - [01-02] ProfileRepository.updateProfile uses direct client write (exception to Edge Function rule): profiles is a player-preferences table with profiles_update_own RLS policy
+- [Phase 01-foundation]: AppTheme._primaryColor promoted to public static const: AvatarWidget needs the primary colour at field level without BuildContext
+- [Phase 01-foundation]: CityNotifier uses manual AsyncNotifier (no code-gen): riverpod_generator still incompatible with Dart 3.10.1 — same decision as 01-02
+- [Phase 01-foundation]: CityRepository is SELECT-only with island join: cities table has SELECT-only RLS; city creation is trigger-only (handle_new_user)
 
 ### Pending Todos
 
@@ -84,6 +88,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T23:31:58Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-03-10T23:40:22.999Z
+Stopped at: Completed 01-03-PLAN.md (Tasks 1+2) — awaiting human-verify checkpoint (Task 3)
 Resume file: None
