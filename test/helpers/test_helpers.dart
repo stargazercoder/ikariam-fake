@@ -4,7 +4,6 @@
 // Full implementations will be added once flutter_riverpod is available (Plan 01-01).
 
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 
 /// Wraps [child] in a [MaterialApp] for widget testing.
 ///
