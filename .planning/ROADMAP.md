@@ -31,7 +31,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can create a display name and avatar for their player profile
   4. A city is automatically placed on an island the first time a new player logs in — no manual action required
   5. All database tables have RLS enabled at migration time and no Flutter client can directly write to any game-state table
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Flutter/Supabase project scaffold, database migrations with RLS, island seeding, handle_new_user trigger
+- [ ] 01-02-PLAN.md — Auth system: login/signup screens, Riverpod auth state provider, GoRouter with auth guards
+- [ ] 01-03-PLAN.md — Profile creation screen with avatar picker, city placeholder screen, end-to-end flow verification
 
 ### Phase 2: Core Economy
 **Goal**: Cities produce resources on a server-side schedule, warehouses cap storage, and players can queue building upgrades — the core idle loop is running
@@ -92,11 +97,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/3 | Planning complete | - |
 | 2. Core Economy | 0/TBD | Not started | - |
 | 3. World Map | 0/TBD | Not started | - |
 | 4. Military | 0/TBD | Not started | - |
