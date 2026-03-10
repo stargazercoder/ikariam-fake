@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 4 plans
 
 Plans:
-- [ ] 01-00-PLAN.md — Wave 0: Test infrastructure scaffolds, mock helpers, and skeleton test files for all phase requirements
+- [x] 01-00-PLAN.md — Wave 0: Test infrastructure scaffolds, mock helpers, and skeleton test files for all phase requirements
 - [ ] 01-01-PLAN.md — Flutter/Supabase project scaffold, database migrations with RLS, island seeding, handle_new_user trigger
 - [ ] 01-02-PLAN.md — Auth system: login/signup screens, Riverpod auth state provider, GoRouter with auth guards
 - [ ] 01-03-PLAN.md — Profile creation screen with avatar picker, city placeholder screen, end-to-end flow verification
@@ -102,7 +102,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/4 | Planning complete | - |
+| 1. Foundation | 1/4 | Executing | - |
 | 2. Core Economy | 0/TBD | Not started | - |
 | 3. World Map | 0/TBD | Not started | - |
 | 4. Military | 0/TBD | Not started | - |
