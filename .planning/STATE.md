@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-03-11T21:49:39.595Z"
+stopped_at: "Checkpoint 05-03: Human verification of combat UI (Tasks 1-2 complete)"
+last_updated: "2026-03-11T21:57:46.779Z"
 last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 19
-  completed_plans: 18
+  completed_plans: 19
   percent: 84
 ---
 
@@ -122,6 +122,8 @@ Recent decisions affecting current work:
 - [Phase 05-combat]: unitAttackStats/unitDefenseStats values match resolve_battles() SQL constants exactly — sync comment enforces manual consistency
 - [Phase 05-combat]: allMyBattlesProvider uses Provider.autoDispose (not StreamProvider) because it merges two async stream values into a synchronous list
 - [Phase 05-combat]: BattleTurn._parseUnits static helper isolates nullable JSONB Map casting in one place — keeps fromJson factory readable
+- [Phase 05-03]: Icons.sword_outlined does not exist in Material Icons — used Icons.gps_fixed_outlined for attacker role icon in battle tile
+- [Phase 05-03]: allMyBattlesProvider returns List<Battle> (not AsyncValue) — BattlesScreen watches provider directly; empty list shown while stream warms up
 
 ### Pending Todos
 
@@ -141,6 +143,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T21:49:39.593Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-03-11T21:57:41.900Z
+Stopped at: Checkpoint 05-03: Human verification of combat UI (Tasks 1-2 complete)
 Resume file: None

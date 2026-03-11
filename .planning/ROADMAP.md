@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Core Economy** - Resource production via pg_cron, warehouse limits, buildings system, and single-slot upgrade queue (completed 2026-03-11)
 - [ ] **Phase 3: World Map** - 2D grid world map, island view, city view, and auto city placement on first login
 - [x] **Phase 4: Military** - Land and naval unit training, dispatch system, and unit unlock requirements (completed 2026-03-11)
-- [ ] **Phase 5: Combat** - Turn-based 5-minute battle engine, battle reports, and naval-before-land phase ordering
+- [x] **Phase 5: Combat** - Turn-based 5-minute battle engine, battle reports, and naval-before-land phase ordering (completed 2026-03-11)
 - [ ] **Phase 6: Production Hardening** - Flutter web deployment, splash screen, RLS audit, performance validation
 
 ## Phase Details
@@ -100,7 +100,7 @@ Plans:
   3. Naval units engage and resolve before land units each turn — the sequence is observable in the battle report
   4. After each turn resolves, both the attacker and defender receive a battle report update via Supabase Realtime without refreshing the page
   5. All battle outcome numbers (casualties, survivors) are calculated server-side and the client cannot submit calculated results
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 - [ ] 05-00-PLAN.md — Wave 0: Test scaffolds for battle models and combat formula
@@ -129,5 +129,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 2. Core Economy | 4/4 | Complete   | 2026-03-11 |
 | 3. World Map | 2/3 | In Progress|  |
 | 4. Military | 4/4 | Complete   | 2026-03-11 |
-| 5. Combat | 3/4 | In Progress|  |
+| 5. Combat | 4/4 | Complete   | 2026-03-11 |
 | 6. Production Hardening | 0/TBD | Not started | - |
