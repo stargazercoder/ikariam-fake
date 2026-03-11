@@ -100,7 +100,7 @@ Plans:
   3. Naval units engage and resolve before land units each turn — the sequence is observable in the battle report
   4. After each turn resolves, both the attacker and defender receive a battle report update via Supabase Realtime without refreshing the page
   5. All battle outcome numbers (casualties, survivors) are calculated server-side and the client cannot submit calculated results
-**Plans:** 4 plans
+**Plans:** 1/4 plans executed
 
 Plans:
 - [ ] 05-00-PLAN.md — Wave 0: Test scaffolds for battle models and combat formula
@@ -129,5 +129,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 2. Core Economy | 4/4 | Complete   | 2026-03-11 |
 | 3. World Map | 2/3 | In Progress|  |
 | 4. Military | 4/4 | Complete   | 2026-03-11 |
-| 5. Combat | 0/4 | Not started | - |
+| 5. Combat | 1/4 | In Progress|  |
 | 6. Production Hardening | 0/TBD | Not started | - |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 5 context gathered
-last_updated: "2026-03-11T21:19:48.820Z"
+stopped_at: Completed 05-00-PLAN.md
+last_updated: "2026-03-11T21:42:05.805Z"
 last_activity: "2026-03-11 - Completed 04-03: Military UI layer (MilitaryRepository, 3 screens, router integration, human verified)"
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 15
-  completed_plans: 15
+  total_plans: 19
+  completed_plans: 16
   percent: 100
 ---
 
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 
 ## Current Position
 
-Phase: 4 of 6 (Military)
-Plan: 4 of 4 in current phase (all plans complete)
+Phase: 5 of 6 (Combat)
+Plan: 1 of 4 in current phase (05-00 complete)
 Status: Executing
-Last activity: 2026-03-11 - Completed 04-03: Military UI layer (MilitaryRepository, 3 screens, router integration, human verified)
+Last activity: 2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)
 
-Progress: [██████████] 100%
+Progress: [████████░░] 84%
 
 ## Performance Metrics
 
@@ -64,6 +64,7 @@ Progress: [██████████] 100%
 | Phase 04-military P01 | 3 | 2 tasks | 6 files |
 | Phase 04-military P02 | 4 | 2 tasks | 8 files |
 | Phase 04-military P03 | 4 | 2 tasks | 9 files |
+| Phase 05-combat P00 | 5 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,7 @@ Recent decisions affecting current work:
 - [Phase 04-02]: calcTravelMinutes uses identical formula in Dart and TypeScript with explicit sync comments and shared BASE_MINUTES_PER_GRID_UNIT constant
 - [Phase 04-military]: [04-03]: watchOutgoingMovements filters client-side by originCityId after owner_id stream — Realtime .stream() does not support compound eq filters
 - [Phase 04-military]: [04-03]: Barracks/Shipyard taps in BuildingCell navigate to dedicated screens instead of upgrade sheet
+- [Phase 05-combat]: Phase 5 Wave 0 test scaffolds follow same skip pattern as Phases 1-4: unit stubs use descriptive skip string messages pointing to implementing plan (05-02)
 
 ### Pending Todos
 
@@ -131,6 +133,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T21:19:48.817Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-combat/05-CONTEXT.md
+Last session: 2026-03-11T21:42:05.802Z
+Stopped at: Completed 05-00-PLAN.md
+Resume file: None

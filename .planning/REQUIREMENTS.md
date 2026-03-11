@@ -47,11 +47,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Combat
 
-- [ ] **CMBT-01**: Battles resolve in turns, each turn lasting 5 minutes
-- [ ] **CMBT-02**: Each turn a portion of armies engage, survivors carry to next turn
-- [ ] **CMBT-03**: Naval battle phase occurs before land battle phase
-- [ ] **CMBT-04**: Battle reports sent to both attacker and defender via Supabase Realtime
-- [ ] **CMBT-05**: All battle calculations run server-side (Edge Function or pg function)
+- [x] **CMBT-01**: Battles resolve in turns, each turn lasting 5 minutes
+- [x] **CMBT-02**: Each turn a portion of armies engage, survivors carry to next turn
+- [x] **CMBT-03**: Naval battle phase occurs before land battle phase
+- [x] **CMBT-04**: Battle reports sent to both attacker and defender via Supabase Realtime
+- [x] **CMBT-05**: All battle calculations run server-side (Edge Function or pg function)
 
 ### Infrastructure
 
@@ -146,11 +146,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MIL-03 | Phase 4 | Complete |
 | MIL-04 | Phase 4 | Complete |
 | MIL-05 | Phase 4 | Complete |
-| CMBT-01 | Phase 5 | Pending |
-| CMBT-02 | Phase 5 | Pending |
-| CMBT-03 | Phase 5 | Pending |
-| CMBT-04 | Phase 5 | Pending |
-| CMBT-05 | Phase 5 | Pending |
+| CMBT-01 | Phase 5 | Complete |
+| CMBT-02 | Phase 5 | Complete |
+| CMBT-03 | Phase 5 | Complete |
+| CMBT-04 | Phase 5 | Complete |
+| CMBT-05 | Phase 5 | Complete |
 | INFR-01 | Phase 6 | Pending |
 
 **Coverage:**
