@@ -324,90 +324,81 @@ class _UnitTrainingRow extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Unit info column.
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        unit.displayName,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: isUnlocked
-                              ? null
-                              : theme.colorScheme.onSurface.withAlpha(100),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      if (!isUnlocked)
-                        Icon(
-                          Icons.lock,
-                          size: 14,
-                          color: theme.colorScheme.onSurface.withAlpha(100),
-                        ),
-                    ],
+            // Unit name + lock icon
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    unit.displayName,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: isUnlocked
+                          ? null
+                          : theme.colorScheme.onSurface.withAlpha(100),
+                    ),
                   ),
-                  const SizedBox(height: 2),
-                  if (!isUnlocked)
-                    Text(
-                      'Requires Barracks Lv.$requiredLevel',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.error,
-                        fontSize: 11,
-                      ),
-                    )
-                  else ...[
-                    Text(
-                      _costString(costs),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade600,
-                        fontSize: 11,
-                      ),
-                    ),
-                    Text(
-                      'Time: ${timePerUnit}m/unit',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade600,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+                ),
+                if (!isUnlocked)
+                  Icon(
+                    Icons.lock,
+                    size: 14,
+                    color: theme.colorScheme.onSurface.withAlpha(100),
+                  ),
+              ],
             ),
-
-            // Quantity input + train button (only if unlocked).
-            if (isUnlocked) ...[
-              SizedBox(
-                width: 60,
-                child: TextField(
-                  controller: quantityController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  textAlign: TextAlign.center,
-                  decoration: const InputDecoration(
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                  ),
-                  enabled: !queueBusy,
+            const SizedBox(height: 2),
+            if (!isUnlocked)
+              Text(
+                'Requires Barracks Lv.$requiredLevel',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.error,
+                  fontSize: 11,
+                ),
+              )
+            else ...[
+              Text(
+                '${_costString(costs)}  •  ${timePerUnit}m/unit',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: Colors.grey.shade600,
+                  fontSize: 11,
                 ),
               ),
-              const SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: queueBusy ? null : onTrain,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 60,
+                    child: TextField(
+                      controller: quantityController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                      textAlign: TextAlign.center,
+                      decoration: const InputDecoration(
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      enabled: !queueBusy,
+                    ),
                   ),
-                ),
-                child: const Text('Train'),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: queueBusy ? null : onTrain,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                    ),
+                    child: const Text('Train'),
+                  ),
+                ],
               ),
             ],
           ],
