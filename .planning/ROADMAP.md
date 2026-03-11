@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Auth, database schema with RLS, server-authority contract, and Flutter/Supabase project scaffold (completed 2026-03-10)
 - [x] **Phase 2: Core Economy** - Resource production via pg_cron, warehouse limits, buildings system, and single-slot upgrade queue (completed 2026-03-11)
 - [ ] **Phase 3: World Map** - 2D grid world map, island view, city view, and auto city placement on first login
-- [ ] **Phase 4: Military** - Land and naval unit training, dispatch system, and unit unlock requirements
+- [x] **Phase 4: Military** - Land and naval unit training, dispatch system, and unit unlock requirements (completed 2026-03-11)
 - [ ] **Phase 5: Combat** - Turn-based 5-minute battle engine, battle reports, and naval-before-land phase ordering
 - [ ] **Phase 6: Production Hardening** - Flutter web deployment, splash screen, RLS audit, performance validation
 
@@ -82,7 +82,7 @@ Plans:
   2. Player with a Shipyard can queue training for any of the 5 naval unit types that the current building level unlocks
   3. Unit training completes automatically after the correct duration via server-side pg_cron and units appear in the player's army roster
   4. Player can dispatch a trained army toward another city and see the troops listed as "in transit" with a travel-time countdown
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 - [x] 04-00-PLAN.md — Wave 0: Test scaffolds for unit constants, military models, and barracks widget
@@ -122,6 +122,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Foundation | 4/4 | Complete   | 2026-03-10 |
 | 2. Core Economy | 4/4 | Complete   | 2026-03-11 |
 | 3. World Map | 2/3 | In Progress|  |
-| 4. Military | 3/4 | In Progress|  |
+| 4. Military | 4/4 | Complete   | 2026-03-11 |
 | 5. Combat | 0/TBD | Not started | - |
 | 6. Production Hardening | 0/TBD | Not started | - |

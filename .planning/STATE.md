@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-military-04-02-PLAN.md
-last_updated: "2026-03-11T14:07:23.291Z"
+stopped_at: Completed 04-military-04-03-PLAN.md (Tasks 1+2; awaiting human verify at Task 3 checkpoint)
+last_updated: "2026-03-11T14:14:42.964Z"
 last_activity: "2026-03-11 - Completed 04-01: Military database layer (tables + functions + cron jobs)"
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 15
-  completed_plans: 14
+  completed_plans: 15
   percent: 68
 ---
 
@@ -63,6 +63,7 @@ Progress: [███████░░░] 68%
 | Phase 04-military P00 | 5 | 1 tasks | 3 files |
 | Phase 04-military P01 | 3 | 2 tasks | 6 files |
 | Phase 04-military P02 | 4 | 2 tasks | 8 files |
+| Phase 04-military P03 | 4 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,8 @@ Recent decisions affecting current work:
 - [Phase 04-02]: UnitType stored as String in models (not enum): keeps models decoupled from constants, same pattern as ConstructionQueueEntry.buildingType
 - [Phase 04-02]: Non-atomic unit deduction in dispatch-units: acceptable for v1 per established project precedent
 - [Phase 04-02]: calcTravelMinutes uses identical formula in Dart and TypeScript with explicit sync comments and shared BASE_MINUTES_PER_GRID_UNIT constant
+- [Phase 04-military]: [04-03]: watchOutgoingMovements filters client-side by originCityId after owner_id stream — Realtime .stream() does not support compound eq filters
+- [Phase 04-military]: [04-03]: Barracks/Shipyard taps in BuildingCell navigate to dedicated screens instead of upgrade sheet
 
 ### Pending Todos
 
@@ -128,6 +131,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T14:07:23.288Z
-Stopped at: Completed 04-military-04-02-PLAN.md
+Last session: 2026-03-11T14:14:42.962Z
+Stopped at: Completed 04-military-04-03-PLAN.md (Tasks 1+2; awaiting human verify at Task 3 checkpoint)
 Resume file: None
