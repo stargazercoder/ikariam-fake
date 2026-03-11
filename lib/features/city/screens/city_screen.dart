@@ -5,18 +5,27 @@ import '../../../features/auth/data/auth_repository.dart';
 import '../../../features/city/providers/city_provider.dart';
 import '../../../features/profile/providers/profile_provider.dart';
 import '../../../shared/widgets/avatar_widget.dart';
+import '../../../core/constants/building_constants.dart';
+import '../../../core/constants/resource_constants.dart';
+import '../models/city_building.dart';
+import '../models/city_resource.dart';
+import '../models/construction_queue_entry.dart';
+import '../providers/buildings_provider.dart';
+import '../providers/construction_provider.dart';
+import '../providers/resources_provider.dart';
+import '../widgets/countdown_timer_widget.dart';
+import 'building_upgrade_sheet.dart';
 
-/// Placeholder city screen — the destination after completing profile setup.
+/// City screen showing real-time resources, building list, and construction
+/// progress.
 ///
-/// Shows the player's auto-assigned city name and island location from the
-/// database.  Actual building/resource content is added in Phase 2.
-///
-/// Displays:
-/// - AppBar with city name as title, player avatar + display name as action
-/// - City name prominently in the body
-/// - Island grid coordinates and luxury resource type
-/// - Phase 2 placeholder message
-/// - Sign-out button in the AppBar
+/// Replaces the Phase 2 placeholder with full economy content:
+/// - AppBar: city name title, player avatar + display name, sign-out button
+/// - Island info card (unchanged from Phase 1)
+/// - Resource panel: 5 resource types with live amounts (Supabase Realtime)
+/// - Construction queue banner (if a building is upgrading)
+/// - Building list: 14 buildings grouped into City Buildings + Production
+///   Buildings, tappable to open upgrade bottom sheet
 class CityScreen extends ConsumerWidget {
   const CityScreen({super.key});
 
@@ -92,8 +101,8 @@ class CityScreen extends ConsumerWidget {
   }
 }
 
-/// Body content for the city screen.
-class _CityBody extends StatelessWidget {
+/// Full economy body — shown once the city data has loaded.
+class _CityBody extends ConsumerWidget {
   const _CityBody({
     required this.city,
     required this.displayName,
@@ -103,19 +112,30 @@ class _CityBody extends StatelessWidget {
   final String displayName;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (city == null) {
-      return const Center(child: Text('No city found. Please contact support.'));
+      return const Center(
+        child: Text('No city found. Please contact support.'),
+      );
     }
 
+    final cityId = city!['id'] as String;
     final cityName = city!['name'] as String? ?? 'Unknown City';
     final island = city!['islands'] as Map<String, dynamic>?;
     final gridX = island?['grid_x'] as int? ?? 0;
     final gridY = island?['grid_y'] as int? ?? 0;
     final luxuryType = island?['luxury_type'] as String? ?? 'unknown';
 
+    // Watch all three economy streams.
+    final resourcesAsync = ref.watch(resourcesStreamProvider(cityId));
+    final buildingsAsync = ref.watch(buildingsStreamProvider(cityId));
+    final constructionAsync = ref.watch(constructionQueueProvider(cityId));
+
+    // Extract active construction entry (may be null if queue is empty).
+    final activeConstruction = constructionAsync.whenOrNull(data: (e) => e);
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
@@ -131,14 +151,15 @@ class _CityBody extends StatelessWidget {
                     ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               if (displayName.isNotEmpty)
                 Text(
                   'Governor: $displayName',
                   style: Theme.of(context).textTheme.bodyLarge,
                   textAlign: TextAlign.center,
                 ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+
               // Island info card.
               Card(
                 child: Padding(
@@ -169,42 +190,24 @@ class _CityBody extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-              // Phase 2 placeholder.
-              Card(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.construction,
-                        size: 48,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Your city awaits...',
-                        style:
-                            Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onPrimaryContainer,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Buildings coming in Phase 2',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
+              const SizedBox(height: 16),
+
+              // Resource panel.
+              _ResourcePanel(resourcesAsync: resourcesAsync),
+              const SizedBox(height: 16),
+
+              // Construction queue banner (if active).
+              if (activeConstruction != null)
+                _ConstructionBanner(entry: activeConstruction),
+
+              if (activeConstruction != null) const SizedBox(height: 16),
+
+              // Building list.
+              _BuildingsList(
+                buildingsAsync: buildingsAsync,
+                cityId: cityId,
+                resourcesAsync: resourcesAsync,
+                activeConstruction: activeConstruction,
               ),
             ],
           ),
@@ -231,6 +234,406 @@ class _CityBody extends StatelessWidget {
     return s[0].toUpperCase() + s.substring(1);
   }
 }
+
+// ---------------------------------------------------------------------------
+// Resource panel
+// ---------------------------------------------------------------------------
+
+/// Compact card showing all 5 resource types with live amounts.
+class _ResourcePanel extends StatelessWidget {
+  const _ResourcePanel({required this.resourcesAsync});
+
+  final AsyncValue<List<CityResource>> resourcesAsync;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Resources',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+            ),
+            const SizedBox(height: 10),
+            resourcesAsync.when(
+              loading: () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+              error: (e, _) => Text(
+                'Failed to load resources: $e',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontSize: 13,
+                ),
+              ),
+              data: (resources) => Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                children: ResourceType.values.map((type) {
+                  final match = resources
+                      .where((r) => r.resourceType == type)
+                      .firstOrNull;
+                  final amount = match?.amount ?? 0.0;
+                  return _ResourceChip(
+                    type: type,
+                    amount: amount,
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A compact chip showing one resource type and its current amount.
+class _ResourceChip extends StatelessWidget {
+  const _ResourceChip({required this.type, required this.amount});
+
+  final ResourceType type;
+  final double amount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          _icon(type),
+          size: 16,
+          color: _color(context, type),
+        ),
+        const SizedBox(width: 4),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _label(type),
+              style: const TextStyle(fontSize: 10, color: Colors.grey),
+            ),
+            Text(
+              amount.toInt().toString(),
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  IconData _icon(ResourceType type) {
+    switch (type) {
+      case ResourceType.wood:
+        return Icons.forest;
+      case ResourceType.marble:
+        return Icons.square;
+      case ResourceType.crystal:
+        return Icons.diamond;
+      case ResourceType.sulfur:
+        return Icons.local_fire_department;
+      case ResourceType.gold:
+        return Icons.monetization_on;
+    }
+  }
+
+  Color _color(BuildContext context, ResourceType type) {
+    switch (type) {
+      case ResourceType.wood:
+        return Colors.green.shade700;
+      case ResourceType.marble:
+        return Colors.grey.shade600;
+      case ResourceType.crystal:
+        return Colors.blue.shade400;
+      case ResourceType.sulfur:
+        return Colors.orange.shade700;
+      case ResourceType.gold:
+        return Colors.amber.shade700;
+    }
+  }
+
+  String _label(ResourceType type) {
+    switch (type) {
+      case ResourceType.wood:
+        return 'Wood';
+      case ResourceType.marble:
+        return 'Marble';
+      case ResourceType.crystal:
+        return 'Crystal';
+      case ResourceType.sulfur:
+        return 'Sulfur';
+      case ResourceType.gold:
+        return 'Gold';
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Construction queue banner
+// ---------------------------------------------------------------------------
+
+/// Banner shown at the top of the buildings section when an upgrade is active.
+class _ConstructionBanner extends StatelessWidget {
+  const _ConstructionBanner({required this.entry});
+
+  final ConstructionQueueEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    // Try to get a display name from BuildingType enum; fall back to raw string.
+    final buildingName = _buildingDisplayName(entry.buildingType);
+    return Card(
+      color: theme.colorScheme.primaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Icon(
+              Icons.construction,
+              color: theme.colorScheme.onPrimaryContainer,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Upgrading $buildingName to Level ${entry.targetLevel}',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: theme.colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        'Finishing in: ',
+                        style: TextStyle(
+                          color: theme.colorScheme.onPrimaryContainer,
+                          fontSize: 13,
+                        ),
+                      ),
+                      CountdownTimerWidget(
+                        finishAt: entry.finishAt,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.bold,
+                          fontFeatures: [
+                            const FontFeature.tabularFigures(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _buildingDisplayName(String dbName) {
+    try {
+      return buildingTypeFromDbName(dbName).displayName;
+    } catch (_) {
+      return dbName;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Buildings list
+// ---------------------------------------------------------------------------
+
+/// Full building list grouped into City Buildings and Production Buildings.
+class _BuildingsList extends ConsumerWidget {
+  const _BuildingsList({
+    required this.buildingsAsync,
+    required this.cityId,
+    required this.resourcesAsync,
+    required this.activeConstruction,
+  });
+
+  final AsyncValue<List<CityBuilding>> buildingsAsync;
+  final String cityId;
+  final AsyncValue<List<CityResource>> resourcesAsync;
+  final ConstructionQueueEntry? activeConstruction;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return buildingsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Text(
+        'Failed to load buildings: $e',
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      ),
+      data: (buildings) {
+        final cityBuildings = buildings
+            .where((b) => !b.buildingType.isProductionBuilding)
+            .toList();
+        final productionBuildings = buildings
+            .where((b) => b.buildingType.isProductionBuilding)
+            .toList();
+
+        // Current resources for the upgrade sheet cost check.
+        final currentResources =
+            resourcesAsync.whenOrNull(data: (r) => r) ?? [];
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _BuildingSection(
+              title: 'City Buildings',
+              buildings: cityBuildings,
+              cityId: cityId,
+              currentResources: currentResources,
+              activeConstruction: activeConstruction,
+            ),
+            const SizedBox(height: 12),
+            _BuildingSection(
+              title: 'Production Buildings',
+              buildings: productionBuildings,
+              cityId: cityId,
+              currentResources: currentResources,
+              activeConstruction: activeConstruction,
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// A labeled group of building rows.
+class _BuildingSection extends StatelessWidget {
+  const _BuildingSection({
+    required this.title,
+    required this.buildings,
+    required this.cityId,
+    required this.currentResources,
+    required this.activeConstruction,
+  });
+
+  final String title;
+  final List<CityBuilding> buildings;
+  final String cityId;
+  final List<CityResource> currentResources;
+  final ConstructionQueueEntry? activeConstruction;
+
+  @override
+  Widget build(BuildContext context) {
+    if (buildings.isEmpty) return const SizedBox.shrink();
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+            ),
+          ),
+          const Divider(height: 1),
+          ...buildings.map(
+            (b) => _BuildingRow(
+              building: b,
+              cityId: cityId,
+              currentResources: currentResources,
+              activeConstruction: activeConstruction,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A single building row tappable to open the upgrade sheet.
+class _BuildingRow extends StatelessWidget {
+  const _BuildingRow({
+    required this.building,
+    required this.cityId,
+    required this.currentResources,
+    required this.activeConstruction,
+  });
+
+  final CityBuilding building;
+  final String cityId;
+  final List<CityResource> currentResources;
+  final ConstructionQueueEntry? activeConstruction;
+
+  bool get _isBeingUpgraded =>
+      activeConstruction != null &&
+      activeConstruction!.buildingType == building.buildingType.dbName;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(
+        building.buildingType.isProductionBuilding
+            ? Icons.factory
+            : Icons.home,
+        color: Theme.of(context).colorScheme.primary,
+      ),
+      title: Text(building.buildingType.displayName),
+      subtitle: _isBeingUpgraded
+          ? Row(
+              children: [
+                Icon(
+                  Icons.construction,
+                  size: 14,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Upgrading to Level ${activeConstruction!.targetLevel}...',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            )
+          : Text('Level ${building.level}'),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => showBuildingUpgradeSheet(
+        context,
+        building: building,
+        cityId: cityId,
+        currentResources: currentResources,
+        activeConstruction: activeConstruction,
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Shared helpers
+// ---------------------------------------------------------------------------
 
 /// A labelled icon + value row used in the island info card.
 class _InfoRow extends StatelessWidget {
