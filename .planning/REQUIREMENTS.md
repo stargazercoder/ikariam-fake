@@ -31,11 +31,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### World Map
 
-- [ ] **MAP-01**: World map displays islands on a grid coordinate system
-- [ ] **MAP-02**: Each island contains 16-17 city slots, 1 wood resource, and 1 luxury resource (marble/crystal/sulfur)
-- [ ] **MAP-03**: Island view shows all cities on the island and resource gathering areas
-- [ ] **MAP-04**: City view displays buildings on a grid layout
-- [ ] **MAP-05**: Map renders as simple 2D grid (not isometric)
+- [x] **MAP-01**: World map displays islands on a grid coordinate system
+- [x] **MAP-02**: Each island contains 16-17 city slots, 1 wood resource, and 1 luxury resource (marble/crystal/sulfur)
+- [x] **MAP-03**: Island view shows all cities on the island and resource gathering areas
+- [x] **MAP-04**: City view displays buildings on a grid layout
+- [x] **MAP-05**: Map renders as simple 2D grid (not isometric)
 
 ### Military
 
@@ -136,11 +136,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BLDG-03 | Phase 2 | Complete |
 | BLDG-04 | Phase 2 | Complete |
 | BLDG-05 | Phase 2 | Complete |
-| MAP-01 | Phase 3 | Pending |
-| MAP-02 | Phase 3 | Pending |
-| MAP-03 | Phase 3 | Pending |
-| MAP-04 | Phase 3 | Pending |
-| MAP-05 | Phase 3 | Pending |
+| MAP-01 | Phase 3 | Complete |
+| MAP-02 | Phase 3 | Complete |
+| MAP-03 | Phase 3 | Complete |
+| MAP-04 | Phase 3 | Complete |
+| MAP-05 | Phase 3 | Complete |
 | MIL-01 | Phase 4 | Pending |
 | MIL-02 | Phase 4 | Pending |
 | MIL-03 | Phase 4 | Pending |

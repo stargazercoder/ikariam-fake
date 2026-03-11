@@ -66,7 +66,7 @@ Plans:
   2. Tapping an island opens the island view showing all occupied city slots and the island's wood and luxury resource gathering areas
   3. Tapping a city slot owned by the player opens the city view with buildings displayed on a grid layout
   4. The map renders as a simple 2D grid (not isometric) and is navigable by pan and zoom
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
 - [ ] 03-00-PLAN.md — Wave 0: Test scaffolds for map models, building positions, and world map smoke test
@@ -115,7 +115,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete   | 2026-03-10 |
 | 2. Core Economy | 4/4 | Complete   | 2026-03-11 |
-| 3. World Map | 0/3 | Planning complete | - |
+| 3. World Map | 1/3 | In Progress|  |
 | 4. Military | 0/TBD | Not started | - |
 | 5. Combat | 0/TBD | Not started | - |
 | 6. Production Hardening | 0/TBD | Not started | - |
