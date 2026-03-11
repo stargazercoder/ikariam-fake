@@ -65,7 +65,7 @@ completed: 2026-03-11
 - **Duration:** 4 min
 - **Started:** 2026-03-10T23:35:14Z
 - **Completed:** 2026-03-10T23:38:56Z
-- **Tasks:** 2 (+ 1 human-verify checkpoint pending)
+- **Tasks:** 3 (2 auto + 1 human-verify checkpoint approved)
 - **Files modified:** 7
 
 ## Accomplishments
@@ -81,10 +81,7 @@ Each task was committed atomically:
 
 1. **Task 1: Avatar widget, avatar picker, and profile creation screen** - `214e79f` (feat)
 2. **Task 2: City placeholder screen and end-to-end flow wiring** - `ab19925` (feat)
-
-**Plan metadata:** (created after this summary)
-
-_Note: Task 3 is a human-verify checkpoint — awaiting user verification of the complete signup-to-city flow._
+3. **Task 3: Verify complete Phase 1 auth flow end-to-end** - Human-verified: APPROVED
 
 ## Files Created/Modified
 
@@ -133,16 +130,14 @@ _Note: Task 3 is a human-verify checkpoint — awaiting user verification of the
 
 - None. No package conflicts, no Riverpod code-gen needed, no build issues.
 
-## User Setup Required
+## Human Verification Result
 
-**Human verification required (Task 3 checkpoint):**
-1. Start Supabase local: `supabase start`
-2. Reset database: `supabase db reset`
-3. Disable email confirmations in Supabase Studio (http://localhost:54323) > Authentication > Settings
-4. Run the app: `flutter run -d chrome --dart-define=SUPABASE_URL=http://localhost:54321 --dart-define=SUPABASE_ANON_KEY=<anon-key-from-supabase-status>`
-5. Complete the full flow: sign up → avatar + display name → city screen
-6. Verify session persistence (F5 refresh stays on /city)
-7. Verify RLS: client INSERT on cities should fail
+**Task 3 checkpoint: APPROVED**
+
+The user verified the complete Phase 1 auth flow end-to-end:
+- Signup → profile creation → city screen flow works correctly
+- Session persistence confirmed (F5 refresh stays on /city)
+- Full auth chain verified as functional
 
 ## Next Phase Readiness
 
@@ -152,7 +147,7 @@ _Note: Task 3 is a human-verify checkpoint — awaiting user verification of the
 - Avatar picker functional with 20 options and selection highlight
 - City screen shows city name + island data from Supabase
 - Sign-out works in both profile and city screens
-- Awaiting: human verification of complete flow (Task 3 checkpoint)
+- Human verification of complete flow: APPROVED (Task 3 checkpoint)
 
 ## Self-Check: PASSED
 

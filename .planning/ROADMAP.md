@@ -37,7 +37,7 @@ Plans:
 - [x] 01-00-PLAN.md — Wave 0: Test infrastructure scaffolds, mock helpers, and skeleton test files for all phase requirements
 - [x] 01-01-PLAN.md — Flutter/Supabase project scaffold, database migrations with RLS, island seeding, handle_new_user trigger
 - [x] 01-02-PLAN.md — Auth system: login/signup screens, Riverpod auth state provider, GoRouter with auth guards
-- [ ] 01-03-PLAN.md — Profile creation screen with avatar picker, city placeholder screen, end-to-end flow verification
+- [x] 01-03-PLAN.md — Profile creation screen with avatar picker, city placeholder screen, end-to-end flow verification
 
 ### Phase 2: Core Economy
 **Goal**: Cities produce resources on a server-side schedule, warehouses cap storage, and players can queue building upgrades — the core idle loop is running
