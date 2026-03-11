@@ -88,10 +88,10 @@ void main() {
 
     test('distance between islands calculates correctly', () {
       // Distance from (0,0) to (3,4) = sqrt(9+16) = sqrt(25) = 5
-      // 5 * 10 baseMinutesPerUnit = 50
-      expect(calcTravelMinutes(0, 0, 3, 4), equals(50));
-      // Distance from (0,0) to (1,0) = 1; 1 * 10 = 10
-      expect(calcTravelMinutes(0, 0, 1, 0), equals(10));
+      // 5 * 2 baseMinutesPerUnit = 10
+      expect(calcTravelMinutes(0, 0, 3, 4), equals(10));
+      // Distance from (0,0) to (1,0) = 1; 1 * 2 = 2
+      expect(calcTravelMinutes(0, 0, 1, 0), equals(2));
     });
   });
 }

@@ -57,10 +57,10 @@ const UNIT_BASE_COSTS: Record<string, Record<string, number>> = {
 // Base training time in minutes per unit (total time = base_time * quantity).
 // NOTE: Must stay in sync with lib/core/constants/unit_constants.dart unitBaseTimes
 const UNIT_BASE_TIMES: Record<string, number> = {
-  hoplite: 3, phalanx: 5, archer: 4, cavalry: 8,
-  catapult: 12, mortar: 15, medic: 5, cook: 2,
-  cargo_ship: 10, ram_ship: 15, catapult_ship: 20,
-  mortar_ship: 25, diving_boat: 18,
+  hoplite: 1, phalanx: 1, archer: 1, cavalry: 2,
+  catapult: 2, mortar: 3, medic: 1, cook: 1,
+  cargo_ship: 2, ram_ship: 3, catapult_ship: 4,
+  mortar_ship: 5, diving_boat: 4,
 };
 
 const VALID_UNIT_TYPES = new Set(Object.keys(UNIT_UNLOCK_LEVELS));

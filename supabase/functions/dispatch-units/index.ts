@@ -18,7 +18,7 @@ const CORS_HEADERS = {
 
 // Base travel speed: 1 grid unit = 10 minutes.
 // NOTE: Must stay in sync with baseMinutesPerGridUnit in lib/core/constants/unit_constants.dart
-const BASE_MINUTES_PER_GRID_UNIT = 10;
+const BASE_MINUTES_PER_GRID_UNIT = 2;
 
 /**
  * Calculates travel time in minutes between two island grid positions.

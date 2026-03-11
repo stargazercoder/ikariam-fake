@@ -156,24 +156,24 @@ const Map<UnitType, Map<String, int>> unitBaseCosts = {
 /// Total training time = base_time * quantity minutes.
 /// NOTE: Must stay in sync with UNIT_BASE_TIMES in supabase/functions/train-units/index.ts
 const Map<UnitType, int> unitBaseTimes = {
-  UnitType.hoplite: 3,
-  UnitType.phalanx: 5,
-  UnitType.archer: 4,
-  UnitType.cavalry: 8,
-  UnitType.catapult: 12,
-  UnitType.mortar: 15,
-  UnitType.medic: 5,
-  UnitType.cook: 2,
-  UnitType.cargoShip: 10,
-  UnitType.ramShip: 15,
-  UnitType.catapultShip: 20,
-  UnitType.mortarShip: 25,
-  UnitType.divingBoat: 18,
+  UnitType.hoplite: 1,
+  UnitType.phalanx: 1,
+  UnitType.archer: 1,
+  UnitType.cavalry: 2,
+  UnitType.catapult: 2,
+  UnitType.mortar: 3,
+  UnitType.medic: 1,
+  UnitType.cook: 1,
+  UnitType.cargoShip: 2,
+  UnitType.ramShip: 3,
+  UnitType.catapultShip: 4,
+  UnitType.mortarShip: 5,
+  UnitType.divingBoat: 4,
 };
 
 /// Base minutes per grid unit of travel distance.
 /// NOTE: Must stay in sync with BASE_MINUTES_PER_GRID_UNIT in supabase/functions/dispatch-units/index.ts
-const int baseMinutesPerGridUnit = 10;
+const int baseMinutesPerGridUnit = 2;
 
 /// Calculates travel time in minutes between two island grid positions.
 /// Formula: max(1, ceil(sqrt(dx^2 + dy^2) * baseMinutesPerUnit))
