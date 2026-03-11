@@ -66,7 +66,12 @@ Plans:
   2. Tapping an island opens the island view showing all occupied city slots and the island's wood and luxury resource gathering areas
   3. Tapping a city slot owned by the player opens the city view with buildings displayed on a grid layout
   4. The map renders as a simple 2D grid (not isometric) and is navigable by pan and zoom
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 03-00-PLAN.md — Wave 0: Test scaffolds for map models, building positions, and world map smoke test
+- [ ] 03-01-PLAN.md — Island models, MapRepository, Riverpod providers, StatefulShellRoute navigation shell, seed update (100 to 10 islands)
+- [ ] 03-02-PLAN.md — World Map, Island View, and City Grid screens with InteractiveViewer pan/zoom, human verification
 
 ### Phase 4: Military
 **Goal**: Players can train land and naval units from appropriate buildings, units require correct building levels to unlock, and trained troops can be dispatched toward other cities
@@ -110,7 +115,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete   | 2026-03-10 |
 | 2. Core Economy | 4/4 | Complete   | 2026-03-11 |
-| 3. World Map | 0/TBD | Not started | - |
+| 3. World Map | 0/3 | Planning complete | - |
 | 4. Military | 0/TBD | Not started | - |
 | 5. Combat | 0/TBD | Not started | - |
 | 6. Production Hardening | 0/TBD | Not started | - |
