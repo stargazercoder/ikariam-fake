@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-03-PLAN.md — Task 3 human-verify checkpoint approved, Phase 1 fully complete
-last_updated: "2026-03-11T00:52:05.394Z"
+stopped_at: Completed 02-00-PLAN.md — Wave 0 test scaffolds created, flutter test passes with zero failures
+last_updated: "2026-03-11T01:53:33.840Z"
 last_activity: "2026-03-11 - Completed quick task 1: Supabase local dev setup"
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 8
+  total_plans: 8
+  completed_plans: 5
+  percent: 63
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-11)
 
 **Core value:** Players can build and manage cities, gather resources, and engage in real-time turn-based warfare — the core loop of build, expand, and conquer must feel satisfying and strategically meaningful.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — Core Economy
 
 ## Current Position
 
-Phase: 1 of 6 (Foundation)
-Plan: 2 of 4 in current phase
+Phase: 2 of 6 (Core Economy)
+Plan: 1 of 4 in current phase (02-00 complete)
 Status: Executing
-Last activity: 2026-03-11 - Completed quick task 1: Supabase local dev setup
+Last activity: 2026-03-11 - Completed 02-00: Wave 0 test scaffolds for Phase 2
 
-Progress: [█░░░░░░░░░] 8%
+Progress: [██████░░░░] 63%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [█░░░░░░░░░] 8%
 | Phase 01-foundation P01 | 17 | 2 tasks | 13 files |
 | Phase 01-foundation P02 | 4 | 2 tasks | 12 files |
 | Phase 01-foundation P03 | 4 | 2 tasks | 7 files |
+| Phase 02-core-economy P00 | 2 | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,7 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: CityRepository is SELECT-only with island join: cities table has SELECT-only RLS; city creation is trigger-only (handle_new_user)
 - [quick-1]: .env.local gitignored to allow per-developer port/key overrides; local Supabase keys are deterministic but devs may run on different ports
 - [quick-1]: Islands table RLS blocks anon reads — 100 islands confirmed via service_role key (Content-Range: 0-0/100)
+- [Phase 02-core-economy]: Wave 0 test scaffolds follow same skip pattern as Phase 1 Plan 01-00: stubs with TODO comments pointing to implementing plan
 
 ### Pending Todos
 
@@ -96,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T12:00:00Z
-Stopped at: Completed 01-03-PLAN.md — Task 3 human-verify checkpoint approved, Phase 1 fully complete
+Last session: 2026-03-11T01:53:33.837Z
+Stopped at: Completed 02-00-PLAN.md — Wave 0 test scaffolds created, flutter test passes with zero failures
 Resume file: None
