@@ -7,11 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/building_constants.dart';
 import '../../../core/constants/unit_constants.dart';
 import '../../../features/city/providers/buildings_provider.dart';
+import '../../../features/city/providers/construction_provider.dart';
+import '../../../features/city/providers/resources_provider.dart';
 import '../../../features/city/widgets/countdown_timer_widget.dart';
 import '../data/military_repository.dart';
 import '../models/city_unit.dart';
 import '../providers/army_roster_provider.dart';
 import '../providers/training_queue_provider.dart';
+import '../widgets/building_upgrade_card.dart';
 
 /// Screen for training naval units in the Shipyard.
 ///
@@ -101,22 +104,27 @@ class _ShipyardScreenState extends ConsumerState<ShipyardScreen> {
     final buildingsAsync = ref.watch(buildingsStreamProvider(widget.cityId));
     final trainingAsync = ref.watch(trainingQueueProvider(widget.cityId));
     final rosterAsync = ref.watch(armyRosterProvider(widget.cityId));
+    final constructionAsync =
+        ref.watch(constructionQueueProvider(widget.cityId));
+    final resourcesAsync = ref.watch(resourcesStreamProvider(widget.cityId));
 
-    // Derive shipyard level from buildings stream.
-    final shipyardLevel = buildingsAsync.whenOrNull(
-          data: (buildings) {
-            try {
-              return buildings
-                  .firstWhere(
-                    (b) => b.buildingType == BuildingType.shipyard,
-                  )
-                  .level;
-            } catch (_) {
-              return 0;
-            }
-          },
-        ) ??
-        0;
+    // Derive shipyard building and level from buildings stream.
+    final shipyardBuilding = buildingsAsync.whenOrNull(
+      data: (buildings) {
+        try {
+          return buildings.firstWhere(
+            (b) => b.buildingType == BuildingType.shipyard,
+          );
+        } catch (_) {
+          return null;
+        }
+      },
+    );
+    final shipyardLevel = shipyardBuilding?.level ?? 0;
+
+    final activeConstruction = constructionAsync.whenOrNull(data: (e) => e);
+    final currentResources =
+        resourcesAsync.whenOrNull(data: (r) => r) ?? [];
 
     // Derive active training entry (null if queue empty).
     final activeTraining = trainingAsync.whenOrNull(data: (e) => e);
@@ -137,6 +145,17 @@ class _ShipyardScreenState extends ConsumerState<ShipyardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Building upgrade card.
+                if (shipyardBuilding != null) ...[
+                  BuildingUpgradeCard(
+                    building: shipyardBuilding,
+                    cityId: widget.cityId,
+                    currentResources: currentResources,
+                    activeConstruction: activeConstruction,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
                 // Active training banner.
                 if (activeTraining != null) ...[
                   _TrainingBanner(entry: activeTraining),
