@@ -100,7 +100,13 @@ Plans:
   3. Naval units engage and resolve before land units each turn — the sequence is observable in the battle report
   4. After each turn resolves, both the attacker and defender receive a battle report update via Supabase Realtime without refreshing the page
   5. All battle outcome numbers (casualties, survivors) are calculated server-side and the client cannot submit calculated results
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 05-00-PLAN.md — Wave 0: Test scaffolds for battle models and combat formula
+- [ ] 05-01-PLAN.md — Database tables (battles, battle_turns), resolve_battles() pg function, modified process_arrivals(), battle-tick cron job
+- [ ] 05-02-PLAN.md — Dart Battle/BattleTurn models, unit combat stats, BattleRepository with dual Realtime streams, providers (TDD)
+- [ ] 05-03-PLAN.md — Flutter UI: BattlesScreen, BattleDetailScreen, BattleTurnCard, 4th navigation tab, human verification
 
 ### Phase 6: Production Hardening
 **Goal**: The game is deployed to the web with acceptable first-load performance, a proper splash screen during CanvasKit load, and the server-authority contract verified in production
@@ -123,5 +129,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 2. Core Economy | 4/4 | Complete   | 2026-03-11 |
 | 3. World Map | 2/3 | In Progress|  |
 | 4. Military | 4/4 | Complete   | 2026-03-11 |
-| 5. Combat | 0/TBD | Not started | - |
+| 5. Combat | 0/4 | Not started | - |
 | 6. Production Hardening | 0/TBD | Not started | - |
