@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-world-map-03-00-PLAN.md
-last_updated: "2026-03-11T09:18:26.487Z"
+stopped_at: Completed 03-world-map-03-01-PLAN.md
+last_updated: "2026-03-11T09:23:32.135Z"
 last_activity: "2026-03-11 - Completed 02-00: Wave 0 test scaffolds for Phase 2"
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
   percent: 63
 ---
 
@@ -58,6 +58,7 @@ Progress: [██████░░░░] 63%
 | Phase 02-core-economy P02 | 4 | 2 tasks | 8 files |
 | Phase 02-core-economy P03 | 5 | 2 tasks | 8 files |
 | Phase 03-world-map P00 | 5 | 1 tasks | 3 files |
+| Phase 03-world-map P01 | 3 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,9 @@ Recent decisions affecting current work:
 - [Phase 02-core-economy]: CountdownTimerWidget is display-only: Timer.periodic ticks display every second, pg_cron complete_building_upgrades() handles actual completion
 - [Phase 02-core-economy]: constructionQueueProvider streams construction_queue directly without repository class — no client-side mutations so repository abstraction adds no value
 - [Phase 03-world-map]: Phase 03 Wave 0 test scaffolds follow same skip pattern as Phase 1 and Phase 2: unit tests use skip string messages, widget tests use skip:true boolean
+- [Phase 03-world-map]: File-level GlobalKey<NavigatorState> for StatefulShellBranch navigator keys — must not be recreated inside Provider or build
+- [Phase 03-world-map]: NavigationBar (Material 3) used instead of BottomNavigationBar — useMaterial3: true confirmed in app_theme.dart
+- [Phase 03-world-map]: Auth Rule 4 redirect changed from /city to /map — world map is the post-login landing screen
 
 ### Pending Todos
 
@@ -111,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T09:18:26.484Z
-Stopped at: Completed 03-world-map-03-00-PLAN.md
+Last session: 2026-03-11T09:23:32.132Z
+Stopped at: Completed 03-world-map-03-01-PLAN.md
 Resume file: None
