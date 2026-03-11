@@ -34,7 +34,7 @@ decisions:
 metrics:
   duration_minutes: 4
   completed_date: "2026-03-11"
-  tasks_completed: 2
+  tasks_completed: 3
   tasks_total: 3
   files_changed: 9
 ---
@@ -109,17 +109,9 @@ None encountered.
 
 ## Checkpoint Status
 
-**Task 3: Human Verification** — PENDING
+**Task 3: Human Verification** — APPROVED
 
-The following must be verified by a human:
-1. `npx supabase db reset` — ensure all migrations apply cleanly
-2. `npx supabase functions serve` — serve Edge Functions locally
-3. `flutter run -d chrome` — launch the app
-4. Log in and navigate to your city
-5. Tap Barracks → see 8 land units, locked/unlocked based on level, train a Hoplite, see countdown
-6. Tap Shipyard → see 5 naval units, train if unlocked
-7. Dispatch button in Barracks → DispatchScreen → enter target city ID, dispatch, verify movement countdown
-8. Verify 409 error when training queue is already busy
+End-to-end military system verified: unit training (Barracks + Shipyard), army roster display, unit dispatch with travel countdown, and 409 rejection when queue busy.
 
 ## Self-Check
 
@@ -135,5 +127,9 @@ The following must be verified by a human:
 **Commits:**
 - [x] d82b33e — feat(04-03): create MilitaryRepository, 3 StreamProviders, and 3 military screens
 - [x] c7f3699 — feat(04-03): integrate military screens into app router and city grid
+- [x] 773b3bd — fix(04-03): add building upgrade card to Barracks and Shipyard screens
+- [x] 936e352 — fix(04-03): fix infinite width constraint in unit training row layout
+- [x] 3029d39 — fix(04-03): wrap unit training row in LayoutBuilder with min-size Row
+- [x] 9b033d5 — fix(04-03): give ElevatedButton explicit width to prevent infinite constraint
 
 ## Self-Check: PASSED
