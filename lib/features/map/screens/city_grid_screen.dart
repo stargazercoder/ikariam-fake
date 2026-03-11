@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../features/city/models/city_building.dart';
 import '../../../features/city/models/city_resource.dart';
@@ -269,13 +270,25 @@ class BuildingCell extends StatelessWidget {
         : theme.colorScheme.primary;
 
     return GestureDetector(
-      onTap: () => showBuildingUpgradeSheet(
-        context,
-        building: building,
-        cityId: cityId,
-        currentResources: currentResources,
-        activeConstruction: activeConstruction,
-      ),
+      onTap: () {
+        // Barracks and Shipyard navigate to their dedicated military screens.
+        if (building.buildingType == BuildingType.barracks) {
+          context.push('/barracks?cityId=$cityId');
+          return;
+        }
+        if (building.buildingType == BuildingType.shipyard) {
+          context.push('/shipyard?cityId=$cityId');
+          return;
+        }
+        // All other buildings show the upgrade bottom sheet.
+        showBuildingUpgradeSheet(
+          context,
+          building: building,
+          cityId: cityId,
+          currentResources: currentResources,
+          activeConstruction: activeConstruction,
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           color: color.withAlpha(_isBeingUpgraded ? 200 : 160),

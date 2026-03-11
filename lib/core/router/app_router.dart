@@ -11,6 +11,9 @@ import '../../features/map/providers/islands_provider.dart';
 import '../../features/map/screens/island_screen.dart';
 import '../../features/map/screens/main_shell_screen.dart';
 import '../../features/map/screens/world_map_screen.dart';
+import '../../features/military/screens/barracks_screen.dart';
+import '../../features/military/screens/dispatch_screen.dart';
+import '../../features/military/screens/shipyard_screen.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../features/profile/screens/create_profile_screen.dart';
 
@@ -152,6 +155,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/city',
                 builder: (context, state) => const CityScreen(),
+              ),
+              GoRoute(
+                path: '/barracks',
+                builder: (context, state) => BarracksScreen(
+                  cityId: state.uri.queryParameters['cityId'] ?? '',
+                ),
+              ),
+              GoRoute(
+                path: '/shipyard',
+                builder: (context, state) => ShipyardScreen(
+                  cityId: state.uri.queryParameters['cityId'] ?? '',
+                ),
+              ),
+              GoRoute(
+                path: '/dispatch',
+                builder: (context, state) => DispatchScreen(
+                  originCityId: state.uri.queryParameters['cityId'] ?? '',
+                ),
               ),
             ],
           ),
