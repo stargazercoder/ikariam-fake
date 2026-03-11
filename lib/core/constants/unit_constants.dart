@@ -175,6 +175,42 @@ const Map<UnitType, int> unitBaseTimes = {
 /// NOTE: Must stay in sync with BASE_MINUTES_PER_GRID_UNIT in supabase/functions/dispatch-units/index.ts
 const int baseMinutesPerGridUnit = 2;
 
+/// Attack power per unit type.
+/// Keep in sync with resolve_battles() constants in battle_functions.sql (Phase 05-01).
+const Map<UnitType, int> unitAttackStats = {
+  UnitType.hoplite: 10,
+  UnitType.phalanx: 15,
+  UnitType.archer: 20,
+  UnitType.cavalry: 30,
+  UnitType.catapult: 40,
+  UnitType.mortar: 50,
+  UnitType.medic: 0,
+  UnitType.cook: 0,
+  UnitType.cargoShip: 5,
+  UnitType.ramShip: 25,
+  UnitType.catapultShip: 35,
+  UnitType.mortarShip: 45,
+  UnitType.divingBoat: 15,
+};
+
+/// Defense power per unit type.
+/// Keep in sync with resolve_battles() constants in battle_functions.sql (Phase 05-01).
+const Map<UnitType, int> unitDefenseStats = {
+  UnitType.hoplite: 20,
+  UnitType.phalanx: 30,
+  UnitType.archer: 15,
+  UnitType.cavalry: 20,
+  UnitType.catapult: 10,
+  UnitType.mortar: 10,
+  UnitType.medic: 5,
+  UnitType.cook: 5,
+  UnitType.cargoShip: 10,
+  UnitType.ramShip: 20,
+  UnitType.catapultShip: 15,
+  UnitType.mortarShip: 15,
+  UnitType.divingBoat: 25,
+};
+
 /// Calculates travel time in minutes between two island grid positions.
 /// Formula: max(1, ceil(sqrt(dx^2 + dy^2) * baseMinutesPerUnit))
 /// Same-island dispatch (distance = 0) always returns minimum 1 minute.
