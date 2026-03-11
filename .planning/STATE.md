@@ -4,8 +4,8 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 01-03-PLAN.md (Tasks 1+2) — awaiting human-verify checkpoint (Task 3)
-last_updated: "2026-03-10T23:40:23.002Z"
-last_activity: 2026-03-11 — Plan 01-02 complete, auth system with GoRouter guards implemented
+last_updated: "2026-03-11T00:16:42Z"
+last_activity: 2026-03-11 — Quick task 1 complete: Supabase local dev scripts + health verification
 progress:
   total_phases: 6
   completed_phases: 1
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 Phase: 1 of 6 (Foundation)
 Plan: 2 of 4 in current phase
 Status: Executing
-Last activity: 2026-03-11 — Plan 01-02 complete, auth system with GoRouter guards implemented
+Last activity: 2026-03-11 — Quick task 1 complete: Supabase local dev scripts + health verification
 
 Progress: [█░░░░░░░░░] 8%
 
@@ -75,6 +75,8 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: AppTheme._primaryColor promoted to public static const: AvatarWidget needs the primary colour at field level without BuildContext
 - [Phase 01-foundation]: CityNotifier uses manual AsyncNotifier (no code-gen): riverpod_generator still incompatible with Dart 3.10.1 — same decision as 01-02
 - [Phase 01-foundation]: CityRepository is SELECT-only with island join: cities table has SELECT-only RLS; city creation is trigger-only (handle_new_user)
+- [quick-1]: .env.local gitignored to allow per-developer port/key overrides; local Supabase keys are deterministic but devs may run on different ports
+- [quick-1]: Islands table RLS blocks anon reads — 100 islands confirmed via service_role key (Content-Range: 0-0/100)
 
 ### Pending Todos
 
@@ -88,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T23:40:22.999Z
-Stopped at: Completed 01-03-PLAN.md (Tasks 1+2) — awaiting human-verify checkpoint (Task 3)
+Last session: 2026-03-11T00:16:42Z
+Stopped at: Completed quick/1-PLAN.md — Supabase local dev scripts created and stack verified
 Resume file: None
