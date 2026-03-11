@@ -1,0 +1,42 @@
+import 'island.dart';
+
+/// Represents a single city slot on an island.
+///
+/// Maps to a row from the `cities` table:
+/// columns: slot_number (int), name (text), owner_id (uuid)
+class CitySlot {
+  const CitySlot({
+    required this.slotNumber,
+    this.cityName,
+    this.ownerId,
+  });
+
+  final int slotNumber;
+  final String? cityName;
+  final String? ownerId;
+
+  /// True when this slot has a city owned by someone.
+  bool get isOccupied => ownerId != null;
+
+  factory CitySlot.fromJson(Map<String, dynamic> json) {
+    return CitySlot(
+      slotNumber: json['slot_number'] as int? ?? 0,
+      cityName: json['name'] as String?,
+      ownerId: json['owner_id'] as String?,
+    );
+  }
+}
+
+/// Aggregates an [Island] with all its [CitySlot]s.
+class IslandDetail {
+  const IslandDetail({
+    required this.island,
+    required this.citySlots,
+  });
+
+  final Island island;
+  final List<CitySlot> citySlots;
+
+  /// Number of occupied city slots on this island.
+  int get cityCount => citySlots.where((s) => s.isOccupied).length;
+}
