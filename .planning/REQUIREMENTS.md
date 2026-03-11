@@ -17,17 +17,17 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Resources
 
 - [x] **RSRC-01**: Cities produce 5 resource types: Wood, Marble, Crystal, Sulfur, Gold
-- [ ] **RSRC-02**: Resource production runs server-side via pg_cron every 5 minutes
+- [x] **RSRC-02**: Resource production runs server-side via pg_cron every 5 minutes
 - [x] **RSRC-03**: Production rate calculated as workers x building_level x research_bonus
 - [x] **RSRC-04**: Resources capped by Warehouse building capacity
 
 ### Buildings
 
-- [ ] **BLDG-01**: City supports 10 building types: Town Hall, Warehouse, Barracks, Shipyard, Academy, Embassy, Trading Port, Town Wall, Hideout, Tavern
+- [x] **BLDG-01**: City supports 10 building types: Town Hall, Warehouse, Barracks, Shipyard, Academy, Embassy, Trading Port, Town Wall, Hideout, Tavern
 - [x] **BLDG-02**: Buildings can be upgraded with cost formula (base_cost x 1.5^level)
 - [x] **BLDG-03**: Building upgrade takes time calculated as base_time x 1.2^level (minutes)
 - [x] **BLDG-04**: Only one construction can run at a time per city
-- [ ] **BLDG-05**: Construction completion detected and applied by pg_cron tick
+- [x] **BLDG-05**: Construction completion detected and applied by pg_cron tick
 
 ### World Map
 
@@ -128,14 +128,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFR-02 | Phase 1 | Complete |
 | INFR-03 | Phase 1 | Complete |
 | RSRC-01 | Phase 2 | Complete |
-| RSRC-02 | Phase 2 | Pending |
+| RSRC-02 | Phase 2 | Complete |
 | RSRC-03 | Phase 2 | Complete |
 | RSRC-04 | Phase 2 | Complete |
-| BLDG-01 | Phase 2 | Pending |
+| BLDG-01 | Phase 2 | Complete |
 | BLDG-02 | Phase 2 | Complete |
 | BLDG-03 | Phase 2 | Complete |
 | BLDG-04 | Phase 2 | Complete |
-| BLDG-05 | Phase 2 | Pending |
+| BLDG-05 | Phase 2 | Complete |
 | MAP-01 | Phase 3 | Pending |
 | MAP-02 | Phase 3 | Pending |
 | MAP-03 | Phase 3 | Pending |

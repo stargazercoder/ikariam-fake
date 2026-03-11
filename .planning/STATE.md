@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-00-PLAN.md — Wave 0 test scaffolds created, flutter test passes with zero failures
-last_updated: "2026-03-11T01:53:33.840Z"
-last_activity: "2026-03-11 - Completed quick task 1: Supabase local dev setup"
+stopped_at: Completed 02-01-PLAN.md — economy tables, triggers, functions, and pg_cron jobs
+last_updated: "2026-03-11T01:56:00.150Z"
+last_activity: "2026-03-11 - Completed 02-00: Wave 0 test scaffolds for Phase 2"
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 8
-  completed_plans: 5
+  completed_plans: 6
   percent: 63
 ---
 
@@ -54,6 +54,7 @@ Progress: [██████░░░░] 63%
 | Phase 01-foundation P02 | 4 | 2 tasks | 12 files |
 | Phase 01-foundation P03 | 4 | 2 tasks | 7 files |
 | Phase 02-core-economy P00 | 2 | 1 tasks | 3 files |
+| Phase 02-core-economy P01 | 3 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Recent decisions affecting current work:
 - [quick-1]: .env.local gitignored to allow per-developer port/key overrides; local Supabase keys are deterministic but devs may run on different ports
 - [quick-1]: Islands table RLS blocks anon reads — 100 islands confirmed via service_role key (Content-Range: 0-0/100)
 - [Phase 02-core-economy]: Wave 0 test scaffolds follow same skip pattern as Phase 1 Plan 01-00: stubs with TODO comments pointing to implementing plan
+- [Phase 02-core-economy]: Production buildings (sawmill, quarry, glassblower, sulfur_pit) included in city_buildings CHECK constraint — required for all 5 resources to produce via process_resource_tick()
+- [Phase 02-core-economy]: pg_cron extension registered via migration file (not seed.sql) to avoid schema-cron-does-not-exist error on supabase db reset
 
 ### Pending Todos
 
@@ -98,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T01:53:33.837Z
-Stopped at: Completed 02-00-PLAN.md — Wave 0 test scaffolds created, flutter test passes with zero failures
+Last session: 2026-03-11T01:56:00.148Z
+Stopped at: Completed 02-01-PLAN.md — economy tables, triggers, functions, and pg_cron jobs
 Resume file: None
