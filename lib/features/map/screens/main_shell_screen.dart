@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// Shell scaffold that wraps all three main game views with a bottom navigation bar.
+/// Shell scaffold that wraps all four main game views with a bottom navigation bar.
 ///
 /// This widget is the builder for [StatefulShellRoute.indexedStack] and provides
 /// the persistent navigation between:
 ///   - Index 0: World Map (pan/zoom grid of islands)
 ///   - Index 1: Island (city slots on a selected island)
 ///   - Index 2: City (existing city management screen)
+///   - Index 3: Battles (active and completed battles list)
 class MainShellScreen extends StatelessWidget {
   const MainShellScreen({
     super.key,
@@ -41,6 +42,11 @@ class MainShellScreen extends StatelessWidget {
             icon: Icon(Icons.location_city_outlined),
             selectedIcon: Icon(Icons.location_city),
             label: 'City',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.shield_outlined),
+            selectedIcon: Icon(Icons.shield),
+            label: 'Battles',
           ),
         ],
       ),

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/unit_constants.dart';
 import '../../../features/auth/providers/auth_state_provider.dart';
 import '../../../features/city/widgets/countdown_timer_widget.dart';
 import '../models/battle.dart';

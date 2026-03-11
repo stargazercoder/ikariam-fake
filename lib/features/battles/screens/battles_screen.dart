@@ -149,7 +149,7 @@ class _BattleTile extends StatelessWidget {
     final theme = Theme.of(context);
 
     final roleIcon = isAttacker
-        ? Icons.sword_outlined
+        ? Icons.gps_fixed_outlined
         : Icons.shield_outlined;
 
     final statusText = _statusLabel(battle.status);

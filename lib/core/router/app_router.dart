@@ -11,6 +11,8 @@ import '../../features/map/providers/islands_provider.dart';
 import '../../features/map/screens/island_screen.dart';
 import '../../features/map/screens/main_shell_screen.dart';
 import '../../features/map/screens/world_map_screen.dart';
+import '../../features/battles/screens/battle_detail_screen.dart';
+import '../../features/battles/screens/battles_screen.dart';
 import '../../features/military/screens/barracks_screen.dart';
 import '../../features/military/screens/dispatch_screen.dart';
 import '../../features/military/screens/shipyard_screen.dart';
@@ -22,6 +24,7 @@ import '../../features/profile/screens/create_profile_screen.dart';
 final _worldNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'worldNav');
 final _islandNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'islandNav');
 final _cityNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'cityNav');
+final _battlesNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'battlesNav');
 
 /// Bridges Riverpod provider changes to GoRouter's [ChangeNotifier] system.
 ///
@@ -172,6 +175,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: '/dispatch',
                 builder: (context, state) => DispatchScreen(
                   originCityId: state.uri.queryParameters['cityId'] ?? '',
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _battlesNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/battles',
+                builder: (context, state) => const BattlesScreen(),
+              ),
+              GoRoute(
+                path: '/battle-detail',
+                builder: (context, state) => BattleDetailScreen(
+                  battleId: state.uri.queryParameters['battleId'] ?? '',
                 ),
               ),
             ],
