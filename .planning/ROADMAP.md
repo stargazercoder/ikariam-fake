@@ -49,10 +49,11 @@ Plans:
   3. Player can tap a building slot, see the upgrade cost and time, and queue an upgrade that completes after the correct duration
   4. A second upgrade request is rejected while a construction queue is already active
   5. Production rate displayed to the player reflects the workers x building_level x research_bonus formula running server-side
-**Plans:** 3 plans
+**Plans:** 4 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Database schema (city_resources, city_buildings, construction_queue), server functions (resource tick, construction completion), pg_cron jobs
+- [ ] 02-00-PLAN.md — Wave 0: Test scaffolds for building upgrade, resource production, and formula tests
+- [ ] 02-01-PLAN.md — Database schema (city_resources, city_buildings with 14 types, construction_queue), server functions (resource tick, construction completion), pg_cron jobs
 - [ ] 02-02-PLAN.md — upgrade-building Edge Function, Dart constants/models for buildings and resources, formula unit tests
 - [ ] 02-03-PLAN.md — Flutter UI: real-time resource display, building list, upgrade bottom sheet, construction countdown, end-to-end verification
 
@@ -108,7 +109,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete   | 2026-03-10 |
-| 2. Core Economy | 0/3 | Planning complete | - |
+| 2. Core Economy | 0/4 | Planning complete | - |
 | 3. World Map | 0/TBD | Not started | - |
 | 4. Military | 0/TBD | Not started | - |
 | 5. Combat | 0/TBD | Not started | - |

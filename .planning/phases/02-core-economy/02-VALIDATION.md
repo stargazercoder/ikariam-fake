@@ -2,7 +2,7 @@
 phase: 2
 slug: core-economy
 status: draft
-nyquist_compliant: false
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-03-11
 ---
@@ -38,15 +38,16 @@ created: 2026-03-11
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
+| 2-00-01 | 00 | 0 | RSRC-01, RSRC-03, RSRC-04, BLDG-02, BLDG-03, BLDG-04 | Scaffolds | `flutter test --reporter compact` | Created in Plan 02-00 | ⬜ pending |
 | 2-01-01 | 01 | 1 | RSRC-01 | DB integration | `supabase db reset && psql check city_resources count` | ❌ W0 | ⬜ pending |
 | 2-01-02 | 01 | 1 | RSRC-02 | DB integration | `psql check cron.job for resource-tick` | ❌ W0 | ⬜ pending |
 | 2-01-03 | 01 | 1 | RSRC-03 | Unit (SQL) | `psql call process_resource_tick() + verify amounts` | ❌ W0 | ⬜ pending |
 | 2-01-04 | 01 | 1 | RSRC-04 | Unit (SQL) | `psql set amount near cap, call tick, verify LEAST` | ❌ W0 | ⬜ pending |
-| 2-02-01 | 02 | 1 | BLDG-01 | DB integration | `psql check city_buildings count = 10` | ❌ W0 | ⬜ pending |
-| 2-02-02 | 02 | 1 | BLDG-02 | Integration | `flutter test integration_test/building_upgrade_test.dart` | ❌ W0 | ⬜ pending |
-| 2-02-03 | 02 | 1 | BLDG-03 | Unit (Dart) | `flutter test test/unit/building_time_test.dart` | ❌ W0 | ⬜ pending |
-| 2-02-04 | 02 | 1 | BLDG-04 | Integration | `flutter test integration_test/building_upgrade_test.dart` | ❌ W0 | ⬜ pending |
-| 2-02-05 | 02 | 1 | BLDG-05 | DB integration | `psql insert past finish_at, call function, verify level` | ❌ W0 | ⬜ pending |
+| 2-02-01 | 02 | 2 | BLDG-01 | DB integration | `psql check city_buildings count = 14` | ❌ W0 | ⬜ pending |
+| 2-02-02 | 02 | 2 | BLDG-02 | Integration | `flutter test integration_test/building_upgrade_test.dart` | Created in Plan 02-00 | ⬜ pending |
+| 2-02-03 | 02 | 2 | BLDG-03 | Unit (Dart) | `flutter test test/unit/building_time_test.dart` | Created in Plan 02-00 | ⬜ pending |
+| 2-02-04 | 02 | 2 | BLDG-04 | Integration | `flutter test integration_test/building_upgrade_test.dart` | Created in Plan 02-00 | ⬜ pending |
+| 2-02-05 | 02 | 2 | BLDG-05 | DB integration | `psql insert past finish_at, call function, verify level` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -54,9 +55,9 @@ created: 2026-03-11
 
 ## Wave 0 Requirements
 
-- [ ] `test/unit/building_time_test.dart` — stubs for BLDG-03: finish_at duration formula
-- [ ] `integration_test/building_upgrade_test.dart` — stubs for BLDG-02, BLDG-04
-- [ ] `integration_test/resource_production_test.dart` — stubs for RSRC-01, RSRC-03, RSRC-04
+- [ ] `test/unit/building_time_test.dart` — stubs for BLDG-03: finish_at duration formula — **Created by Plan 02-00**
+- [ ] `integration_test/building_upgrade_test.dart` — stubs for BLDG-02, BLDG-04 — **Created by Plan 02-00**
+- [ ] `integration_test/resource_production_test.dart` — stubs for RSRC-01, RSRC-03, RSRC-04 — **Created by Plan 02-00**
 
 *No additional framework install needed — integration_test already in dev_dependencies.*
 
@@ -74,11 +75,11 @@ created: 2026-03-11
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 30s
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references — Plan 02-00 creates all 3 stub files
+- [x] No watch-mode flags
+- [x] Feedback latency < 30s
 - [ ] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
