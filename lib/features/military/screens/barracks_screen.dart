@@ -320,88 +320,91 @@ class _UnitTrainingRow extends StatelessWidget {
     final costs = unitBaseCosts[unit] ?? {};
     final timePerUnit = unitBaseTimes[unit] ?? 0;
 
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Unit name + lock icon
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    unit.displayName,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: isUnlocked
-                          ? null
-                          : theme.colorScheme.onSurface.withAlpha(100),
-                    ),
-                  ),
-                ),
-                if (!isUnlocked)
-                  Icon(
-                    Icons.lock,
-                    size: 14,
-                    color: theme.colorScheme.onSurface.withAlpha(100),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 2),
-            if (!isUnlocked)
-              Text(
-                'Requires Barracks Lv.$requiredLevel',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.error,
-                  fontSize: 11,
-                ),
-              )
-            else ...[
-              Text(
-                '${_costString(costs)}  •  ${timePerUnit}m/unit',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.grey.shade600,
-                  fontSize: 11,
-                ),
-              ),
-              const SizedBox(height: 8),
+    return LayoutBuilder(
+      builder: (context, constraints) => Card(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Unit name + lock icon
               Row(
                 children: [
-                  SizedBox(
-                    width: 60,
-                    child: TextField(
-                      controller: quantityController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                      textAlign: TextAlign.center,
-                      decoration: const InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                        border: OutlineInputBorder(),
-                        isDense: true,
-                      ),
-                      enabled: !queueBusy,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: queueBusy ? null : onTrain,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                  Expanded(
+                    child: Text(
+                      unit.displayName,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isUnlocked
+                            ? null
+                            : theme.colorScheme.onSurface.withAlpha(100),
                       ),
                     ),
-                    child: const Text('Train'),
                   ),
+                  if (!isUnlocked)
+                    Icon(
+                      Icons.lock,
+                      size: 14,
+                      color: theme.colorScheme.onSurface.withAlpha(100),
+                    ),
                 ],
               ),
+              const SizedBox(height: 2),
+              if (!isUnlocked)
+                Text(
+                  'Requires Barracks Lv.$requiredLevel',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.error,
+                    fontSize: 11,
+                  ),
+                )
+              else ...[
+                Text(
+                  '${_costString(costs)}  •  ${timePerUnit}m/unit',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.grey.shade600,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 60,
+                      child: TextField(
+                        controller: quantityController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        textAlign: TextAlign.center,
+                        decoration: const InputDecoration(
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                        enabled: !queueBusy,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: queueBusy ? null : onTrain,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                      ),
+                      child: const Text('Train'),
+                    ),
+                  ],
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
