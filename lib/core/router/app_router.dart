@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,8 +8,35 @@ import '../../features/auth/providers/auth_state_provider.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/signup_screen.dart';
 import '../../features/city/screens/city_screen.dart';
+import '../../features/map/screens/main_shell_screen.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../features/profile/screens/create_profile_screen.dart';
+
+// Navigator keys for each StatefulShellBranch — must be file-level constants
+// so they are created once per app lifetime (not recreated on rebuilds).
+final _worldNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'worldNav');
+final _islandNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'islandNav');
+final _cityNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'cityNav');
+
+/// Placeholder widget for the World Map view (replaced in Plan 03-02).
+class _WorldMapPlaceholder extends StatelessWidget {
+  const _WorldMapPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text('World Map'));
+  }
+}
+
+/// Placeholder widget for the Island view (replaced in Plan 03-02).
+class _IslandPlaceholder extends StatelessWidget {
+  const _IslandPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text('Island View'));
+  }
+}
 
 /// Bridges Riverpod provider changes to GoRouter's [ChangeNotifier] system.
 ///
@@ -39,11 +67,11 @@ class _RouterNotifier extends ChangeNotifier {
 /// Precedence (evaluated in order):
 ///   1. No session and not on an auth route → redirect to /login
 ///   2. Session exists but profile is still loading → redirect to /loading
-///      (avoids a brief flash of /city before profile check completes)
+///      (avoids a brief flash of /map before profile check completes)
 ///   3. Session exists, profile loaded, display_name is null
 ///      → redirect to /create-profile
 ///   4. Session exists, profile complete, on auth route
-///      → redirect to /city
+///      → redirect to /map
 ///   5. All other cases → no redirect (return null)
 String? _redirect(Ref ref, GoRouterState state) {
   final session = Supabase.instance.client.auth.currentSession;
@@ -60,7 +88,7 @@ String? _redirect(Ref ref, GoRouterState state) {
   // User is authenticated beyond this point.
 
   // Rule 2: Profile still loading — stay on loading route or hold.
-  // We avoid redirecting to /city until we know profile completeness.
+  // We avoid redirecting to /map until we know profile completeness.
   final profileState = ref.read(profileProvider);
   if (profileState.isLoading) {
     // While loading, do not redirect authenticated users away from non-auth
@@ -79,7 +107,7 @@ String? _redirect(Ref ref, GoRouterState state) {
 
   // Rule 4: Session + complete profile but still on an auth screen.
   if (isAuthRoute) {
-    return '/city';
+    return '/map';
   }
 
   // Rule 5: No redirect needed.
@@ -112,9 +140,38 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/create-profile',
         builder: (context, state) => const CreateProfileScreen(),
       ),
-      GoRoute(
-        path: '/city',
-        builder: (context, state) => const CityScreen(),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            MainShellScreen(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            navigatorKey: _worldNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/map',
+                builder: (context, state) => const _WorldMapPlaceholder(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _islandNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/island',
+                builder: (context, state) => const _IslandPlaceholder(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _cityNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/city',
+                builder: (context, state) => const CityScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
     ],
   );

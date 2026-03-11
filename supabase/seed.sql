@@ -1,5 +1,5 @@
--- Seed: 100 islands in a 10x10 grid
--- Luxury types distributed cyclically: marble, crystal, sulfur (~33 each)
+-- Seed: 10 islands in a 5x2 grid
+-- Luxury types distributed cyclically: marble, crystal, sulfur (~3-4 each)
 -- max_city_slots: 16 for most, 17 for every 5th island (idx % 5 == 0)
 
 DO $$
@@ -9,8 +9,8 @@ DECLARE
   luxury_types  text[] := ARRAY['marble', 'crystal', 'sulfur'];
   idx           int := 0;
 BEGIN
-  FOR x IN 1..10 LOOP
-    FOR y IN 1..10 LOOP
+  FOR x IN 1..5 LOOP
+    FOR y IN 1..2 LOOP
       INSERT INTO public.islands (grid_x, grid_y, luxury_type, max_city_slots)
       VALUES (
         x,
