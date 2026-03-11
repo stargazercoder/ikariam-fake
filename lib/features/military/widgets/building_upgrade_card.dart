@@ -243,22 +243,25 @@ class _BuildingUpgradeCardState extends ConsumerState<BuildingUpgradeCard> {
           ),
 
         // Upgrade button
-        SizedBox(
-          height: 36,
-          child: ElevatedButton.icon(
-            onPressed: (_isLoading || !_hasEnoughResources || _queueBusy)
-                ? null
-                : _startUpgrade,
-            icon: _isLoading
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.build, size: 18),
-            label: Text(_isLoading ? 'Starting...' : 'Upgrade'),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            height: 36,
+            child: ElevatedButton.icon(
+              onPressed: (_isLoading || !_hasEnoughResources || _queueBusy)
+                  ? null
+                  : _startUpgrade,
+              icon: _isLoading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.build, size: 18),
+              label: Text(_isLoading ? 'Starting...' : 'Upgrade'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
             ),
           ),
         ),
