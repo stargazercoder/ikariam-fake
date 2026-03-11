@@ -13,7 +13,7 @@ Six phases take this game from a blank Flutter project to a playable multiplayer
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Auth, database schema with RLS, server-authority contract, and Flutter/Supabase project scaffold (completed 2026-03-10)
-- [ ] **Phase 2: Core Economy** - Resource production via pg_cron, warehouse limits, buildings system, and single-slot upgrade queue
+- [x] **Phase 2: Core Economy** - Resource production via pg_cron, warehouse limits, buildings system, and single-slot upgrade queue (completed 2026-03-11)
 - [ ] **Phase 3: World Map** - 2D grid world map, island view, city view, and auto city placement on first login
 - [ ] **Phase 4: Military** - Land and naval unit training, dispatch system, and unit unlock requirements
 - [ ] **Phase 5: Combat** - Turn-based 5-minute battle engine, battle reports, and naval-before-land phase ordering
@@ -49,7 +49,7 @@ Plans:
   3. Player can tap a building slot, see the upgrade cost and time, and queue an upgrade that completes after the correct duration
   4. A second upgrade request is rejected while a construction queue is already active
   5. Production rate displayed to the player reflects the workers x building_level x research_bonus formula running server-side
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 - [ ] 02-00-PLAN.md — Wave 0: Test scaffolds for building upgrade, resource production, and formula tests
@@ -109,7 +109,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete   | 2026-03-10 |
-| 2. Core Economy | 3/4 | In Progress|  |
+| 2. Core Economy | 4/4 | Complete   | 2026-03-11 |
 | 3. World Map | 0/TBD | Not started | - |
 | 4. Military | 0/TBD | Not started | - |
 | 5. Combat | 0/TBD | Not started | - |

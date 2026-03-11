@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-02-PLAN.md — upgrade-building Edge Function and Dart constants/models
-last_updated: "2026-03-11T02:03:38.544Z"
+stopped_at: Checkpoint 02-03-PLAN.md Task 3 — human verify complete economy loop
+last_updated: "2026-03-11T02:11:39.554Z"
 last_activity: "2026-03-11 - Completed 02-00: Wave 0 test scaffolds for Phase 2"
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
   percent: 63
 ---
 
@@ -56,6 +56,7 @@ Progress: [██████░░░░] 63%
 | Phase 02-core-economy P00 | 2 | 1 tasks | 3 files |
 | Phase 02-core-economy P01 | 3 | 2 tasks | 7 files |
 | Phase 02-core-economy P02 | 4 | 2 tasks | 8 files |
+| Phase 02-core-economy P03 | 5 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,9 @@ Recent decisions affecting current work:
 - [Phase 02-core-economy]: BASE_COSTS and BASE_TIMES duplicated in Edge Function TypeScript and Dart constants — sync comment enforces manual consistency; server authority must not import client code
 - [Phase 02-core-economy]: Non-atomic resource deduction in upgrade-building: deduct_resource() called sequentially per resource; partial deduction possible on failure (acceptable for v1)
 - [Phase 02-core-economy]: ConstructionQueueEntry.buildingType is String (not BuildingType enum) to keep construction model decoupled from building enum
+- [Phase 02-core-economy]: BuildingUpgradeException wraps Edge Function server error message for structured UI error display
+- [Phase 02-core-economy]: CountdownTimerWidget is display-only: Timer.periodic ticks display every second, pg_cron complete_building_upgrades() handles actual completion
+- [Phase 02-core-economy]: constructionQueueProvider streams construction_queue directly without repository class — no client-side mutations so repository abstraction adds no value
 
 ### Pending Todos
 
@@ -105,6 +109,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T02:03:38.541Z
-Stopped at: Completed 02-02-PLAN.md — upgrade-building Edge Function and Dart constants/models
+Last session: 2026-03-11T02:11:39.551Z
+Stopped at: Checkpoint 02-03-PLAN.md Task 3 — human verify complete economy loop
 Resume file: None
