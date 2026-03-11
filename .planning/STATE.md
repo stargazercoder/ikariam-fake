@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-00-PLAN.md
-last_updated: "2026-03-11T21:42:05.805Z"
-last_activity: "2026-03-11 - Completed 04-03: Military UI layer (MilitaryRepository, 3 screens, router integration, human verified)"
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-11T21:44:20.419Z"
+last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 19
-  completed_plans: 16
-  percent: 100
+  completed_plans: 17
+  percent: 84
 ---
 
 # Project State
@@ -65,6 +65,7 @@ Progress: [████████░░] 84%
 | Phase 04-military P02 | 4 | 2 tasks | 8 files |
 | Phase 04-military P03 | 4 | 2 tasks | 9 files |
 | Phase 05-combat P00 | 5 | 1 tasks | 2 files |
+| Phase 05-combat P01 | 18 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -114,6 +115,9 @@ Recent decisions affecting current work:
 - [Phase 04-military]: [04-03]: watchOutgoingMovements filters client-side by originCityId after owner_id stream — Realtime .stream() does not support compound eq filters
 - [Phase 04-military]: [04-03]: Barracks/Shipyard taps in BuildingCell navigate to dedicated screens instead of upgrade sheet
 - [Phase 05-combat]: Phase 5 Wave 0 test scaffolds follow same skip pattern as Phases 1-4: unit stubs use descriptive skip string messages pointing to implementing plan (05-02)
+- [Phase 05-combat]: Naval gate-keeper: attacker naval wiped -> defender_won immediately, land phase blocked
+- [Phase 05-combat]: Unit stats as JSONB constants inside resolve_battles() body — not a DB table
+- [Phase 05-combat]: Rejected armies (city already in battle): units lost, movement row deleted
 
 ### Pending Todos
 
@@ -133,6 +137,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T21:42:05.802Z
-Stopped at: Completed 05-00-PLAN.md
+Last session: 2026-03-11T21:44:20.417Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
