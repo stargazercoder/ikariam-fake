@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Checkpoint 05-03: Human verification of combat UI (Tasks 1-2 complete)"
-last_updated: "2026-03-11T21:57:46.779Z"
+stopped_at: "Completed 05-03: Battle UI layer (BattlesScreen, BattleDetailScreen, BattleTurnCard) — human verification approved"
+last_updated: "2026-03-11T22:00:28.254Z"
 last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
 progress:
   total_phases: 6
@@ -67,6 +67,7 @@ Progress: [████████░░] 84%
 | Phase 05-combat P00 | 5 | 1 tasks | 2 files |
 | Phase 05-combat P01 | 18 | 2 tasks | 6 files |
 | Phase 05-combat P02 | 3 | 2 tasks | 8 files |
+| Phase 05-combat P03 | 30 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,8 @@ Recent decisions affecting current work:
 - [Phase 05-combat]: BattleTurn._parseUnits static helper isolates nullable JSONB Map casting in one place — keeps fromJson factory readable
 - [Phase 05-03]: Icons.sword_outlined does not exist in Material Icons — used Icons.gps_fixed_outlined for attacker role icon in battle tile
 - [Phase 05-03]: allMyBattlesProvider returns List<Battle> (not AsyncValue) — BattlesScreen watches provider directly; empty list shown while stream warms up
+- [Phase 05-03]: Icons.sword_outlined does not exist in Material Icons — used Icons.gps_fixed_outlined for attacker role icon in battle tile
+- [Phase 05-03]: allMyBattlesProvider returns List<Battle> (not AsyncValue) — BattlesScreen watches provider directly; empty list shown while stream warms up
 
 ### Pending Todos
 
@@ -143,6 +146,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T21:57:41.900Z
-Stopped at: Checkpoint 05-03: Human verification of combat UI (Tasks 1-2 complete)
+Last session: 2026-03-11T22:00:28.252Z
+Stopped at: Completed 05-03: Battle UI layer (BattlesScreen, BattleDetailScreen, BattleTurnCard) — human verification approved
 Resume file: None
