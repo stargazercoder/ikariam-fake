@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: "Completed 05-03: Battle UI layer (BattlesScreen, BattleDetailScreen, BattleTurnCard) — human verification approved"
-last_updated: "2026-03-11T22:00:28.254Z"
+last_updated: "2026-03-11T22:04:23.560Z"
 last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
 progress:
   total_phases: 6
