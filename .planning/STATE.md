@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-military-04-00-PLAN.md
+stopped_at: Completed 04-military-04-01-PLAN.md
 last_updated: "2026-03-11T13:55:59.865Z"
 last_activity: "2026-03-11 - Completed 02-00: Wave 0 test scaffolds for Phase 2"
 progress:
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 
 ## Current Position
 
-Phase: 2 of 6 (Core Economy)
-Plan: 1 of 4 in current phase (02-00 complete)
+Phase: 4 of 6 (Military)
+Plan: 2 of 4 in current phase (04-01 complete)
 Status: Executing
-Last activity: 2026-03-11 - Completed 02-00: Wave 0 test scaffolds for Phase 2
+Last activity: 2026-03-11 - Completed 04-01: Military database layer (tables + functions + cron jobs)
 
-Progress: [██████░░░░] 63%
+Progress: [███████░░░] 68%
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [██████░░░░] 63%
 | Phase 03-world-map P01 | 3 | 2 tasks | 8 files |
 | Phase 03-world-map P02 | 45 | 2 tasks | 9 files |
 | Phase 04-military P00 | 5 | 1 tasks | 3 files |
+| Phase 04-military P01 | 3 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,9 @@ Recent decisions affecting current work:
 - [Phase 03-world-map]: 5x5 world map grid (not 5x2): expanded from checkpoint feedback, matched seed data
 - [Phase 03-world-map]: playerIslandIdProvider added: IslandScreen derives default island from cityProvider to avoid null loading state
 - [Phase 04-military]: Wave 0 test scaffolds follow same skip pattern as Phases 1, 2, and 3: unit stubs use skip string messages pointing to implementing plan, widget stubs use skip: true boolean
+- [04-01]: unit_movements uses JSONB snapshot (not join table): army immutable at departure, no cascading deletes, simpler Phase 5 combat resolution
+- [04-01]: city_units has no pre-population trigger — complete_training() uses INSERT ON CONFLICT for first unit creation in a city
+- [04-01]: process_arrivals() uses jsonb_each_text() to iterate JSONB unit type/quantity pairs in unit_movements.units
 
 ### Pending Todos
 
@@ -120,6 +124,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T13:55:59.863Z
-Stopped at: Completed 04-military-04-00-PLAN.md
+Last session: 2026-03-11T07:20:00Z
+Stopped at: Completed 04-military-04-01-PLAN.md
 Resume file: None
