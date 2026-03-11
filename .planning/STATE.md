@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-military-04-01-PLAN.md
-last_updated: "2026-03-11T13:55:59.865Z"
-last_activity: "2026-03-11 - Completed 02-00: Wave 0 test scaffolds for Phase 2"
+stopped_at: Completed 04-military-04-02-PLAN.md
+last_updated: "2026-03-11T14:07:23.291Z"
+last_activity: "2026-03-11 - Completed 04-01: Military database layer (tables + functions + cron jobs)"
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 15
-  completed_plans: 12
-  percent: 63
+  completed_plans: 14
+  percent: 68
 ---
 
 # Project State
@@ -62,6 +62,7 @@ Progress: [███████░░░] 68%
 | Phase 03-world-map P02 | 45 | 2 tasks | 9 files |
 | Phase 04-military P00 | 5 | 1 tasks | 3 files |
 | Phase 04-military P01 | 3 | 2 tasks | 6 files |
+| Phase 04-military P02 | 4 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,9 @@ Recent decisions affecting current work:
 - [04-01]: unit_movements uses JSONB snapshot (not join table): army immutable at departure, no cascading deletes, simpler Phase 5 combat resolution
 - [04-01]: city_units has no pre-population trigger — complete_training() uses INSERT ON CONFLICT for first unit creation in a city
 - [04-01]: process_arrivals() uses jsonb_each_text() to iterate JSONB unit type/quantity pairs in unit_movements.units
+- [Phase 04-02]: UnitType stored as String in models (not enum): keeps models decoupled from constants, same pattern as ConstructionQueueEntry.buildingType
+- [Phase 04-02]: Non-atomic unit deduction in dispatch-units: acceptable for v1 per established project precedent
+- [Phase 04-02]: calcTravelMinutes uses identical formula in Dart and TypeScript with explicit sync comments and shared BASE_MINUTES_PER_GRID_UNIT constant
 
 ### Pending Todos
 
@@ -124,6 +128,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T07:20:00Z
-Stopped at: Completed 04-military-04-01-PLAN.md
+Last session: 2026-03-11T14:07:23.288Z
+Stopped at: Completed 04-military-04-02-PLAN.md
 Resume file: None
