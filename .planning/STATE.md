@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-world-map-03-02-PLAN.md
-last_updated: "2026-03-11T09:53:27.747Z"
+stopped_at: Completed 04-military-04-00-PLAN.md
+last_updated: "2026-03-11T13:55:59.865Z"
 last_activity: "2026-03-11 - Completed 02-00: Wave 0 test scaffolds for Phase 2"
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 15
+  completed_plans: 12
   percent: 63
 ---
 
@@ -60,6 +60,7 @@ Progress: [██████░░░░] 63%
 | Phase 03-world-map P00 | 5 | 1 tasks | 3 files |
 | Phase 03-world-map P01 | 3 | 2 tasks | 8 files |
 | Phase 03-world-map P02 | 45 | 2 tasks | 9 files |
+| Phase 04-military P00 | 5 | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -99,6 +100,7 @@ Recent decisions affecting current work:
 - [Phase 03-world-map]: Auth Rule 4 redirect changed from /city to /map — world map is the post-login landing screen
 - [Phase 03-world-map]: 5x5 world map grid (not 5x2): expanded from checkpoint feedback, matched seed data
 - [Phase 03-world-map]: playerIslandIdProvider added: IslandScreen derives default island from cityProvider to avoid null loading state
+- [Phase 04-military]: Wave 0 test scaffolds follow same skip pattern as Phases 1, 2, and 3: unit stubs use skip string messages pointing to implementing plan, widget stubs use skip: true boolean
 
 ### Pending Todos
 
@@ -118,6 +120,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T09:49:02.925Z
-Stopped at: Completed 03-world-map-03-02-PLAN.md
+Last session: 2026-03-11T13:55:59.863Z
+Stopped at: Completed 04-military-04-00-PLAN.md
 Resume file: None

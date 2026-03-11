@@ -39,11 +39,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Military
 
-- [ ] **MIL-01**: 8 land unit types trainable from Barracks (Hoplite, Phalanx, Archer, Cavalry, Catapult, Mortar, Medic, Cook)
-- [ ] **MIL-02**: 5 naval unit types buildable from Shipyard (Cargo Ship, Ram Ship, Catapult Ship, Mortar Ship, Diving Boat)
-- [ ] **MIL-03**: Each unit type requires specific building level to unlock
-- [ ] **MIL-04**: Training queue with time-based completion via pg_cron
-- [ ] **MIL-05**: Troops can be dispatched to other cities with travel time based on distance
+- [x] **MIL-01**: 8 land unit types trainable from Barracks (Hoplite, Phalanx, Archer, Cavalry, Catapult, Mortar, Medic, Cook)
+- [x] **MIL-02**: 5 naval unit types buildable from Shipyard (Cargo Ship, Ram Ship, Catapult Ship, Mortar Ship, Diving Boat)
+- [x] **MIL-03**: Each unit type requires specific building level to unlock
+- [x] **MIL-04**: Training queue with time-based completion via pg_cron
+- [x] **MIL-05**: Troops can be dispatched to other cities with travel time based on distance
 
 ### Combat
 
@@ -141,11 +141,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MAP-03 | Phase 3 | Complete |
 | MAP-04 | Phase 3 | Complete |
 | MAP-05 | Phase 3 | Complete |
-| MIL-01 | Phase 4 | Pending |
-| MIL-02 | Phase 4 | Pending |
-| MIL-03 | Phase 4 | Pending |
-| MIL-04 | Phase 4 | Pending |
-| MIL-05 | Phase 4 | Pending |
+| MIL-01 | Phase 4 | Complete |
+| MIL-02 | Phase 4 | Complete |
+| MIL-03 | Phase 4 | Complete |
+| MIL-04 | Phase 4 | Complete |
+| MIL-05 | Phase 4 | Complete |
 | CMBT-01 | Phase 5 | Pending |
 | CMBT-02 | Phase 5 | Pending |
 | CMBT-03 | Phase 5 | Pending |

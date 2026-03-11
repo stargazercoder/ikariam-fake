@@ -82,7 +82,7 @@ Plans:
   2. Player with a Shipyard can queue training for any of the 5 naval unit types that the current building level unlocks
   3. Unit training completes automatically after the correct duration via server-side pg_cron and units appear in the player's army roster
   4. Player can dispatch a trained army toward another city and see the troops listed as "in transit" with a travel-time countdown
-**Plans:** 4 plans
+**Plans:** 1/4 plans executed
 
 Plans:
 - [ ] 04-00-PLAN.md — Wave 0: Test scaffolds for unit constants, military models, and barracks widget
@@ -122,6 +122,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Foundation | 4/4 | Complete   | 2026-03-10 |
 | 2. Core Economy | 4/4 | Complete   | 2026-03-11 |
 | 3. World Map | 2/3 | In Progress|  |
-| 4. Military | 0/4 | Not started | - |
+| 4. Military | 1/4 | In Progress|  |
 | 5. Combat | 0/TBD | Not started | - |
 | 6. Production Hardening | 0/TBD | Not started | - |
