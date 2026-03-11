@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-03-11T21:44:20.419Z"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-03-11T21:49:39.595Z"
 last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 19
-  completed_plans: 17
+  completed_plans: 18
   percent: 84
 ---
 
@@ -66,6 +66,7 @@ Progress: [████████░░] 84%
 | Phase 04-military P03 | 4 | 2 tasks | 9 files |
 | Phase 05-combat P00 | 5 | 1 tasks | 2 files |
 | Phase 05-combat P01 | 18 | 2 tasks | 6 files |
+| Phase 05-combat P02 | 3 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,9 @@ Recent decisions affecting current work:
 - [Phase 05-combat]: Naval gate-keeper: attacker naval wiped -> defender_won immediately, land phase blocked
 - [Phase 05-combat]: Unit stats as JSONB constants inside resolve_battles() body — not a DB table
 - [Phase 05-combat]: Rejected armies (city already in battle): units lost, movement row deleted
+- [Phase 05-combat]: unitAttackStats/unitDefenseStats values match resolve_battles() SQL constants exactly — sync comment enforces manual consistency
+- [Phase 05-combat]: allMyBattlesProvider uses Provider.autoDispose (not StreamProvider) because it merges two async stream values into a synchronous list
+- [Phase 05-combat]: BattleTurn._parseUnits static helper isolates nullable JSONB Map casting in one place — keeps fromJson factory readable
 
 ### Pending Todos
 
@@ -137,6 +141,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T21:44:20.417Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-03-11T21:49:39.593Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
