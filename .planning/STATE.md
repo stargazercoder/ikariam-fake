@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md — economy tables, triggers, functions, and pg_cron jobs
-last_updated: "2026-03-11T01:56:00.150Z"
+stopped_at: Completed 02-02-PLAN.md — upgrade-building Edge Function and Dart constants/models
+last_updated: "2026-03-11T02:03:38.544Z"
 last_activity: "2026-03-11 - Completed 02-00: Wave 0 test scaffolds for Phase 2"
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 8
-  completed_plans: 6
+  completed_plans: 7
   percent: 63
 ---
 
@@ -55,6 +55,7 @@ Progress: [██████░░░░] 63%
 | Phase 01-foundation P03 | 4 | 2 tasks | 7 files |
 | Phase 02-core-economy P00 | 2 | 1 tasks | 3 files |
 | Phase 02-core-economy P01 | 3 | 2 tasks | 7 files |
+| Phase 02-core-economy P02 | 4 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,9 @@ Recent decisions affecting current work:
 - [Phase 02-core-economy]: Wave 0 test scaffolds follow same skip pattern as Phase 1 Plan 01-00: stubs with TODO comments pointing to implementing plan
 - [Phase 02-core-economy]: Production buildings (sawmill, quarry, glassblower, sulfur_pit) included in city_buildings CHECK constraint — required for all 5 resources to produce via process_resource_tick()
 - [Phase 02-core-economy]: pg_cron extension registered via migration file (not seed.sql) to avoid schema-cron-does-not-exist error on supabase db reset
+- [Phase 02-core-economy]: BASE_COSTS and BASE_TIMES duplicated in Edge Function TypeScript and Dart constants — sync comment enforces manual consistency; server authority must not import client code
+- [Phase 02-core-economy]: Non-atomic resource deduction in upgrade-building: deduct_resource() called sequentially per resource; partial deduction possible on failure (acceptable for v1)
+- [Phase 02-core-economy]: ConstructionQueueEntry.buildingType is String (not BuildingType enum) to keep construction model decoupled from building enum
 
 ### Pending Todos
 
@@ -101,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T01:56:00.148Z
-Stopped at: Completed 02-01-PLAN.md — economy tables, triggers, functions, and pg_cron jobs
+Last session: 2026-03-11T02:03:38.541Z
+Stopped at: Completed 02-02-PLAN.md — upgrade-building Edge Function and Dart constants/models
 Resume file: None
