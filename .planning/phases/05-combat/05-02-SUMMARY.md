@@ -115,6 +115,10 @@ None.
 
 None - no external service configuration required.
 
+## Self-Check: PASSED
+
+All created files found on disk. Task commits c738e8a and 8f030b3 confirmed in git log. All 59 unit tests pass.
+
 ## Next Phase Readiness
 
 - All data layer for battles is complete: models, repository, providers
