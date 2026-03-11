@@ -1,27 +1,32 @@
-// Wave 0 test scaffolds for Phase 3 World Map — building position map.
+// Tests for building position map — verifies completeness and uniqueness.
 //
 // Covers: MAP-04 (city grid building positions)
-// Implementation target: Plan 03-02
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ikariam/core/constants/building_constants.dart';
+import 'package:ikariam/features/map/constants/building_positions.dart';
 
 void main() {
   group('Building positions', () {
     test(
       'kBuildingPositions contains all 14 BuildingType values',
       () {
-        // TODO: implement when kBuildingPositions is defined in Plan 03-02
+        expect(kBuildingPositions.length, equals(14));
+        expect(
+          kBuildingPositions.keys,
+          containsAll(BuildingType.values),
+        );
       },
-      skip: 'TODO: 03-02',
     );
 
     test(
       'kBuildingPositions has no duplicate row/col positions',
       () {
-        // TODO: implement when kBuildingPositions is defined in Plan 03-02
+        final positionStrings = kBuildingPositions.values
+            .map((pos) => '${pos.row},${pos.col}')
+            .toSet();
+        expect(positionStrings.length, equals(14));
       },
-      skip: 'TODO: 03-02',
     );
   });
 }

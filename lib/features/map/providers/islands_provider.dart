@@ -9,9 +9,22 @@ final allIslandsProvider = FutureProvider<List<Island>>((ref) async {
   return repository.fetchAllIslands();
 });
 
-/// StateProvider holding the currently selected island ID.
+/// Notifier holding the currently selected island ID.
 ///
 /// Used for cross-tab communication: tapping an island on the World tab
 /// updates this provider so the Island tab can display the correct island.
 /// Null means no island has been selected yet (Island tab shows player's own island).
-final selectedIslandIdProvider = StateProvider<String?>((ref) => null);
+class SelectedIslandNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void select(String islandId) => state = islandId;
+
+  void clear() => state = null;
+}
+
+/// Provider for [SelectedIslandNotifier].
+final selectedIslandIdProvider =
+    NotifierProvider<SelectedIslandNotifier, String?>(
+  SelectedIslandNotifier.new,
+);

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +7,10 @@ import '../../features/auth/providers/auth_state_provider.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/signup_screen.dart';
 import '../../features/city/screens/city_screen.dart';
+import '../../features/map/providers/islands_provider.dart';
+import '../../features/map/screens/island_screen.dart';
 import '../../features/map/screens/main_shell_screen.dart';
+import '../../features/map/screens/world_map_screen.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../features/profile/screens/create_profile_screen.dart';
 
@@ -17,26 +19,6 @@ import '../../features/profile/screens/create_profile_screen.dart';
 final _worldNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'worldNav');
 final _islandNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'islandNav');
 final _cityNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'cityNav');
-
-/// Placeholder widget for the World Map view (replaced in Plan 03-02).
-class _WorldMapPlaceholder extends StatelessWidget {
-  const _WorldMapPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('World Map'));
-  }
-}
-
-/// Placeholder widget for the Island view (replaced in Plan 03-02).
-class _IslandPlaceholder extends StatelessWidget {
-  const _IslandPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Island View'));
-  }
-}
 
 /// Bridges Riverpod provider changes to GoRouter's [ChangeNotifier] system.
 ///
@@ -82,6 +64,8 @@ String? _redirect(Ref ref, GoRouterState state) {
 
   // Rule 1: Not authenticated.
   if (session == null) {
+    // Clear stale island selection so the Island tab starts fresh on next login.
+    ref.read(selectedIslandIdProvider.notifier).clear();
     return isAuthRoute ? null : '/login';
   }
 
@@ -149,7 +133,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/map',
-                builder: (context, state) => const _WorldMapPlaceholder(),
+                builder: (context, state) => const WorldMapScreen(),
               ),
             ],
           ),
@@ -158,7 +142,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/island',
-                builder: (context, state) => const _IslandPlaceholder(),
+                builder: (context, state) => const IslandScreen(),
               ),
             ],
           ),

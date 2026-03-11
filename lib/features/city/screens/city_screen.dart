@@ -3,18 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../features/auth/data/auth_repository.dart';
 import '../../../features/city/providers/city_provider.dart';
+import '../../../features/map/screens/city_grid_screen.dart';
 import '../../../features/profile/providers/profile_provider.dart';
 import '../../../shared/widgets/avatar_widget.dart';
 import '../../../core/constants/building_constants.dart';
 import '../../../core/constants/resource_constants.dart';
-import '../models/city_building.dart';
 import '../models/city_resource.dart';
 import '../models/construction_queue_entry.dart';
 import '../providers/buildings_provider.dart';
 import '../providers/construction_provider.dart';
 import '../providers/resources_provider.dart';
 import '../widgets/countdown_timer_widget.dart';
-import 'building_upgrade_sheet.dart';
 
 /// City screen showing real-time resources, building list, and construction
 /// progress.
@@ -134,6 +133,10 @@ class _CityBody extends ConsumerWidget {
     // Extract active construction entry (may be null if queue is empty).
     final activeConstruction = constructionAsync.whenOrNull(data: (e) => e);
 
+    // Current resources for the upgrade sheet cost check.
+    final currentResources =
+        resourcesAsync.whenOrNull(data: (r) => r) ?? <CityResource>[];
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Center(
@@ -202,12 +205,21 @@ class _CityBody extends ConsumerWidget {
 
               if (activeConstruction != null) const SizedBox(height: 16),
 
-              // Building list.
-              _BuildingsList(
-                buildingsAsync: buildingsAsync,
-                cityId: cityId,
-                resourcesAsync: resourcesAsync,
-                activeConstruction: activeConstruction,
+              // Building grid (spatial layout replacing flat list).
+              buildingsAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Text(
+                  'Failed to load buildings: $e',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+                data: (buildings) => BuildingsGrid(
+                  buildings: buildings,
+                  cityId: cityId,
+                  currentResources: currentResources,
+                  activeConstruction: activeConstruction,
+                ),
               ),
             ],
           ),
@@ -457,177 +469,6 @@ class _ConstructionBanner extends StatelessWidget {
     } catch (_) {
       return dbName;
     }
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Buildings list
-// ---------------------------------------------------------------------------
-
-/// Full building list grouped into City Buildings and Production Buildings.
-class _BuildingsList extends ConsumerWidget {
-  const _BuildingsList({
-    required this.buildingsAsync,
-    required this.cityId,
-    required this.resourcesAsync,
-    required this.activeConstruction,
-  });
-
-  final AsyncValue<List<CityBuilding>> buildingsAsync;
-  final String cityId;
-  final AsyncValue<List<CityResource>> resourcesAsync;
-  final ConstructionQueueEntry? activeConstruction;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return buildingsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Text(
-        'Failed to load buildings: $e',
-        style: TextStyle(color: Theme.of(context).colorScheme.error),
-      ),
-      data: (buildings) {
-        final cityBuildings = buildings
-            .where((b) => !b.buildingType.isProductionBuilding)
-            .toList();
-        final productionBuildings = buildings
-            .where((b) => b.buildingType.isProductionBuilding)
-            .toList();
-
-        // Current resources for the upgrade sheet cost check.
-        final currentResources =
-            resourcesAsync.whenOrNull(data: (r) => r) ?? [];
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _BuildingSection(
-              title: 'City Buildings',
-              buildings: cityBuildings,
-              cityId: cityId,
-              currentResources: currentResources,
-              activeConstruction: activeConstruction,
-            ),
-            const SizedBox(height: 12),
-            _BuildingSection(
-              title: 'Production Buildings',
-              buildings: productionBuildings,
-              cityId: cityId,
-              currentResources: currentResources,
-              activeConstruction: activeConstruction,
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-/// A labeled group of building rows.
-class _BuildingSection extends StatelessWidget {
-  const _BuildingSection({
-    required this.title,
-    required this.buildings,
-    required this.cityId,
-    required this.currentResources,
-    required this.activeConstruction,
-  });
-
-  final String title;
-  final List<CityBuilding> buildings;
-  final String cityId;
-  final List<CityResource> currentResources;
-  final ConstructionQueueEntry? activeConstruction;
-
-  @override
-  Widget build(BuildContext context) {
-    if (buildings.isEmpty) return const SizedBox.shrink();
-    return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Text(
-              title,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-            ),
-          ),
-          const Divider(height: 1),
-          ...buildings.map(
-            (b) => _BuildingRow(
-              building: b,
-              cityId: cityId,
-              currentResources: currentResources,
-              activeConstruction: activeConstruction,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// A single building row tappable to open the upgrade sheet.
-class _BuildingRow extends StatelessWidget {
-  const _BuildingRow({
-    required this.building,
-    required this.cityId,
-    required this.currentResources,
-    required this.activeConstruction,
-  });
-
-  final CityBuilding building;
-  final String cityId;
-  final List<CityResource> currentResources;
-  final ConstructionQueueEntry? activeConstruction;
-
-  bool get _isBeingUpgraded =>
-      activeConstruction != null &&
-      activeConstruction!.buildingType == building.buildingType.dbName;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(
-        building.buildingType.isProductionBuilding
-            ? Icons.factory
-            : Icons.home,
-        color: Theme.of(context).colorScheme.primary,
-      ),
-      title: Text(building.buildingType.displayName),
-      subtitle: _isBeingUpgraded
-          ? Row(
-              children: [
-                Icon(
-                  Icons.construction,
-                  size: 14,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'Upgrading to Level ${activeConstruction!.targetLevel}...',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.secondary,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            )
-          : Text('Level ${building.level}'),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () => showBuildingUpgradeSheet(
-        context,
-        building: building,
-        cityId: cityId,
-        currentResources: currentResources,
-        activeConstruction: activeConstruction,
-      ),
-    );
   }
 }
 
