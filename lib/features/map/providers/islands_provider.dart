@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../features/city/providers/city_provider.dart';
 import '../data/map_repository.dart';
 import '../models/island.dart';
 
@@ -28,3 +29,14 @@ final selectedIslandIdProvider =
     NotifierProvider<SelectedIslandNotifier, String?>(
   SelectedIslandNotifier.new,
 );
+
+/// Provider that returns the player's own island ID from their city data.
+///
+/// Used by IslandScreen as a fallback when no island has been explicitly
+/// selected via the World Map tab.
+final playerIslandIdProvider = Provider<String?>((ref) {
+  final cityAsync = ref.watch(cityProvider);
+  return cityAsync.whenOrNull(
+    data: (city) => city?['island_id'] as String?,
+  );
+});

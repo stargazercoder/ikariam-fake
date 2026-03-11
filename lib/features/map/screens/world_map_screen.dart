@@ -53,9 +53,9 @@ class _IslandGrid extends ConsumerWidget {
   // Each grid cell is 120 logical pixels.
   static const double _cellSize = 120.0;
 
-  // World map dimensions: 5 columns × 2 rows.
+  // World map dimensions: 5 columns × 5 rows.
   static const int _cols = 5;
-  static const int _rows = 2;
+  static const int _rows = 5;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

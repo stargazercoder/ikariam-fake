@@ -19,11 +19,9 @@ class IslandScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedId = ref.watch(selectedIslandIdProvider);
+    final playerIslandId = ref.watch(playerIslandIdProvider);
 
-    // If no island is selected, we need the player's island ID.
-    // Read it from cityProvider (cityProvider is in features/city/providers).
-    // Avoid circular dependency by reading directly from Supabase.
-    final String? effectiveIslandId = selectedId ?? _getPlayerIslandId();
+    final String? effectiveIslandId = selectedId ?? playerIslandId;
 
     if (effectiveIslandId == null) {
       return const Scaffold(
@@ -32,17 +30,6 @@ class IslandScreen extends ConsumerWidget {
     }
 
     return _IslandDetailView(islandId: effectiveIslandId);
-  }
-
-  /// Reads the player's island_id directly from the city cached in Supabase.
-  ///
-  /// Returns null while loading or if no city is found.
-  String? _getPlayerIslandId() {
-    // We cannot easily async here in build, so we rely on selectedIslandId
-    // being set before the Island tab is shown, or use the player city from
-    // a separate source. Returning null triggers a loading spinner which is
-    // resolved once the user taps an island on the world map.
-    return null;
   }
 }
 
