@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 Phase: 1 of 6 (Foundation)
 Plan: 2 of 4 in current phase
 Status: Executing
-Last activity: 2026-03-11 — Quick task 1 complete: Supabase local dev scripts + health verification
+Last activity: 2026-03-11 - Completed quick task 1: Supabase local dev setup
 
 Progress: [█░░░░░░░░░] 8%
 
@@ -87,6 +87,12 @@ None yet.
 - Phase 4/5: Turn-based battle networking over WebSocket is a niche pattern with sparse documentation — research recommended before planning Phase 5
 - Phase 3: flame_tiled integration and multi-city ownership schema (colonies) may need phase-level research before planning
 - Game balance formulas (base costs, production rates, unit stats) not validated — will need iteration post-launch
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Setup Supabase local dev with Docker - start services, init config, apply migrations | 2026-03-11 | 0b035b5 | [1-setup-supabase-local-dev-with-docker-sta](./quick/1-setup-supabase-local-dev-with-docker-sta/) |
 
 ## Session Continuity
 
