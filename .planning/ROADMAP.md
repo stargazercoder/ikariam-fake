@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Auth, database schema with RLS, server-authority contract, and Flutter/Supabase project scaffold (completed 2026-03-10)
 - [x] **Phase 2: Core Economy** - Resource production via pg_cron, warehouse limits, buildings system, and single-slot upgrade queue (completed 2026-03-11)
-- [ ] **Phase 3: World Map** - 2D grid world map, island view, city view, and auto city placement on first login
+- [x] **Phase 3: World Map** - 2D grid world map, island view, city view, and auto city placement on first login (completed 2026-03-11)
 - [x] **Phase 4: Military** - Land and naval unit training, dispatch system, and unit unlock requirements (completed 2026-03-11)
 - [x] **Phase 5: Combat** - Turn-based 5-minute battle engine, battle reports, and naval-before-land phase ordering (completed 2026-03-11)
 - [ ] **Phase 6: Production Hardening** - Flutter web deployment, splash screen, RLS audit, performance validation
@@ -52,10 +52,10 @@ Plans:
 **Plans:** 4/4 plans complete
 
 Plans:
-- [ ] 02-00-PLAN.md — Wave 0: Test scaffolds for building upgrade, resource production, and formula tests
-- [ ] 02-01-PLAN.md — Database schema (city_resources, city_buildings with 14 types, construction_queue), server functions (resource tick, construction completion), pg_cron jobs
-- [ ] 02-02-PLAN.md — upgrade-building Edge Function, Dart constants/models for buildings and resources, formula unit tests
-- [ ] 02-03-PLAN.md — Flutter UI: real-time resource display, building list, upgrade bottom sheet, construction countdown, end-to-end verification
+- [x] 02-00-PLAN.md — Wave 0: Test scaffolds for building upgrade, resource production, and formula tests
+- [x] 02-01-PLAN.md — Database schema (city_resources, city_buildings with 14 types, construction_queue), server functions (resource tick, construction completion), pg_cron jobs
+- [x] 02-02-PLAN.md — upgrade-building Edge Function, Dart constants/models for buildings and resources, formula unit tests
+- [x] 02-03-PLAN.md — Flutter UI: real-time resource display, building list, upgrade bottom sheet, construction countdown, end-to-end verification
 
 ### Phase 3: World Map
 **Goal**: Players can navigate a 2D grid world map, view islands with their city slots and resource areas, and see their own city laid out on a building grid
@@ -66,12 +66,12 @@ Plans:
   2. Tapping an island opens the island view showing all occupied city slots and the island's wood and luxury resource gathering areas
   3. Tapping a city slot owned by the player opens the city view with buildings displayed on a grid layout
   4. The map renders as a simple 2D grid (not isometric) and is navigable by pan and zoom
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
-- [ ] 03-00-PLAN.md — Wave 0: Test scaffolds for map models, building positions, and world map smoke test
-- [ ] 03-01-PLAN.md — Island models, MapRepository, Riverpod providers, StatefulShellRoute navigation shell, seed update (100 to 10 islands)
-- [ ] 03-02-PLAN.md — World Map, Island View, and City Grid screens with InteractiveViewer pan/zoom, human verification
+- [x] 03-00-PLAN.md — Wave 0: Test scaffolds for map models, building positions, and world map smoke test
+- [x] 03-01-PLAN.md — Island models, MapRepository, Riverpod providers, StatefulShellRoute navigation shell, seed update (100 to 10 islands)
+- [x] 03-02-PLAN.md — World Map, Island View, and City Grid screens with InteractiveViewer pan/zoom, human verification
 
 ### Phase 4: Military
 **Goal**: Players can train land and naval units from appropriate buildings, units require correct building levels to unlock, and trained troops can be dispatched toward other cities
@@ -87,8 +87,8 @@ Plans:
 Plans:
 - [x] 04-00-PLAN.md — Wave 0: Test scaffolds for unit constants, military models, and barracks widget
 - [x] 04-01-PLAN.md — Database tables (city_units, training_queue, unit_movements), pg functions (complete_training, deduct_units, process_arrivals), pg_cron jobs
-- [ ] 04-02-PLAN.md — Edge Functions (train-units, dispatch-units), Dart UnitType enum/constants, military models, TDD unit tests
-- [ ] 04-03-PLAN.md — Flutter UI: MilitaryRepository, providers, BarracksScreen, ShipyardScreen, DispatchScreen, route integration, human verification
+- [x] 04-02-PLAN.md — Edge Functions (train-units, dispatch-units), Dart UnitType enum/constants, military models, TDD unit tests
+- [x] 04-03-PLAN.md — Flutter UI: MilitaryRepository, providers, BarracksScreen, ShipyardScreen, DispatchScreen, route integration, human verification
 
 ### Phase 5: Combat
 **Goal**: Two players' armies can engage in a turn-based battle that resolves in 5-minute turns server-side, both players receive battle reports in real-time, and naval units fight before land units each turn
@@ -103,10 +103,10 @@ Plans:
 **Plans:** 4/4 plans complete
 
 Plans:
-- [ ] 05-00-PLAN.md — Wave 0: Test scaffolds for battle models and combat formula
-- [ ] 05-01-PLAN.md — Database tables (battles, battle_turns), resolve_battles() pg function, modified process_arrivals(), battle-tick cron job
-- [ ] 05-02-PLAN.md — Dart Battle/BattleTurn models, unit combat stats, BattleRepository with dual Realtime streams, providers (TDD)
-- [ ] 05-03-PLAN.md — Flutter UI: BattlesScreen, BattleDetailScreen, BattleTurnCard, 4th navigation tab, human verification
+- [x] 05-00-PLAN.md — Wave 0: Test scaffolds for battle models and combat formula
+- [x] 05-01-PLAN.md — Database tables (battles, battle_turns), resolve_battles() pg function, modified process_arrivals(), battle-tick cron job
+- [x] 05-02-PLAN.md — Dart Battle/BattleTurn models, unit combat stats, BattleRepository with dual Realtime streams, providers (TDD)
+- [x] 05-03-PLAN.md — Flutter UI: BattlesScreen, BattleDetailScreen, BattleTurnCard, 4th navigation tab, human verification
 
 ### Phase 6: Production Hardening
 **Goal**: The game is deployed to the web with acceptable first-load performance, a proper splash screen during CanvasKit load, and the server-authority contract verified in production
@@ -116,7 +116,11 @@ Plans:
   1. Visiting the game URL shows a styled HTML/CSS splash screen immediately while CanvasKit loads — the page is never blank
   2. The game reaches interactive state within an acceptable time on a standard connection
   3. All INFR-02 and INFR-03 guarantees (server-only mutations, RLS on all tables) are verified to hold in the production Supabase environment
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Splash screen implementation: Wave 0 test scaffold, index.html splash div, custom flutter_bootstrap.js, manifest.json branding
+- [ ] 06-02-PLAN.md — Production build, INFR-02/INFR-03 security audits, visual splash verification checkpoint
 
 ## Progress
 
@@ -127,7 +131,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete   | 2026-03-10 |
 | 2. Core Economy | 4/4 | Complete   | 2026-03-11 |
-| 3. World Map | 2/3 | In Progress|  |
+| 3. World Map | 3/3 | Complete   | 2026-03-11 |
 | 4. Military | 4/4 | Complete   | 2026-03-11 |
 | 5. Combat | 4/4 | Complete   | 2026-03-11 |
-| 6. Production Hardening | 0/TBD | Not started | - |
+| 6. Production Hardening | 0/2 | Not started | - |
