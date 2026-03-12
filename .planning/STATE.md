@@ -3,15 +3,31 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 05-03: Battle UI layer (BattlesScreen, BattleDetailScreen, BattleTurnCard) — human verification approved"
-last_updated: "2026-03-11T22:04:23.560Z"
+stopped_at: "Completed 06-01: Web splash screen (INFR-01) — branded loading screen with flutter_bootstrap.js lifecycle hook"
+last_updated: "2026-03-12T07:51:56.248Z"
 last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
 progress:
   total_phases: 6
   completed_phases: 5
+  total_plans: 21
+  completed_plans: 20
+  percent: 95
+---
+
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: executing
+stopped_at: "Completed 05-03: Battle UI layer (BattlesScreen, BattleDetailScreen, BattleTurnCard) — human verification approved"
+last_updated: "2026-03-11T22:04:23.560Z"
+last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
+progress:
+  [██████████] 95%
+  completed_phases: 5
   total_plans: 19
   completed_plans: 19
-  percent: 84
+  percent: 95
 ---
 
 # Project State
@@ -68,6 +84,7 @@ Progress: [████████░░] 84%
 | Phase 05-combat P01 | 18 | 2 tasks | 6 files |
 | Phase 05-combat P02 | 3 | 2 tasks | 8 files |
 | Phase 05-combat P03 | 30 | 3 tasks | 5 files |
+| Phase 06-production-hardening P01 | 2 | 1 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -127,6 +144,8 @@ Recent decisions affecting current work:
 - [Phase 05-03]: allMyBattlesProvider returns List<Battle> (not AsyncValue) — BattlesScreen watches provider directly; empty list shown while stream warms up
 - [Phase 05-03]: Icons.sword_outlined does not exist in Material Icons — used Icons.gps_fixed_outlined for attacker role icon in battle tile
 - [Phase 05-03]: allMyBattlesProvider returns List<Battle> (not AsyncValue) — BattlesScreen watches provider directly; empty list shown while stream warms up
+- [Phase 06-01]: Splash removed AFTER await appRunner.runApp(): guarantees first Flutter frame is painted before fade — avoids flash of un-rendered canvas
+- [Phase 06-01]: flutter_bootstrap.js opacity fade (0.4s) with setTimeout DOM removal: smooth UX without layout jank; 400ms matches CSS transition duration
 
 ### Pending Todos
 
@@ -146,6 +165,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T22:00:28.252Z
-Stopped at: Completed 05-03: Battle UI layer (BattlesScreen, BattleDetailScreen, BattleTurnCard) — human verification approved
+Last session: 2026-03-12T07:51:56.246Z
+Stopped at: Completed 06-01: Web splash screen (INFR-01) — branded loading screen with flutter_bootstrap.js lifecycle hook
 Resume file: None
