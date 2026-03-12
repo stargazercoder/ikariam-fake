@@ -42,27 +42,28 @@ void main() {
   });
 
   group('upgradeDurationMinutes formula', () {
-    test('warehouse level 0 returns base time 5', () {
-      expect(upgradeDurationMinutes(BuildingType.warehouse, 0), 5);
+    // NOTE: buildingBaseTimes are reduced to 1 for all types (fast-test mode)
+    test('warehouse level 0 returns base time 1', () {
+      expect(upgradeDurationMinutes(BuildingType.warehouse, 0), 1);
     });
 
-    test('warehouse level 3 returns 9 (5 * 1.2^3 = 8.64, ceil = 9)', () {
-      expect(upgradeDurationMinutes(BuildingType.warehouse, 3), 9);
+    test('warehouse level 3 returns 2 (1 * 1.2^3 = 1.728, ceil = 2)', () {
+      expect(upgradeDurationMinutes(BuildingType.warehouse, 3), 2);
     });
 
-    test('town_hall level 0 returns base time 10', () {
-      expect(upgradeDurationMinutes(BuildingType.townHall, 0), 10);
+    test('town_hall level 0 returns base time 1', () {
+      expect(upgradeDurationMinutes(BuildingType.townHall, 0), 1);
     });
 
-    test('sawmill level 0 returns base time 3', () {
-      expect(upgradeDurationMinutes(BuildingType.sawmill, 0), 3);
+    test('sawmill level 0 returns base time 1', () {
+      expect(upgradeDurationMinutes(BuildingType.sawmill, 0), 1);
     });
 
     test('returns ceil of fractional result', () {
-      // warehouse level 1: 5 * 1.2^1 = 6.0 exactly
-      expect(upgradeDurationMinutes(BuildingType.warehouse, 1), 6);
-      // warehouse level 2: 5 * 1.2^2 = 7.2 -> ceil = 8
-      expect(upgradeDurationMinutes(BuildingType.warehouse, 2), 8);
+      // warehouse level 1: 1 * 1.2^1 = 1.2 -> ceil = 2
+      expect(upgradeDurationMinutes(BuildingType.warehouse, 1), 2);
+      // warehouse level 2: 1 * 1.2^2 = 1.44 -> ceil = 2
+      expect(upgradeDurationMinutes(BuildingType.warehouse, 2), 2);
     });
   });
 
