@@ -55,7 +55,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFR-01**: Flutter web shows splash screen during CanvasKit load instead of blank page
+- [x] **INFR-01**: Flutter web shows splash screen during CanvasKit load instead of blank page
 - [x] **INFR-02**: All game state mutations run server-side (no client-side calculations)
 - [x] **INFR-03**: RLS (Row Level Security) enabled on every database table from creation
 
@@ -151,7 +151,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CMBT-03 | Phase 5 | Complete |
 | CMBT-04 | Phase 5 | Complete |
 | CMBT-05 | Phase 5 | Complete |
-| INFR-01 | Phase 6 | Pending |
+| INFR-01 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 31 total

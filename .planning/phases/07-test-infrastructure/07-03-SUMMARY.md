@@ -28,6 +28,7 @@ key-decisions:
   - "[07-03] set +e before flutter test captures exit code instead of aborting — allows printing summary before exiting"
   - "[07-03] supabase db reset step uses set -e (must succeed before tests run); flutter step uses set +e"
   - "[07-03] PowerShell uses $LASTEXITCODE immediately after flutter test — $ErrorActionPreference Stop does not catch external CLI exit codes"
+  - "[07-03] 5 building_formulas_test.dart test expectations updated to match speed-up base times from migration 20260312000007_speed_up_all_timers.sql"
 
 patterns-established:
   - "Two-step test automation: db reset (authoritative seed) then flutter test (unit + widget coverage)"
@@ -35,20 +36,20 @@ patterns-established:
 requirements-completed: [TEST-04]
 
 # Metrics
-duration: 5min
+duration: 10min
 completed: 2026-03-12
 ---
 
 # Phase 7 Plan 03: CLI Test Automation Scripts Summary
 
-**Bash (test_all.sh) and PowerShell (test_all.ps1) unified test scripts: supabase db reset --local + flutter test --reporter expanded in one command**
+**Bash (test_all.sh) and PowerShell (test_all.ps1) unified test scripts: supabase db reset --local + flutter test --reporter expanded in one command, verified 75 passed / 12 skipped / 0 failures**
 
 ## Performance
 
-- **Duration:** ~5 min
+- **Duration:** ~10 min
 - **Started:** 2026-03-12T11:20:20Z
-- **Completed:** 2026-03-12T11:25:00Z
-- **Tasks:** 1 of 2 (Task 2 is human-verify checkpoint — awaiting user verification)
+- **Completed:** 2026-03-12T11:30:00Z
+- **Tasks:** 2 of 2 (fully complete — human verification passed)
 - **Files modified:** 2
 
 ## Accomplishments
@@ -57,12 +58,16 @@ completed: 2026-03-12
 - test_all.ps1 (36 lines): PowerShell equivalent for Windows developers
 - Both scripts exit non-zero on any failure
 - Both scripts print clear section headers and a final PASS/FAIL summary line
+- Human verification confirmed: 75 passed, 12 skipped (expected: auth/profile stubs + seed scenario stubs needing live DB), 0 failures
+- 5 building_formulas_test.dart expectations fixed to align with speed-up migration base times (commit 2577385)
+- All 4 TEST requirements confirmed: TEST-01 (7 seed accounts), TEST-02 (dev toolbar), TEST-03 (rich game states), TEST-04 (CLI scripts)
 
 ## Task Commits
 
 Each task was committed atomically:
 
 1. **Task 1: Create test_all.sh and test_all.ps1 CLI scripts** - `4721b49` (feat)
+2. **Task 2: Verify complete test infrastructure end-to-end** - `2577385` (fix — test expectations updated to match speed-up base times; human verification approved)
 
 ## Files Created/Modified
 
@@ -74,10 +79,24 @@ Each task was committed atomically:
 - `set +e` before `flutter test` so the script can capture the exit code and print summary before re-exiting — without this, `set -euo pipefail` would abort immediately on test failure and skip the summary output
 - PowerShell `$ErrorActionPreference = 'Stop'` does not intercept external CLI exit codes — `$LASTEXITCODE` must be checked explicitly after `flutter test`
 - `supabase db reset` step keeps `set -e` active (hard failure if DB cannot be reset — no point running tests against bad state)
+- 12 expected skips: auth/profile widget stubs require live Supabase connection, seed scenario stubs are placeholders for future Phase 5 integration tests — both categories intentionally skipped
 
 ## Deviations from Plan
 
-None - plan executed exactly as written.
+### Auto-fixed Issues
+
+**1. [Rule 1 - Bug] Fixed building_formulas_test.dart expectations for speed-up migration**
+- **Found during:** Task 2 (human-verify: running flutter test)
+- **Issue:** 5 tests in building_formulas_test.dart expected original base times; migration 20260312000007_speed_up_all_timers.sql reduced all building upgrade durations
+- **Fix:** Updated test expectations to match new speed-up base times
+- **Files modified:** test/unit/building_formulas_test.dart
+- **Verification:** flutter test reports 75 passed, 0 failures
+- **Committed in:** 2577385
+
+---
+
+**Total deviations:** 1 auto-fixed (Rule 1 — bug fix in test expectations)
+**Impact on plan:** Test expectations were out of sync with a previously committed migration. Fix was necessary for correctness. No scope creep.
 
 ## Issues Encountered
 
@@ -89,11 +108,10 @@ None - no external service configuration required.
 
 ## Next Phase Readiness
 
-- TEST-04 scripts created and ready for verification
-- Human verification (Task 2 checkpoint) needed to confirm full end-to-end cycle works:
-  1. `bash scripts/test_all.sh` resets DB, seeds 7 accounts, passes all Flutter tests
-  2. `.\scripts\test_all.ps1` does the same on Windows
-  3. All 4 TEST requirements confirmed: TEST-01 (7 seed accounts), TEST-02 (dev toolbar), TEST-03 (rich game states), TEST-04 (CLI scripts)
+- All 4 TEST requirements fully verified (TEST-01 through TEST-04)
+- Phase 7 test infrastructure is complete — 7 seed accounts, dev toolbar, rich game states, CLI automation scripts all working
+- 12 skipped tests are documented: they require live Supabase connection and will pass in integration test environment
+- Project is production-ready per Phase 6 audit; test infrastructure provides developer confidence for ongoing feature work
 
 ---
 *Phase: 07-test-infrastructure*
