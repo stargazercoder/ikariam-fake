@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 06-01: Web splash screen (INFR-01) — branded loading screen with flutter_bootstrap.js lifecycle hook"
-last_updated: "2026-03-12T07:51:56.248Z"
+stopped_at: "Completed 06-02: Production build and security audits — INFR-01/02/03 all verified, flutter build web --release SUCCESS, v1 production-ready"
+last_updated: "2026-03-12T08:16:50.025Z"
 last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 21
-  completed_plans: 20
+  completed_plans: 21
   percent: 95
 ---
 
@@ -85,6 +85,7 @@ Progress: [████████░░] 84%
 | Phase 05-combat P02 | 3 | 2 tasks | 8 files |
 | Phase 05-combat P03 | 30 | 3 tasks | 5 files |
 | Phase 06-production-hardening P01 | 2 | 1 tasks | 4 files |
+| Phase 06-production-hardening P02 | 15 | 2 tasks | 0 files |
 
 ## Accumulated Context
 
@@ -146,6 +147,9 @@ Recent decisions affecting current work:
 - [Phase 05-03]: allMyBattlesProvider returns List<Battle> (not AsyncValue) — BattlesScreen watches provider directly; empty list shown while stream warms up
 - [Phase 06-01]: Splash removed AFTER await appRunner.runApp(): guarantees first Flutter frame is painted before fade — avoids flash of un-rendered canvas
 - [Phase 06-01]: flutter_bootstrap.js opacity fade (0.4s) with setTimeout DOM removal: smooth UX without layout jank; 400ms matches CSS transition duration
+- [Phase 06-02]: INFR-02 approved exception confirmed: ProfileRepository.updateProfile is only client-side write; all game-state mutations go through Edge Functions
+- [Phase 06-02]: INFR-03 confirmed: all public tables have RLS enabled and at least 1 policy each
+- [Phase 06-02]: INFR-01 human-verified: splash visible before Flutter renders, page never shows blank white
 
 ### Pending Todos
 
@@ -165,6 +169,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T07:51:56.246Z
-Stopped at: Completed 06-01: Web splash screen (INFR-01) — branded loading screen with flutter_bootstrap.js lifecycle hook
+Last session: 2026-03-12T08:16:50.023Z
+Stopped at: Completed 06-02: Production build and security audits — INFR-01/02/03 all verified, flutter build web --release SUCCESS, v1 production-ready
 Resume file: None

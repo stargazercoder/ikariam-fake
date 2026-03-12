@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: World Map** - 2D grid world map, island view, city view, and auto city placement on first login (completed 2026-03-11)
 - [x] **Phase 4: Military** - Land and naval unit training, dispatch system, and unit unlock requirements (completed 2026-03-11)
 - [x] **Phase 5: Combat** - Turn-based 5-minute battle engine, battle reports, and naval-before-land phase ordering (completed 2026-03-11)
-- [ ] **Phase 6: Production Hardening** - Flutter web deployment, splash screen, RLS audit, performance validation
+- [x] **Phase 6: Production Hardening** - Flutter web deployment, splash screen, RLS audit, performance validation (completed 2026-03-12)
 
 ## Phase Details
 
@@ -116,7 +116,7 @@ Plans:
   1. Visiting the game URL shows a styled HTML/CSS splash screen immediately while CanvasKit loads — the page is never blank
   2. The game reaches interactive state within an acceptable time on a standard connection
   3. All INFR-02 and INFR-03 guarantees (server-only mutations, RLS on all tables) are verified to hold in the production Supabase environment
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 06-01-PLAN.md — Splash screen implementation: Wave 0 test scaffold, index.html splash div, custom flutter_bootstrap.js, manifest.json branding
@@ -134,4 +134,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. World Map | 3/3 | Complete   | 2026-03-11 |
 | 4. Military | 4/4 | Complete   | 2026-03-11 |
 | 5. Combat | 4/4 | Complete   | 2026-03-11 |
-| 6. Production Hardening | 1/2 | In Progress|  |
+| 6. Production Hardening | 2/2 | Complete   | 2026-03-12 |
