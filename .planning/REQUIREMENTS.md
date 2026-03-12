@@ -127,15 +127,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-04 | Phase 1 | Complete |
 | INFR-02 | Phase 1 | Complete |
 | INFR-03 | Phase 1 | Complete |
-| RSRC-01 | Phase 2, 9 | Pending verification |
-| RSRC-02 | Phase 2, 9 | Pending verification |
-| RSRC-03 | Phase 2, 9 | Pending verification |
-| RSRC-04 | Phase 2, 9 | Pending verification |
-| BLDG-01 | Phase 2, 9 | Pending verification |
-| BLDG-02 | Phase 2, 9 | Pending verification |
-| BLDG-03 | Phase 2, 9 | Pending verification |
-| BLDG-04 | Phase 2, 9 | Pending verification |
-| BLDG-05 | Phase 2, 9 | Pending verification |
+| RSRC-01 | Phase 2, 9 | Complete |
+| RSRC-02 | Phase 2, 9 | Complete |
+| RSRC-03 | Phase 2, 9 | Complete |
+| RSRC-04 | Phase 2, 9 | Complete |
+| BLDG-01 | Phase 2, 9 | Complete |
+| BLDG-02 | Phase 2, 9 | Complete |
+| BLDG-03 | Phase 2, 9 | Complete |
+| BLDG-04 | Phase 2, 9 | Complete |
+| BLDG-05 | Phase 2, 9 | Complete |
 | MAP-01 | Phase 3 | Complete |
 | MAP-02 | Phase 3 | Complete |
 | MAP-03 | Phase 3 | Complete |

@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Production Hardening** - Flutter web deployment, splash screen, RLS audit, performance validation (completed 2026-03-12)
 - [x] **Phase 7: Test Infrastructure** - Multi-account test scenarios, dev toolbar, rich seed scripts, unified test automation CLI (completed 2026-03-12)
 - [x] **Phase 8: Bug Fixes & Timer Guards** - Fix dispatch-units undefined constant, add environment guard for speed-up migration, implement partial army engagement, fix dev toolbar bug (completed 2026-03-12)
-- [ ] **Phase 9: Phase 2 Verification** - Create missing Phase 2 VERIFICATION.md for 9 RSRC/BLDG requirements
+- [x] **Phase 9: Phase 2 Verification** - Create missing Phase 2 VERIFICATION.md for 9 RSRC/BLDG requirements (completed 2026-03-12)
 
 ## Phase Details
 
@@ -140,7 +140,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 6. Production Hardening | 2/2 | Complete   | 2026-03-12 |
 | 7. Test Infrastructure | 3/3 | Complete   | 2026-03-12 |
 | 8. Bug Fixes & Timer Guards | 2/2 | Complete   | 2026-03-12 |
-| 9. Phase 2 Verification | 0/1 | Not started | - |
+| 9. Phase 2 Verification | 1/1 | Complete   | 2026-03-12 |
 
 ### Phase 7: Test Infrastructure
 **Goal**: The game is easily testable with multiple pre-configured accounts at different game stages, a dev toolbar for instant game-state manipulation, seed scripts for ready-to-play scenarios, and a unified test automation script that resets and validates everything in one command
@@ -182,7 +182,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Phase 2 VERIFICATION.md exists with observable truths for all 9 requirements
   2. Each requirement has evidence linking to specific code files and functions
-**Plans:** 1 plans
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 09-01-PLAN.md — Audit Phase 2 source files and create 02-VERIFICATION.md with evidence for all 9 RSRC/BLDG requirements

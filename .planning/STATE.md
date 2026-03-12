@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 08-02: Env guard timers and partial engagement — CMBT-01/CMBT-02 closed, 7 tests passing"
-last_updated: "2026-03-12T15:06:04.123Z"
+stopped_at: "Completed 09-01: Phase 2 Core Economy VERIFICATION.md — all 9 RSRC/BLDG requirements verified, v1.0 milestone audit complete"
+last_updated: "2026-03-12T16:50:38.841Z"
 last_activity: 2026-03-12 - Gap closure phases 8-9 created from v1.0 milestone audit
 progress:
   total_phases: 9
-  completed_phases: 8
-  total_plans: 26
-  completed_plans: 26
+  completed_phases: 9
+  total_plans: 27
+  completed_plans: 27
   percent: 96
 ---
 
@@ -123,6 +123,7 @@ Progress: [████████░░] 84%
 | Phase 07 P03 | 10 | 2 tasks | 2 files |
 | Phase 08-bug-fixes-timer-guards P01 | 3 | 2 tasks | 6 files |
 | Phase 08-bug-fixes-timer-guards P02 | 4 | 2 tasks | 4 files |
+| Phase 09-phase2-verification P01 | 8 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -203,6 +204,7 @@ Recent decisions affecting current work:
 - [Phase 08-bug-fixes-timer-guards]: [08-02] Engagement fraction applied only in attack/defense summation loops, NOT in casualty loops — double-applying would over-count the fraction
 - [Phase 08-bug-fixes-timer-guards]: [08-02] v_turn_interval resolved once per function call via current_setting — avoids repeated setting lookups in the per-battle loop
 - [Phase 08-bug-fixes-timer-guards]: [08-02] Migration 20260312000009 handles both environments in one function body via v_turn_interval rather than using another conditional DO block
+- [Phase 09-phase2-verification]: 02-VERIFICATION.md score is 12/12 must-haves (not 9/9) because Observable Truths table expands 9 requirements to 12 truths via static/runtime verification splits on BLDG-04, BLDG-05, and Realtime wiring truths
 
 ### Roadmap Evolution
 
@@ -228,6 +230,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T15:03:02.139Z
-Stopped at: Completed 08-02: Env guard timers and partial engagement — CMBT-01/CMBT-02 closed, 7 tests passing
+Last session: 2026-03-12T16:50:38.838Z
+Stopped at: Completed 09-01: Phase 2 Core Economy VERIFICATION.md — all 9 RSRC/BLDG requirements verified, v1.0 milestone audit complete
 Resume file: None
