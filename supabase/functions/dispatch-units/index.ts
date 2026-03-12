@@ -16,7 +16,11 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-// Base travel speed: 1 grid unit = 10 minutes.
+// Base travel speed: 1 grid unit = 10 seconds (fast testing mode).
+// NOTE: Must stay in sync with baseSecondsPerGridUnit in lib/core/constants/unit_constants.dart
+const BASE_SECONDS_PER_GRID_UNIT = 10;
+
+// Base travel speed in minutes: 1 grid unit = 2 minutes.
 // NOTE: Must stay in sync with baseMinutesPerGridUnit in lib/core/constants/unit_constants.dart
 const BASE_MINUTES_PER_GRID_UNIT = 2;
 
@@ -184,6 +188,9 @@ Deno.serve(async (req: Request) => {
 
   // 7. Calculate travel time
   const travelMinutes = calcTravelMinutes(originIsland, destIsland);
+  if (!Number.isFinite(travelMinutes) || travelMinutes <= 0) {
+    return errorResponse('Failed to calculate travel time', 500);
+  }
 
   // 8. Deduct units from origin city (validate + deduct last, right before insert)
   // Note: Non-atomic deduction — acceptable for v1 per project decision.

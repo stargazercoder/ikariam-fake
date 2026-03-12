@@ -247,10 +247,11 @@ class _DevToolbarFabState extends ConsumerState<_DevToolbarFab> {
       ),
     );
 
+    final defenderCityId = controller.text.trim();
     controller.dispose();
-    if (confirmed != true || controller.text.trim().isEmpty) return;
+    if (confirmed != true || defenderCityId.isEmpty) return;
     try {
-      final battleId = await _devRpc.triggerBattle(cityId, controller.text.trim());
+      final battleId = await _devRpc.triggerBattle(cityId, defenderCityId);
       _showSnack('Battle started: $battleId');
     } catch (_) {
       _showSnack('Failed to trigger battle');
