@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Combat** - Turn-based 5-minute battle engine, battle reports, and naval-before-land phase ordering (completed 2026-03-11)
 - [x] **Phase 6: Production Hardening** - Flutter web deployment, splash screen, RLS audit, performance validation (completed 2026-03-12)
 - [x] **Phase 7: Test Infrastructure** - Multi-account test scenarios, dev toolbar, rich seed scripts, unified test automation CLI (completed 2026-03-12)
-- [ ] **Phase 8: Bug Fixes & Timer Guards** - Fix dispatch-units undefined constant, add environment guard for speed-up migration, implement partial army engagement, fix dev toolbar bug
+- [x] **Phase 8: Bug Fixes & Timer Guards** - Fix dispatch-units undefined constant, add environment guard for speed-up migration, implement partial army engagement, fix dev toolbar bug (completed 2026-03-12)
 - [ ] **Phase 9: Phase 2 Verification** - Create missing Phase 2 VERIFICATION.md for 9 RSRC/BLDG requirements
 
 ## Phase Details
@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 5. Combat | 4/4 | Complete   | 2026-03-11 |
 | 6. Production Hardening | 2/2 | Complete   | 2026-03-12 |
 | 7. Test Infrastructure | 3/3 | Complete   | 2026-03-12 |
-| 8. Bug Fixes & Timer Guards | 1/2 | In Progress|  |
+| 8. Bug Fixes & Timer Guards | 2/2 | Complete   | 2026-03-12 |
 | 9. Phase 2 Verification | 0/0 | Not started | - |
 
 ### Phase 7: Test Infrastructure
@@ -168,7 +168,7 @@ Plans:
   2. Production environment uses 5-minute battle turns (CMBT-01) and 5-minute resource ticks (RSRC-02) — speed-up migration is environment-gated
   3. Each battle turn only a fraction of armies engage (e.g., 30%), with survivors carrying to next turn
   4. Dev toolbar "Trigger Battle" action works correctly without controller dispose error
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 08-01-PLAN.md — Wave 0 test scaffolds, dispatch-units constant fix (MIL-05), dev toolbar dispose fix

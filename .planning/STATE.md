@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 08-01: Bug fixes and test scaffolds — BASE_MINUTES_PER_GRID_UNIT fixed, NaN guard added, dev toolbar dispose fixed, 12 tests passing"
-last_updated: "2026-03-12T15:02:10.855Z"
+stopped_at: "Completed 08-02: Env guard timers and partial engagement — CMBT-01/CMBT-02 closed, 7 tests passing"
+last_updated: "2026-03-12T15:03:02.143Z"
 last_activity: 2026-03-12 - Gap closure phases 8-9 created from v1.0 milestone audit
 progress:
   total_phases: 9
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 26
-  completed_plans: 25
+  completed_plans: 26
   percent: 96
 ---
 
@@ -122,6 +122,7 @@ Progress: [████████░░] 84%
 | Phase 07-test-infrastructure P02 | 4 | 2 tasks | 4 files |
 | Phase 07 P03 | 10 | 2 tasks | 2 files |
 | Phase 08-bug-fixes-timer-guards P01 | 3 | 2 tasks | 6 files |
+| Phase 08-bug-fixes-timer-guards P02 | 4 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -199,6 +200,9 @@ Recent decisions affecting current work:
 - [Phase 08-bug-fixes-timer-guards]: [08-01] BASE_MINUTES_PER_GRID_UNIT = 2 declared in dispatch-units/index.ts to match Dart constant
 - [Phase 08-bug-fixes-timer-guards]: [08-01] NaN/finite guard added after calcTravelMinutes call in dispatch-units — returns 500 instead of inserting invalid arrive_at
 - [Phase 08-bug-fixes-timer-guards]: [08-01] Dev toolbar _triggerBattle: capture controller.text into local variable before dispose()
+- [Phase 08-bug-fixes-timer-guards]: [08-02] Engagement fraction applied only in attack/defense summation loops, NOT in casualty loops — double-applying would over-count the fraction
+- [Phase 08-bug-fixes-timer-guards]: [08-02] v_turn_interval resolved once per function call via current_setting — avoids repeated setting lookups in the per-battle loop
+- [Phase 08-bug-fixes-timer-guards]: [08-02] Migration 20260312000009 handles both environments in one function body via v_turn_interval rather than using another conditional DO block
 
 ### Roadmap Evolution
 
@@ -224,6 +228,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T15:02:10.851Z
-Stopped at: Completed 08-01: Bug fixes and test scaffolds — BASE_MINUTES_PER_GRID_UNIT fixed, NaN guard added, dev toolbar dispose fixed, 12 tests passing
+Last session: 2026-03-12T15:03:02.139Z
+Stopped at: Completed 08-02: Env guard timers and partial engagement — CMBT-01/CMBT-02 closed, 7 tests passing
 Resume file: None
