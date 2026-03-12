@@ -136,7 +136,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 4. Military | 4/4 | Complete   | 2026-03-11 |
 | 5. Combat | 4/4 | Complete   | 2026-03-11 |
 | 6. Production Hardening | 2/2 | Complete   | 2026-03-12 |
-| 7. Test Infrastructure | 1/3 | In Progress|  |
+| 7. Test Infrastructure | 2/3 | In Progress|  |
 
 ### Phase 7: Test Infrastructure
 **Goal**: The game is easily testable with multiple pre-configured accounts at different game stages, a dev toolbar for instant game-state manipulation, seed scripts for ready-to-play scenarios, and a unified test automation script that resets and validates everything in one command
@@ -147,7 +147,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
   2. A dev toolbar is accessible in debug mode that allows instant resource injection, building level-up, unit spawning, and battle triggering without going through normal game flows
   3. Seed scripts produce a rich, deterministic game world where multiple accounts are already interacting (troops dispatched, battles in progress, construction queues active)
   4. A single CLI command resets the database, re-seeds all data, runs all Flutter unit/widget tests, and reports pass/fail status
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 - [ ] 07-01-PLAN.md — Expand seed.sql to 7 test accounts with rich game states, create SECURITY DEFINER RPC helpers for dev toolbar
