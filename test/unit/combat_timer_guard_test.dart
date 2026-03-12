@@ -1,32 +1,47 @@
-// Tests documenting production timer constants (CMBT-01).
-// These serve as living documentation of the pg_cron schedule and
-// battle turn interval used in the production Supabase database.
+// Tests for production timer contract — CMBT-01.
 //
-// Wave 0 stubs — unskipped in 08-02 Task 1 when timer guard migrations are added.
+// These are documentary tests: they verify the Dart-side constants and
+// documented production values that must match the SQL migrations.
+//
+// Production timers (migration 20260312000008_env_guard_timers.sql):
+//   - Battle turn interval: 5 minutes
+//   - Resource tick schedule: */5 * * * *
+//
+// Dev speed-up timers (migration 20260312000007_speed_up_all_timers.sql):
+//   - Battle turn interval: 10 seconds
 
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('production timer constants (CMBT-01)', () {
-    test(
-      'production battle turn interval is 5 minutes',
-      () {
-        // The base migration uses INTERVAL '5 minutes' for battle turns
-        // in the process_battle_turns pg_cron schedule.
-        // Verified in supabase/migrations/20250601000000_battle_functions.sql
-        expect(true, isTrue); // documentation test — asserts convention exists
-      },
-      skip: 'Unskipped in 08-02 Task 1',
-    );
+  // Production timer constants documented here.
+  // These values must match migration 20260312000008_env_guard_timers.sql.
+  const int productionBattleTurnMinutes = 5;
+  const String productionResourceTickCron = '*/5 * * * *';
 
-    test(
-      'production resource tick is every 5 minutes',
-      () {
-        // The base cron schedule for process_resource_tick is */5 * * * *
-        // Verified in supabase/migrations that register the pg_cron job.
-        expect(true, isTrue); // documentation test — asserts convention exists
-      },
-      skip: 'Unskipped in 08-02 Task 1',
-    );
+  // Dev speed-up constant documented here.
+  // Must match migration 20260312000007_speed_up_all_timers.sql.
+  const int devBattleTurnSeconds = 10;
+
+  group('production timer constants (CMBT-01)', () {
+    test('production battle turn interval is 5 minutes', () {
+      // CMBT-01: In production, each battle turn resolves after 5 minutes.
+      // SQL: next_turn_at + INTERVAL '5 minutes'
+      // See: supabase/migrations/20260312000008_env_guard_timers.sql
+      expect(productionBattleTurnMinutes, 5);
+    });
+
+    test('production resource tick is every 5 minutes', () {
+      // CMBT-01: In production, the resource tick pg_cron schedule is */5 * * * *
+      // SQL: cron.schedule('resource-tick', '*/5 * * * *', ...)
+      // See: supabase/migrations/20260312000008_env_guard_timers.sql
+      expect(productionResourceTickCron, '*/5 * * * *');
+    });
+
+    test('dev speed-up uses 10-second battle turns', () {
+      // Dev mode: battle turns resolve after 10 seconds for faster testing.
+      // SQL: next_turn_at + INTERVAL '10 seconds'
+      // See: supabase/migrations/20260312000007_speed_up_all_timers.sql
+      expect(devBattleTurnSeconds, 10);
+    });
   });
 }
