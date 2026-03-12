@@ -43,12 +43,12 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **MIL-02**: 5 naval unit types buildable from Shipyard (Cargo Ship, Ram Ship, Catapult Ship, Mortar Ship, Diving Boat)
 - [x] **MIL-03**: Each unit type requires specific building level to unlock
 - [x] **MIL-04**: Training queue with time-based completion via pg_cron
-- [x] **MIL-05**: Troops can be dispatched to other cities with travel time based on distance
+- [ ] **MIL-05**: Troops can be dispatched to other cities with travel time based on distance
 
 ### Combat
 
-- [x] **CMBT-01**: Battles resolve in turns, each turn lasting 5 minutes
-- [x] **CMBT-02**: Each turn a portion of armies engage, survivors carry to next turn
+- [ ] **CMBT-01**: Battles resolve in turns, each turn lasting 5 minutes
+- [ ] **CMBT-02**: Each turn a portion of armies engage, survivors carry to next turn
 - [x] **CMBT-03**: Naval battle phase occurs before land battle phase
 - [x] **CMBT-04**: Battle reports sent to both attacker and defender via Supabase Realtime
 - [x] **CMBT-05**: All battle calculations run server-side (Edge Function or pg function)
@@ -127,15 +127,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-04 | Phase 1 | Complete |
 | INFR-02 | Phase 1 | Complete |
 | INFR-03 | Phase 1 | Complete |
-| RSRC-01 | Phase 2 | Complete |
-| RSRC-02 | Phase 2 | Complete |
-| RSRC-03 | Phase 2 | Complete |
-| RSRC-04 | Phase 2 | Complete |
-| BLDG-01 | Phase 2 | Complete |
-| BLDG-02 | Phase 2 | Complete |
-| BLDG-03 | Phase 2 | Complete |
-| BLDG-04 | Phase 2 | Complete |
-| BLDG-05 | Phase 2 | Complete |
+| RSRC-01 | Phase 2, 9 | Pending verification |
+| RSRC-02 | Phase 2, 9 | Pending verification |
+| RSRC-03 | Phase 2, 9 | Pending verification |
+| RSRC-04 | Phase 2, 9 | Pending verification |
+| BLDG-01 | Phase 2, 9 | Pending verification |
+| BLDG-02 | Phase 2, 9 | Pending verification |
+| BLDG-03 | Phase 2, 9 | Pending verification |
+| BLDG-04 | Phase 2, 9 | Pending verification |
+| BLDG-05 | Phase 2, 9 | Pending verification |
 | MAP-01 | Phase 3 | Complete |
 | MAP-02 | Phase 3 | Complete |
 | MAP-03 | Phase 3 | Complete |
@@ -145,9 +145,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MIL-02 | Phase 4 | Complete |
 | MIL-03 | Phase 4 | Complete |
 | MIL-04 | Phase 4 | Complete |
-| MIL-05 | Phase 4 | Complete |
-| CMBT-01 | Phase 5 | Complete |
-| CMBT-02 | Phase 5 | Complete |
+| MIL-05 | Phase 8 | Pending |
+| CMBT-01 | Phase 8 | Pending |
+| CMBT-02 | Phase 8 | Pending |
 | CMBT-03 | Phase 5 | Complete |
 | CMBT-04 | Phase 5 | Complete |
 | CMBT-05 | Phase 5 | Complete |
@@ -155,6 +155,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 - v1 requirements: 31 total
+- Complete: 19
+- Pending: 3 (MIL-05, CMBT-01, CMBT-02 → Phase 8)
+- Pending verification: 9 (RSRC/BLDG → Phase 9)
 - Mapped to phases: 31
 - Unmapped: 0 ✓
 

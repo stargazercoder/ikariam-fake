@@ -19,6 +19,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Combat** - Turn-based 5-minute battle engine, battle reports, and naval-before-land phase ordering (completed 2026-03-11)
 - [x] **Phase 6: Production Hardening** - Flutter web deployment, splash screen, RLS audit, performance validation (completed 2026-03-12)
 - [x] **Phase 7: Test Infrastructure** - Multi-account test scenarios, dev toolbar, rich seed scripts, unified test automation CLI (completed 2026-03-12)
+- [ ] **Phase 8: Bug Fixes & Timer Guards** - Fix dispatch-units undefined constant, add environment guard for speed-up migration, implement partial army engagement, fix dev toolbar bug
+- [ ] **Phase 9: Phase 2 Verification** - Create missing Phase 2 VERIFICATION.md for 9 RSRC/BLDG requirements
 
 ## Phase Details
 
@@ -126,7 +128,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -137,6 +139,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 5. Combat | 4/4 | Complete   | 2026-03-11 |
 | 6. Production Hardening | 2/2 | Complete   | 2026-03-12 |
 | 7. Test Infrastructure | 3/3 | Complete   | 2026-03-12 |
+| 8. Bug Fixes & Timer Guards | 0/0 | Not started | - |
+| 9. Phase 2 Verification | 0/0 | Not started | - |
 
 ### Phase 7: Test Infrastructure
 **Goal**: The game is easily testable with multiple pre-configured accounts at different game stages, a dev toolbar for instant game-state manipulation, seed scripts for ready-to-play scenarios, and a unified test automation script that resets and validates everything in one command
@@ -153,3 +157,25 @@ Plans:
 - [ ] 07-01-PLAN.md — Expand seed.sql to 7 test accounts with rich game states, create SECURITY DEFINER RPC helpers for dev toolbar
 - [ ] 07-02-PLAN.md — Flutter DevToolbarWrapper widget with resource injection, building level-up, unit spawning, battle triggering actions
 - [ ] 07-03-PLAN.md — Unified CLI test scripts (test_all.sh + test_all.ps1), end-to-end human verification
+
+### Phase 8: Bug Fixes & Timer Guards
+**Goal**: Fix the dispatch-units undefined constant that breaks unit arrival, add environment guard to speed-up migration so production uses correct timers, implement partial army engagement per turn, and fix dev toolbar trigger battle bug
+**Depends on**: Phase 7
+**Requirements**: MIL-05, CMBT-01, CMBT-02
+**Gap Closure**: Closes gaps from v1.0 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. Dispatched units arrive at their destination with a valid arrive_at timestamp and process_arrivals picks them up
+  2. Production environment uses 5-minute battle turns (CMBT-01) and 5-minute resource ticks (RSRC-02) — speed-up migration is environment-gated
+  3. Each battle turn only a fraction of armies engage (e.g., 30%), with survivors carrying to next turn
+  4. Dev toolbar "Trigger Battle" action works correctly without controller dispose error
+**Plans:** 0/0 plans
+
+### Phase 9: Phase 2 Verification
+**Goal**: Create the missing Phase 2 VERIFICATION.md to formally verify all 9 RSRC and BLDG requirements against the codebase
+**Depends on**: Phase 8
+**Requirements**: RSRC-01, RSRC-02, RSRC-03, RSRC-04, BLDG-01, BLDG-02, BLDG-03, BLDG-04, BLDG-05
+**Gap Closure**: Closes verification gap from v1.0 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. Phase 2 VERIFICATION.md exists with observable truths for all 9 requirements
+  2. Each requirement has evidence linking to specific code files and functions
+**Plans:** 0/0 plans

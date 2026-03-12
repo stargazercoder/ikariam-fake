@@ -57,10 +57,10 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 
 ## Current Position
 
-Phase: 5 of 6 (Combat)
-Plan: 1 of 4 in current phase (05-00 complete)
-Status: Executing
-Last activity: 2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)
+Phase: 8 of 9 (Bug Fixes & Timer Guards)
+Plan: 0 of 0 in current phase (not yet planned)
+Status: Planning gap closure
+Last activity: 2026-03-12 - Gap closure phases 8-9 created from v1.0 milestone audit
 
 Progress: [████████░░] 84%
 
@@ -183,6 +183,8 @@ Recent decisions affecting current work:
 ### Roadmap Evolution
 
 - Phase 7 added: Test Infrastructure — multi-account test scenarios, dev toolbar, rich seed scripts, unified test automation CLI
+- Phase 8 added: Bug Fixes & Timer Guards — dispatch-units fix, speed-up environment guard, partial army engagement, dev toolbar fix
+- Phase 9 added: Phase 2 Verification — create missing VERIFICATION.md for 9 RSRC/BLDG requirements
 
 ### Pending Todos
 
