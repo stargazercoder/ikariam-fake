@@ -2,7 +2,7 @@
 
 ## Overview
 
-Six phases take this game from a blank Flutter project to a playable multiplayer strategy game. The dependency chain is strict: auth gates everything (RLS references auth.uid()), resources gate buildings (costs require a working resource system), buildings gate military (units need Barracks/Shipyard), the world map gives military units somewhere to go, and combat is the payoff the entire system exists to deliver. Infrastructure concerns are woven throughout but receive a dedicated final phase for production hardening.
+Seven phases take this game from a blank Flutter project to a playable, easily testable multiplayer strategy game. The dependency chain is strict: auth gates everything (RLS references auth.uid()), resources gate buildings (costs require a working resource system), buildings gate military (units need Barracks/Shipyard), the world map gives military units somewhere to go, and combat is the payoff the entire system exists to deliver. Infrastructure concerns are woven throughout but receive a dedicated phase for production hardening, followed by test infrastructure to make the whole system easy to validate and iterate on.
 
 ## Phases
 
@@ -18,6 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Military** - Land and naval unit training, dispatch system, and unit unlock requirements (completed 2026-03-11)
 - [x] **Phase 5: Combat** - Turn-based 5-minute battle engine, battle reports, and naval-before-land phase ordering (completed 2026-03-11)
 - [x] **Phase 6: Production Hardening** - Flutter web deployment, splash screen, RLS audit, performance validation (completed 2026-03-12)
+- [ ] **Phase 7: Test Infrastructure** - Multi-account test scenarios, dev toolbar, rich seed scripts, unified test automation CLI
 
 ## Phase Details
 
@@ -119,13 +120,13 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 06-01-PLAN.md — Splash screen implementation: Wave 0 test scaffold, index.html splash div, custom flutter_bootstrap.js, manifest.json branding
-- [ ] 06-02-PLAN.md — Production build, INFR-02/INFR-03 security audits, visual splash verification checkpoint
+- [x] 06-01-PLAN.md — Splash screen implementation: Wave 0 test scaffold, index.html splash div, custom flutter_bootstrap.js, manifest.json branding
+- [x] 06-02-PLAN.md — Production build, INFR-02/INFR-03 security audits, visual splash verification checkpoint
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -135,3 +136,20 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 4. Military | 4/4 | Complete   | 2026-03-11 |
 | 5. Combat | 4/4 | Complete   | 2026-03-11 |
 | 6. Production Hardening | 2/2 | Complete   | 2026-03-12 |
+| 7. Test Infrastructure | 0/3 | Not started | — |
+
+### Phase 7: Test Infrastructure
+**Goal**: The game is easily testable with multiple pre-configured accounts at different game stages, a dev toolbar for instant game-state manipulation, seed scripts for ready-to-play scenarios, and a unified test automation script that resets and validates everything in one command
+**Depends on**: Phase 6
+**Requirements**: TEST-01, TEST-02, TEST-03, TEST-04
+**Success Criteria** (what must be TRUE):
+  1. At least 6+ test accounts exist with varied game states (new player, mid-game with buildings, military-ready with army, active battle, etc.) so each feature can be tested without manual setup
+  2. A dev toolbar is accessible in debug mode that allows instant resource injection, building level-up, unit spawning, and battle triggering without going through normal game flows
+  3. Seed scripts produce a rich, deterministic game world where multiple accounts are already interacting (troops dispatched, battles in progress, construction queues active)
+  4. A single CLI command resets the database, re-seeds all data, runs all Flutter unit/widget tests, and reports pass/fail status
+**Plans:** 3 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Expand seed.sql to 7 test accounts with rich game states, create SECURITY DEFINER RPC helpers for dev toolbar
+- [ ] 07-02-PLAN.md — Flutter DevToolbarWrapper widget with resource injection, building level-up, unit spawning, battle triggering actions
+- [ ] 07-03-PLAN.md — Unified CLI test scripts (test_all.sh + test_all.ps1), end-to-end human verification
