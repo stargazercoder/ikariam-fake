@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 5. Combat | 4/4 | Complete   | 2026-03-11 |
 | 6. Production Hardening | 2/2 | Complete   | 2026-03-12 |
 | 7. Test Infrastructure | 3/3 | Complete   | 2026-03-12 |
-| 8. Bug Fixes & Timer Guards | 0/2 | In Progress | - |
+| 8. Bug Fixes & Timer Guards | 1/2 | In Progress|  |
 | 9. Phase 2 Verification | 0/0 | Not started | - |
 
 ### Phase 7: Test Infrastructure
@@ -168,7 +168,7 @@ Plans:
   2. Production environment uses 5-minute battle turns (CMBT-01) and 5-minute resource ticks (RSRC-02) — speed-up migration is environment-gated
   3. Each battle turn only a fraction of armies engage (e.g., 30%), with survivors carrying to next turn
   4. Dev toolbar "Trigger Battle" action works correctly without controller dispose error
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 08-01-PLAN.md — Wave 0 test scaffolds, dispatch-units constant fix (MIL-05), dev toolbar dispose fix

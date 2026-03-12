@@ -43,7 +43,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **MIL-02**: 5 naval unit types buildable from Shipyard (Cargo Ship, Ram Ship, Catapult Ship, Mortar Ship, Diving Boat)
 - [x] **MIL-03**: Each unit type requires specific building level to unlock
 - [x] **MIL-04**: Training queue with time-based completion via pg_cron
-- [ ] **MIL-05**: Troops can be dispatched to other cities with travel time based on distance
+- [x] **MIL-05**: Troops can be dispatched to other cities with travel time based on distance
 
 ### Combat
 
@@ -145,7 +145,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MIL-02 | Phase 4 | Complete |
 | MIL-03 | Phase 4 | Complete |
 | MIL-04 | Phase 4 | Complete |
-| MIL-05 | Phase 8 | Pending |
+| MIL-05 | Phase 8 | Complete |
 | CMBT-01 | Phase 8 | Pending |
 | CMBT-02 | Phase 8 | Pending |
 | CMBT-03 | Phase 5 | Complete |

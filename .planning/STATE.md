@@ -3,11 +3,27 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
+stopped_at: "Completed 08-01: Bug fixes and test scaffolds — BASE_MINUTES_PER_GRID_UNIT fixed, NaN guard added, dev toolbar dispose fixed, 12 tests passing"
+last_updated: "2026-03-12T15:02:10.855Z"
+last_activity: 2026-03-12 - Gap closure phases 8-9 created from v1.0 milestone audit
+progress:
+  total_phases: 9
+  completed_phases: 7
+  total_plans: 26
+  completed_plans: 25
+  percent: 96
+---
+
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: executing
 stopped_at: "Completed 07-03: CLI test automation scripts — TEST-04 verified, 75 passed 12 skipped 0 failures, Phase 7 complete"
 last_updated: "2026-03-12T12:09:14.026Z"
 last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
 progress:
-  total_phases: 7
+  [██████████] 96%
   completed_phases: 7
   total_plans: 24
   completed_plans: 24
@@ -105,6 +121,7 @@ Progress: [████████░░] 84%
 | Phase 07-test-infrastructure P01 | 4 | 2 tasks | 3 files |
 | Phase 07-test-infrastructure P02 | 4 | 2 tasks | 4 files |
 | Phase 07 P03 | 10 | 2 tasks | 2 files |
+| Phase 08-bug-fixes-timer-guards P01 | 3 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -179,6 +196,9 @@ Recent decisions affecting current work:
 - [Phase 07-test-infrastructure]: [07-03] PowerShell uses $LASTEXITCODE after flutter test — $ErrorActionPreference Stop does not catch external CLI exit codes
 - [Phase 07]: [07-03] set +e before flutter test captures exit code instead of aborting — allows printing summary before exiting
 - [Phase 07]: [07-03] 12 expected skips in flutter test: auth/profile stubs need live DB, seed scenario stubs are future Phase 5 integration placeholders
+- [Phase 08-bug-fixes-timer-guards]: [08-01] BASE_MINUTES_PER_GRID_UNIT = 2 declared in dispatch-units/index.ts to match Dart constant
+- [Phase 08-bug-fixes-timer-guards]: [08-01] NaN/finite guard added after calcTravelMinutes call in dispatch-units — returns 500 instead of inserting invalid arrive_at
+- [Phase 08-bug-fixes-timer-guards]: [08-01] Dev toolbar _triggerBattle: capture controller.text into local variable before dispose()
 
 ### Roadmap Evolution
 
@@ -204,6 +224,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T12:05:27.798Z
-Stopped at: Completed 07-03: CLI test automation scripts — TEST-04 verified, 75 passed 12 skipped 0 failures, Phase 7 complete
+Last session: 2026-03-12T15:02:10.851Z
+Stopped at: Completed 08-01: Bug fixes and test scaffolds — BASE_MINUTES_PER_GRID_UNIT fixed, NaN guard added, dev toolbar dispose fixed, 12 tests passing
 Resume file: None
