@@ -3,11 +3,27 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
+stopped_at: "Completed 07-01: Expanded seed (7 accounts, rich game states) and 4 SECURITY DEFINER dev RPC helpers — TEST-01/TEST-03"
+last_updated: "2026-03-12T11:10:53.191Z"
+last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
+progress:
+  total_phases: 7
+  completed_phases: 6
+  total_plans: 24
+  completed_plans: 22
+  percent: 92
+---
+
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: executing
 stopped_at: "Completed 06-02: Production build and security audits — INFR-01/02/03 all verified, flutter build web --release SUCCESS, v1 production-ready"
 last_updated: "2026-03-12T08:16:50.025Z"
 last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
 progress:
-  total_phases: 6
+  [█████████░] 92%
   completed_phases: 6
   total_plans: 21
   completed_plans: 21
@@ -86,6 +102,7 @@ Progress: [████████░░] 84%
 | Phase 05-combat P03 | 30 | 3 tasks | 5 files |
 | Phase 06-production-hardening P01 | 2 | 1 tasks | 4 files |
 | Phase 06-production-hardening P02 | 15 | 2 tasks | 0 files |
+| Phase 07-test-infrastructure P01 | 4 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -150,6 +167,13 @@ Recent decisions affecting current work:
 - [Phase 06-02]: INFR-02 approved exception confirmed: ProfileRepository.updateProfile is only client-side write; all game-state mutations go through Edge Functions
 - [Phase 06-02]: INFR-03 confirmed: all public tables have RLS enabled and at least 1 policy each
 - [Phase 06-02]: INFR-01 human-verified: splash visible before Flutter renders, page never shows blank white
+- [Phase 07-01]: [07-01] Battle for accounts 5-6 seeded directly into battles table (not via unit_movements) — avoids process_arrivals cron dependency, simpler and deterministic
+- [Phase 07-01]: [07-01] dev_trigger_battle accepts city IDs (not user IDs) — toolbar knows city context, resolves owner_id internally via SECURITY DEFINER
+- [Phase 07-01]: [07-01] supabase db reset verification deferred: Docker Desktop not running; SQL follows established SECURITY DEFINER patterns from Phase 5
+
+### Roadmap Evolution
+
+- Phase 7 added: Test Infrastructure — multi-account test scenarios, dev toolbar, rich seed scripts, unified test automation CLI
 
 ### Pending Todos
 
@@ -169,6 +193,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T08:16:50.023Z
-Stopped at: Completed 06-02: Production build and security audits — INFR-01/02/03 all verified, flutter build web --release SUCCESS, v1 production-ready
+Last session: 2026-03-12T11:10:53.188Z
+Stopped at: Completed 07-01: Expanded seed (7 accounts, rich game states) and 4 SECURITY DEFINER dev RPC helpers — TEST-01/TEST-03
 Resume file: None
