@@ -18,21 +18,32 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="A multiplayer strategy game — build cities, gather resources, and conquer enemies">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="ikariam">
+  <meta name="apple-mobile-web-app-title" content="Ikariam">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>ikariam</title>
+  <title>Ikariam</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <div id="splash">
+    <style>
+      #splash { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #1A237E; z-index: 9999; transition: opacity 0.4s ease; }
+      #splash h1 { color: #C9A84C; font-family: serif; font-size: 2.5rem; letter-spacing: 0.1em; }
+      #splash p { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-top: 0.5rem; text-align: center; }
+    </style>
+    <div style="text-align:center">
+      <h1>IKARIAM</h1>
+      <p>Loading...</p>
+    </div>
+  </div>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
