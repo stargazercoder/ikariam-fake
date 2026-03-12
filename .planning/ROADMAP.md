@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 5. Combat | 4/4 | Complete   | 2026-03-11 |
 | 6. Production Hardening | 2/2 | Complete   | 2026-03-12 |
 | 7. Test Infrastructure | 3/3 | Complete   | 2026-03-12 |
-| 8. Bug Fixes & Timer Guards | 0/0 | Not started | - |
+| 8. Bug Fixes & Timer Guards | 0/2 | In Progress | - |
 | 9. Phase 2 Verification | 0/0 | Not started | - |
 
 ### Phase 7: Test Infrastructure
@@ -154,9 +154,9 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 **Plans:** 3/3 plans complete
 
 Plans:
-- [ ] 07-01-PLAN.md — Expand seed.sql to 7 test accounts with rich game states, create SECURITY DEFINER RPC helpers for dev toolbar
-- [ ] 07-02-PLAN.md — Flutter DevToolbarWrapper widget with resource injection, building level-up, unit spawning, battle triggering actions
-- [ ] 07-03-PLAN.md — Unified CLI test scripts (test_all.sh + test_all.ps1), end-to-end human verification
+- [x] 07-01-PLAN.md — Expand seed.sql to 7 test accounts with rich game states, create SECURITY DEFINER RPC helpers for dev toolbar
+- [x] 07-02-PLAN.md — Flutter DevToolbarWrapper widget with resource injection, building level-up, unit spawning, battle triggering actions
+- [x] 07-03-PLAN.md — Unified CLI test scripts (test_all.sh + test_all.ps1), end-to-end human verification
 
 ### Phase 8: Bug Fixes & Timer Guards
 **Goal**: Fix the dispatch-units undefined constant that breaks unit arrival, add environment guard to speed-up migration so production uses correct timers, implement partial army engagement per turn, and fix dev toolbar trigger battle bug
@@ -168,7 +168,11 @@ Plans:
   2. Production environment uses 5-minute battle turns (CMBT-01) and 5-minute resource ticks (RSRC-02) — speed-up migration is environment-gated
   3. Each battle turn only a fraction of armies engage (e.g., 30%), with survivors carrying to next turn
   4. Dev toolbar "Trigger Battle" action works correctly without controller dispose error
-**Plans:** 0/0 plans
+**Plans:** 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Wave 0 test scaffolds, dispatch-units constant fix (MIL-05), dev toolbar dispose fix
+- [ ] 08-02-PLAN.md — Environment guard migration (CMBT-01), partial army engagement in resolve_battles() (CMBT-02)
 
 ### Phase 9: Phase 2 Verification
 **Goal**: Create the missing Phase 2 VERIFICATION.md to formally verify all 9 RSRC and BLDG requirements against the codebase
