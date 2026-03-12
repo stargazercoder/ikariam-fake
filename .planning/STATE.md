@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 07-02: Dev toolbar widget (DevToolbarWrapper, DevRpcService, MainShellScreen integration) — TEST-02"
-last_updated: "2026-03-12T11:19:08.822Z"
+stopped_at: "Completed 07-03 Task 1: CLI test scripts (test_all.sh + test_all.ps1) — TEST-04 — awaiting human-verify checkpoint"
+last_updated: "2026-03-12T11:21:31.383Z"
 last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 24
-  completed_plans: 23
+  completed_plans: 24
   percent: 92
 ---
 
@@ -174,6 +174,8 @@ Recent decisions affecting current work:
 - [Phase 07-02]: [07-02] DevRpcService._client is a lazy getter (not constructor field): avoids Supabase.instance.client call during widget construction in tests
 - [Phase 07-02]: [07-02] Widget tests use ProviderScope + _NullCityNotifier subclass of CityNotifier: AsyncNotifierProvider.overrideWith requires same notifier type
 - [Phase 07-02]: [07-02] kDebugMode double-gate in MainShellScreen and DevToolbarWrapper: shell gate prevents constructing wrapper in release, internal check provides defense-in-depth
+- [Phase 07-test-infrastructure]: [07-03] set +e before flutter test captures exit code instead of aborting — allows printing summary before exiting
+- [Phase 07-test-infrastructure]: [07-03] PowerShell uses $LASTEXITCODE after flutter test — $ErrorActionPreference Stop does not catch external CLI exit codes
 
 ### Roadmap Evolution
 
@@ -197,6 +199,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T11:19:08.820Z
-Stopped at: Completed 07-02: Dev toolbar widget (DevToolbarWrapper, DevRpcService, MainShellScreen integration) — TEST-02
+Last session: 2026-03-12T11:21:31.284Z
+Stopped at: Completed 07-03 Task 1: CLI test scripts (test_all.sh + test_all.ps1) — TEST-04 — awaiting human-verify checkpoint
 Resume file: None
