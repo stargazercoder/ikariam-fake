@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../core/dev/dev_toolbar.dart';
 
 /// Shell scaffold that wraps all four main game views with a bottom navigation bar.
 ///
@@ -20,7 +23,9 @@ class MainShellScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: navigationShell,
+      body: kDebugMode
+          ? DevToolbarWrapper(child: navigationShell)
+          : navigationShell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: (index) => navigationShell.goBranch(
