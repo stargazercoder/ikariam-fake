@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Economy & Combat Depth
 status: ready_to_plan
-stopped_at: Completed 10-economy-foundation/10-03-PLAN.md — Phase 10 fully complete
-last_updated: "2026-03-13T20:47:09.912Z"
+stopped_at: Completed 11-island-upgrades-resource-rate-ui/11-01-PLAN.md
+last_updated: "2026-03-13T21:44:53.249Z"
 last_activity: 2026-03-13 — Roadmap created for v1.1 milestone, all 13 requirements mapped
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 5
+  completed_plans: 4
   percent: 100
 ---
 
@@ -85,6 +85,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 10-economy-foundation P01 | 3 | 1 tasks | 2 files |
 | Phase 10-economy-foundation P03 | 18 | 3 tasks | 5 files |
 | Phase 10-economy-foundation P03 | 18 | 4 tasks | 6 files |
+| Phase 11-island-upgrades-resource-rate-ui P01 | 5 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,9 @@ Recent decisions affecting current work:
 - [Phase 10-economy-foundation]: cities table added to supabase_realtime publication with REPLICA IDENTITY FULL for live population/happiness broadcasts
 - [Phase 10-economy-foundation]: Wine icon: Icons.wine_bar + Colors.purple.shade600 — consistent across all UI files
 - [Phase 10-economy-foundation]: _TavernWineSlider syncs initial rate from stream only on first emission to avoid fighting user slider interaction
+- [Phase 11-island-upgrades-resource-rate-ui]: Island multiplier applies to all 4 production resources uniformly — luxury type distinction deferred to v1.2
+- [Phase 11-island-upgrades-resource-rate-ui]: Wood donation cost uses DONATION_COSTS constant table (300 * 1.5^level) in Edge Function — no DB lookup
+- [Phase 11-island-upgrades-resource-rate-ui]: Islands NOT added to Realtime publication — island screen re-fetches on mount; level effect visible at next 5-min tick
 
 ### Pending Todos
 
@@ -118,6 +122,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T20:41:28.019Z
-Stopped at: Completed 10-economy-foundation/10-03-PLAN.md — Phase 10 fully complete
+Last session: 2026-03-13T21:44:53.247Z
+Stopped at: Completed 11-island-upgrades-resource-rate-ui/11-01-PLAN.md
 Resume file: None

@@ -15,8 +15,8 @@
 
 ### Resources
 
-- [ ] **RSRC-01**: User can donate wood to upgrade island shared resource level
-- [ ] **RSRC-02**: Island resource level multiplier applies to all cities on that island
+- [x] **RSRC-01**: User can donate wood to upgrade island shared resource level
+- [x] **RSRC-02**: Island resource level multiplier applies to all cities on that island
 - [ ] **RSRC-03**: User can see hourly production rate per resource in main resource bar
 - [ ] **RSRC-04**: User can see detailed production breakdown per resource (base rate, building level, island bonus, research bonus)
 
@@ -71,8 +71,8 @@
 | ECON-03 | Phase 10 | Complete |
 | ECON-04 | Phase 10 | Complete |
 | ECON-05 | Phase 10 | Complete |
-| RSRC-01 | Phase 11 | Pending |
-| RSRC-02 | Phase 11 | Pending |
+| RSRC-01 | Phase 11 | Complete |
+| RSRC-02 | Phase 11 | Complete |
 | RSRC-03 | Phase 11 | Pending |
 | RSRC-04 | Phase 11 | Pending |
 | CMBT-01 | Phase 12 | Pending |
