@@ -39,13 +39,23 @@ Players can build and manage cities, gather resources, and engage in real-time t
 
 ### Active
 
+<!-- v1.1 Economy & Combat Depth -->
+- [ ] Happiness system: tavern consumes wine to boost happiness, happiness affects population growth rate
+- [ ] Population-based tax income (population x tax rate = gold/hour)
+- [ ] Island resource points upgradeable (shared resource building levels)
+- [ ] Resource UI: hourly production rate in main resource bar + detailed breakdown in building/resource screens
+- [ ] Player-to-player resource trading via cargo ships
+- [ ] Marketplace with buy/sell orders (order book)
+- [ ] Battle outcome: pillage (steal resources on victory)
+- [ ] Battle reports: turn-by-turn unit loss visualization with color-coded unit types
+- [ ] Tavern happiness configuration (wine spending rate adjustable)
+
+<!-- Deferred to future milestones -->
 - [ ] Research system with 4 branches: Seafaring, Economy, Science, Military
 - [ ] Research prerequisites (tech tree with dependencies)
 - [ ] Academy building generates research points hourly
 - [ ] Players can send reinforcements during ongoing battles
-- [ ] Battle outcomes: pillage (steal resources) + occupation (city takeover)
-- [ ] Player-to-player resource trading via cargo ships
-- [ ] Marketplace with buy/sell orders (order book)
+- [ ] Battle outcome: occupation (city takeover) — deferred to v1.2+
 - [ ] Alliance system: create/join (requires Embassy), roles
 - [ ] Alliance chat and player-to-player messaging via Realtime
 - [ ] War declarations and NAP agreements
@@ -65,6 +75,21 @@ Players can build and manage cities, gather resources, and engage in real-time t
 - Espionage system — requires stable combat first
 - Barbarian villages (PvE) — requires combat maturity
 - WASM renderer — CanvasKit sufficient
+- City occupation (takeover) — deferred to v1.2+, pillage first
+
+## Current Milestone: v1.1 Economy & Combat Depth
+
+**Goal:** Deepen the economic loop with happiness/population/tax mechanics, add trading between players, and make combat victories meaningful with pillage rewards and improved battle reports.
+
+**Target features:**
+- Happiness system (tavern + wine → happiness → population growth)
+- Population-based gold tax income
+- Upgradeable island resource points
+- Resource production UI (hourly rates + breakdown)
+- Direct player trading + marketplace (order book)
+- Pillage mechanic (steal resources on battle victory)
+- Turn-by-turn battle report visualization (color-coded units)
+- Tavern happiness configuration
 
 ## Context
 
@@ -103,4 +128,4 @@ Players can build and manage cities, gather resources, and engage in real-time t
 | Manual Riverpod providers (no code-gen) | riverpod_generator incompatible with Dart 3.10.1 | ⚠️ Revisit — upgrade when SDK supports it |
 
 ---
-*Last updated: 2026-03-12 after v0.1.0 milestone*
+*Last updated: 2026-03-13 after v1.1 milestone start*

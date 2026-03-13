@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.1.0
-milestone_name: MVP
-status: milestone_complete
-stopped_at: "v0.1.0 MVP milestone archived — 9 phases, 27 plans, 31 requirements shipped"
-last_updated: "2026-03-12T20:00:00.000Z"
-last_activity: 2026-03-12 - v0.1.0 MVP milestone completed and archived
+milestone: v1.1
+milestone_name: Economy & Combat Depth
+status: defining_requirements
+stopped_at: "Milestone v1.1 started — defining requirements"
+last_updated: "2026-03-13T00:00:00.000Z"
+last_activity: 2026-03-13 — Milestone v1.1 started
 progress:
-  total_phases: 9
-  completed_phases: 9
-  total_plans: 27
-  completed_plans: 27
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 ---
