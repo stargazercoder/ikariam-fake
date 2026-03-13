@@ -85,6 +85,6 @@ Plans:
 | 7. Test Infrastructure | v0.1.0 | 3/3 | Complete | 2026-03-12 |
 | 8. Bug Fixes & Timer Guards | v0.1.0 | 2/2 | Complete | 2026-03-12 |
 | 9. Phase 2 Verification | v0.1.0 | 1/1 | Complete | 2026-03-12 |
-| 10. Economy Foundation | 3/3 | Complete   | 2026-03-13 | - |
+| 10. Economy Foundation | 3/3 | Complete    | 2026-03-13 | - |
 | 11. Island Upgrades + Resource Rate UI | v1.1 | 0/? | Not started | - |
 | 12. Combat Depth | v1.1 | 0/? | Not started | - |
