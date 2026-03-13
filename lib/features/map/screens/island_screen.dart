@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../city/providers/city_provider.dart';
+import '../../../core/constants/island_constants.dart';
 import '../models/island_city_slot.dart';
 import '../providers/island_detail_provider.dart';
 import '../providers/islands_provider.dart';
@@ -77,6 +79,11 @@ class _IslandDetailBody extends ConsumerWidget {
 
   final IslandDetail detail;
 
+  String? _playerCityId(WidgetRef ref) {
+    final city = ref.read(cityProvider).whenOrNull(data: (c) => c);
+    return city?['id'] as String?;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final island = detail.island;
@@ -130,6 +137,22 @@ class _IslandDetailBody extends ConsumerWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 8),
+                  // Island resource level indicator.
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.upgrade,
+                        size: 18,
+                        color: Theme.of(context).colorScheme.tertiary,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Resource Level: ${island.resourceLevel} / $maxIslandResourceLevel',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -159,10 +182,24 @@ class _IslandDetailBody extends ConsumerWidget {
             itemBuilder: (context, index) {
               // Last 2 items are resource areas.
               if (index == island.maxCitySlots) {
+                // Wood cell — tappable to donate and upgrade island resource.
+                final playerCityId = _playerCityId(ref);
                 return _ResourceCell(
                   icon: Icons.forest,
                   label: 'Wood',
                   color: Colors.green.shade700,
+                  onTap: () {
+                    showDialog<void>(
+                      context: context,
+                      builder: (_) => _DonateWoodDialog(
+                        islandId: island.id,
+                        currentLevel: island.resourceLevel,
+                        cityId: playerCityId ?? '',
+                        onDonated: () =>
+                            ref.invalidate(islandDetailProvider(island.id)),
+                      ),
+                    );
+                  },
                 );
               }
               if (index == island.maxCitySlots + 1) {
@@ -184,10 +221,11 @@ class _IslandDetailBody extends ConsumerWidget {
                 slot: slot,
                 currentUserId: currentUserId,
                 onTap: () {
-                  if (slot != null &&
-                      slot.isOccupied &&
-                      slot.ownerId == currentUserId) {
+                  if (slot == null || !slot.isOccupied) return;
+                  if (slot.ownerId == currentUserId) {
                     context.go('/city');
+                  } else if (slot.cityId != null) {
+                    _showEnemyCityDialog(context, ref, slot);
                   }
                 },
               );
@@ -196,6 +234,57 @@ class _IslandDetailBody extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _showEnemyCityDialog(BuildContext context, WidgetRef ref, CitySlot slot) {
+    final playerCityId = _playerCityId(ref) ?? '';
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.location_city, size: 24),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                slot.cityName ?? 'Enemy City',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Owner: ${_shortId(slot.ownerId ?? '')}'),
+            const SizedBox(height: 4),
+            Text('City ID: ${_shortId(slot.cityId ?? '')}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton.icon(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.push(
+                '/dispatch?cityId=$playerCityId&targetCityId=${slot.cityId}',
+              );
+            },
+            icon: const Icon(Icons.gps_fixed_outlined, size: 18),
+            label: const Text('Attack'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _shortId(String id) {
+    if (id.length <= 8) return id;
+    return '${id.substring(0, 8)}...';
   }
 
   IconData _luxuryIcon(String type) {
@@ -285,7 +374,7 @@ class _CitySlotCell extends StatelessWidget {
         : theme.colorScheme.secondary;
 
     return GestureDetector(
-      onTap: _isPlayerOwned ? onTap : null,
+      onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: color.withAlpha(200),
@@ -334,36 +423,198 @@ class _ResourceCell extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.color,
+    this.onTap,
   });
 
   final IconData icon;
   final String label;
   final Color color;
 
+  /// Optional tap callback. When set, wraps the cell in a GestureDetector.
+  final VoidCallback? onTap;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final cell = Container(
       decoration: BoxDecoration(
         color: color.withAlpha(180),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color, width: 2),
+        border: Border.all(
+          color: onTap != null ? Colors.white : color,
+          width: onTap != null ? 2 : 2,
+        ),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
         children: [
-          Icon(icon, size: 20, color: Colors.white),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 9,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 20, color: Colors.white),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 9,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-            textAlign: TextAlign.center,
           ),
+          // Tap indicator for tappable cells.
+          if (onTap != null)
+            Positioned(
+              right: 2,
+              top: 2,
+              child: Icon(
+                Icons.touch_app,
+                size: 10,
+                color: Colors.white.withAlpha(200),
+              ),
+            ),
         ],
       ),
     );
+
+    if (onTap == null) return cell;
+    return GestureDetector(onTap: onTap, child: cell);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Donate wood dialog
+// ---------------------------------------------------------------------------
+
+/// Dialog for donating wood to upgrade the island's shared resource building.
+class _DonateWoodDialog extends StatefulWidget {
+  const _DonateWoodDialog({
+    required this.islandId,
+    required this.currentLevel,
+    required this.cityId,
+    required this.onDonated,
+  });
+
+  final String islandId;
+  final int currentLevel;
+  final String cityId;
+
+  /// Called after a successful donation so the parent can refresh island data.
+  final VoidCallback onDonated;
+
+  @override
+  State<_DonateWoodDialog> createState() => _DonateWoodDialogState();
+}
+
+class _DonateWoodDialogState extends State<_DonateWoodDialog> {
+  bool _donating = false;
+
+  @override
+  Widget build(BuildContext context) {
+    // Maximum level reached — show info message only.
+    if (widget.currentLevel >= maxIslandResourceLevel) {
+      return AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.upgrade, size: 22),
+            SizedBox(width: 8),
+            Text('Island Resource Building'),
+          ],
+        ),
+        content: const Text(
+          'Island resource building is at maximum level!',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    }
+
+    final woodCost = islandDonationCost(widget.currentLevel);
+    final currentMult = islandMultiplier(widget.currentLevel);
+    final nextMult = islandMultiplier(widget.currentLevel + 1);
+
+    return AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.upgrade, size: 22),
+          SizedBox(width: 8),
+          Text('Upgrade Island Resource'),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Donate wood to upgrade the island\'s shared resource building '
+            'from level ${widget.currentLevel} to ${widget.currentLevel + 1}.',
+          ),
+          const SizedBox(height: 12),
+          // Cost row.
+          Row(
+            children: [
+              const Icon(Icons.forest, size: 18, color: Colors.green),
+              const SizedBox(width: 6),
+              Text(
+                '$woodCost Wood',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Benefit row.
+          Text(
+            'Production bonus: ${currentMult.toStringAsFixed(1)}x'
+            ' \u2192 ${nextMult.toStringAsFixed(1)}x'
+            ' for all cities on this island',
+            style: const TextStyle(fontSize: 13),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: _donating ? null : () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: _donating ? null : _donate,
+          child: _donating
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Donate'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _donate() async {
+    setState(() => _donating = true);
+    try {
+      await Supabase.instance.client.functions.invoke(
+        'donate-island-wood',
+        body: {'city_id': widget.cityId},
+      );
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      widget.onDonated();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _donating = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Donation failed: $e'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
   }
 }
