@@ -9,7 +9,8 @@ enum ResourceType {
   marble,
   crystal,
   sulfur,
-  gold;
+  gold,
+  wine;
 
   /// Returns the DB column value (snake_case string).
   String get value => name;
