@@ -66,25 +66,25 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ECON-01 | — | Pending |
-| ECON-02 | — | Pending |
-| ECON-03 | — | Pending |
-| ECON-04 | — | Pending |
-| ECON-05 | — | Pending |
-| RSRC-01 | — | Pending |
-| RSRC-02 | — | Pending |
-| RSRC-03 | — | Pending |
-| RSRC-04 | — | Pending |
-| CMBT-01 | — | Pending |
-| CMBT-02 | — | Pending |
-| CMBT-03 | — | Pending |
-| CMBT-04 | — | Pending |
+| ECON-01 | Phase 10 | Pending |
+| ECON-02 | Phase 10 | Pending |
+| ECON-03 | Phase 10 | Pending |
+| ECON-04 | Phase 10 | Pending |
+| ECON-05 | Phase 10 | Pending |
+| RSRC-01 | Phase 11 | Pending |
+| RSRC-02 | Phase 11 | Pending |
+| RSRC-03 | Phase 11 | Pending |
+| RSRC-04 | Phase 11 | Pending |
+| CMBT-01 | Phase 12 | Pending |
+| CMBT-02 | Phase 12 | Pending |
+| CMBT-03 | Phase 12 | Pending |
+| CMBT-04 | Phase 12 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 13 total
-- Mapped to phases: 0
-- Unmapped: 13
+- Mapped to phases: 13
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-13*
-*Last updated: 2026-03-13 after initial definition*
+*Last updated: 2026-03-13 — traceability updated after roadmap creation*

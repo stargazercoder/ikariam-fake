@@ -2,128 +2,54 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Economy & Combat Depth
-status: defining_requirements
-stopped_at: "Milestone v1.1 started — defining requirements"
+status: ready_to_plan
+stopped_at: "Roadmap created — Phase 10 ready to plan"
 last_updated: "2026-03-13T00:00:00.000Z"
-last_activity: 2026-03-13 — Milestone v1.1 started
+last_activity: 2026-03-13 — v1.1 roadmap created, 13 requirements mapped to 3 phases
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
   percent: 0
 ---
 
----
-gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: executing
-stopped_at: "Completed 07-03: CLI test automation scripts — TEST-04 verified, 75 passed 12 skipped 0 failures, Phase 7 complete"
-last_updated: "2026-03-12T12:09:14.026Z"
-last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
-progress:
-  [██████████] 96%
-  completed_phases: 7
-  total_plans: 24
-  completed_plans: 24
-  percent: 92
----
-
----
-gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: executing
-stopped_at: "Completed 06-02: Production build and security audits — INFR-01/02/03 all verified, flutter build web --release SUCCESS, v1 production-ready"
-last_updated: "2026-03-12T08:16:50.025Z"
-last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
-progress:
-  [█████████░] 92%
-  completed_phases: 6
-  total_plans: 21
-  completed_plans: 21
-  percent: 95
----
-
----
-gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: executing
-stopped_at: "Completed 05-03: Battle UI layer (BattlesScreen, BattleDetailScreen, BattleTurnCard) — human verification approved"
-last_updated: "2026-03-11T22:04:23.560Z"
-last_activity: "2026-03-12 - Completed 05-00: Combat Wave 0 test scaffolds (20 skipped stubs covering CMBT-01 through CMBT-05)"
-progress:
-  [██████████] 95%
-  completed_phases: 5
-  total_plans: 19
-  completed_plans: 19
-  percent: 95
----
-
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-11)
+See: .planning/PROJECT.md (updated 2026-03-13)
 
 **Core value:** Players can build and manage cities, gather resources, and engage in real-time turn-based warfare — the core loop of build, expand, and conquer must feel satisfying and strategically meaningful.
-**Current focus:** Phase 2 — Core Economy
+**Current focus:** Phase 10 — Economy Foundation
 
 ## Current Position
 
-Phase: 8 of 9 (Bug Fixes & Timer Guards)
-Plan: 0 of 0 in current phase (not yet planned)
-Status: Planning gap closure
-Last activity: 2026-03-12 - Gap closure phases 8-9 created from v1.0 milestone audit
+Phase: 10 of 12 (Economy Foundation)
+Plan: 0 of ? in current phase (not yet planned)
+Status: Ready to plan
+Last activity: 2026-03-13 — Roadmap created for v1.1 milestone, all 13 requirements mapped
 
-Progress: [████████░░] 84%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
-**Velocity:**
-- Total plans completed: 3
-- Average duration: 12 min
-- Total execution time: 0.60 hours
+**Velocity (v0.1.0 reference):**
+- Total plans completed: 27
+- Average duration: ~8 min
+- Total execution time: ~3.6 hours
 
-**By Phase:**
+**By Phase (v1.1):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation | 3/4 | ~36 min | 12 min |
+| - | - | - | - |
 
 **Recent Trend:**
-- Last 5 plans: 01-00 (15 min), 01-01 (17 min), 01-02 (4 min)
-- Trend: Accelerating
+- v0.1.0 final plans: ~4-10 min each
+- Trend: Stable
 
 *Updated after each plan completion*
-| Phase 01-foundation P01 | 17 | 2 tasks | 13 files |
-| Phase 01-foundation P02 | 4 | 2 tasks | 12 files |
-| Phase 01-foundation P03 | 4 | 2 tasks | 7 files |
-| Phase 02-core-economy P00 | 2 | 1 tasks | 3 files |
-| Phase 02-core-economy P01 | 3 | 2 tasks | 7 files |
-| Phase 02-core-economy P02 | 4 | 2 tasks | 8 files |
-| Phase 02-core-economy P03 | 5 | 2 tasks | 8 files |
-| Phase 03-world-map P00 | 5 | 1 tasks | 3 files |
-| Phase 03-world-map P01 | 3 | 2 tasks | 8 files |
-| Phase 03-world-map P02 | 45 | 2 tasks | 9 files |
-| Phase 04-military P00 | 5 | 1 tasks | 3 files |
-| Phase 04-military P01 | 3 | 2 tasks | 6 files |
-| Phase 04-military P02 | 4 | 2 tasks | 8 files |
-| Phase 04-military P03 | 4 | 2 tasks | 9 files |
-| Phase 05-combat P00 | 5 | 1 tasks | 2 files |
-| Phase 05-combat P01 | 18 | 2 tasks | 6 files |
-| Phase 05-combat P02 | 3 | 2 tasks | 8 files |
-| Phase 05-combat P03 | 30 | 3 tasks | 5 files |
-| Phase 06-production-hardening P01 | 2 | 1 tasks | 4 files |
-| Phase 06-production-hardening P02 | 15 | 2 tasks | 0 files |
-| Phase 07-test-infrastructure P01 | 4 | 2 tasks | 3 files |
-| Phase 07-test-infrastructure P02 | 4 | 2 tasks | 4 files |
-| Phase 07 P03 | 10 | 2 tasks | 2 files |
-| Phase 08-bug-fixes-timer-guards P01 | 3 | 2 tasks | 6 files |
-| Phase 08-bug-fixes-timer-guards P02 | 4 | 2 tasks | 4 files |
-| Phase 09-phase2-verification P01 | 8 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -132,85 +58,11 @@ Progress: [████████░░] 84%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- All game mutations go through Edge Functions — no Flutter client writes directly to game-state tables
-- pg_cron jobs must be created via raw SQL (not dashboard UI) to avoid 5-second HTTP timeout cap
-- RLS must be enabled in the same migration that creates each table — never added later
-- All timestamps are server-side NOW() — client computes display-only countdowns from server UTC
-- [01-00] Mock stubs in mocks.dart use placeholder classes until supabase_flutter + go_router are added in Plan 01-01
-- [01-00] Test scaffolding pattern: all requirement-mapped tests created as skipped stubs before production code exists
-- [Phase 01-foundation]: riverpod_generator omitted from pubspec: incompatible with flutter_test pinned deps in Dart 3.10.1 (analyzer ^9.0.0 conflict); to be added when SDK supports it
-- [Phase 01-foundation]: Supabase DB verification via docker exec supabase_db_ikariam psql (psql not in PATH on Windows)
-- [01-02] Manual Riverpod providers used throughout (no @riverpod code-gen): riverpod_generator still requires analyzer ^9.0.0, incompatible with Dart 3.10.1
-- [01-02] GoRouter created once per app lifetime; _RouterNotifier bridges Riverpod state changes to refreshListenable — router never recreated on auth change
-- [01-02] ProfileRepository.updateProfile uses direct client write (exception to Edge Function rule): profiles is a player-preferences table with profiles_update_own RLS policy
-- [Phase 01-foundation]: AppTheme._primaryColor promoted to public static const: AvatarWidget needs the primary colour at field level without BuildContext
-- [Phase 01-foundation]: CityNotifier uses manual AsyncNotifier (no code-gen): riverpod_generator still incompatible with Dart 3.10.1 — same decision as 01-02
-- [Phase 01-foundation]: CityRepository is SELECT-only with island join: cities table has SELECT-only RLS; city creation is trigger-only (handle_new_user)
-- [quick-1]: .env.local gitignored to allow per-developer port/key overrides; local Supabase keys are deterministic but devs may run on different ports
-- [quick-1]: Islands table RLS blocks anon reads — 100 islands confirmed via service_role key (Content-Range: 0-0/100)
-- [Phase 02-core-economy]: Wave 0 test scaffolds follow same skip pattern as Phase 1 Plan 01-00: stubs with TODO comments pointing to implementing plan
-- [Phase 02-core-economy]: Production buildings (sawmill, quarry, glassblower, sulfur_pit) included in city_buildings CHECK constraint — required for all 5 resources to produce via process_resource_tick()
-- [Phase 02-core-economy]: pg_cron extension registered via migration file (not seed.sql) to avoid schema-cron-does-not-exist error on supabase db reset
-- [Phase 02-core-economy]: BASE_COSTS and BASE_TIMES duplicated in Edge Function TypeScript and Dart constants — sync comment enforces manual consistency; server authority must not import client code
-- [Phase 02-core-economy]: Non-atomic resource deduction in upgrade-building: deduct_resource() called sequentially per resource; partial deduction possible on failure (acceptable for v1)
-- [Phase 02-core-economy]: ConstructionQueueEntry.buildingType is String (not BuildingType enum) to keep construction model decoupled from building enum
-- [Phase 02-core-economy]: BuildingUpgradeException wraps Edge Function server error message for structured UI error display
-- [Phase 02-core-economy]: CountdownTimerWidget is display-only: Timer.periodic ticks display every second, pg_cron complete_building_upgrades() handles actual completion
-- [Phase 02-core-economy]: constructionQueueProvider streams construction_queue directly without repository class — no client-side mutations so repository abstraction adds no value
-- [Phase 03-world-map]: Phase 03 Wave 0 test scaffolds follow same skip pattern as Phase 1 and Phase 2: unit tests use skip string messages, widget tests use skip:true boolean
-- [Phase 03-world-map]: File-level GlobalKey<NavigatorState> for StatefulShellBranch navigator keys — must not be recreated inside Provider or build
-- [Phase 03-world-map]: NavigationBar (Material 3) used instead of BottomNavigationBar — useMaterial3: true confirmed in app_theme.dart
-- [Phase 03-world-map]: Auth Rule 4 redirect changed from /city to /map — world map is the post-login landing screen
-- [Phase 03-world-map]: 5x5 world map grid (not 5x2): expanded from checkpoint feedback, matched seed data
-- [Phase 03-world-map]: playerIslandIdProvider added: IslandScreen derives default island from cityProvider to avoid null loading state
-- [Phase 04-military]: Wave 0 test scaffolds follow same skip pattern as Phases 1, 2, and 3: unit stubs use skip string messages pointing to implementing plan, widget stubs use skip: true boolean
-- [04-01]: unit_movements uses JSONB snapshot (not join table): army immutable at departure, no cascading deletes, simpler Phase 5 combat resolution
-- [04-01]: city_units has no pre-population trigger — complete_training() uses INSERT ON CONFLICT for first unit creation in a city
-- [04-01]: process_arrivals() uses jsonb_each_text() to iterate JSONB unit type/quantity pairs in unit_movements.units
-- [Phase 04-02]: UnitType stored as String in models (not enum): keeps models decoupled from constants, same pattern as ConstructionQueueEntry.buildingType
-- [Phase 04-02]: Non-atomic unit deduction in dispatch-units: acceptable for v1 per established project precedent
-- [Phase 04-02]: calcTravelMinutes uses identical formula in Dart and TypeScript with explicit sync comments and shared BASE_MINUTES_PER_GRID_UNIT constant
-- [Phase 04-military]: [04-03]: watchOutgoingMovements filters client-side by originCityId after owner_id stream — Realtime .stream() does not support compound eq filters
-- [Phase 04-military]: [04-03]: Barracks/Shipyard taps in BuildingCell navigate to dedicated screens instead of upgrade sheet
-- [Phase 05-combat]: Phase 5 Wave 0 test scaffolds follow same skip pattern as Phases 1-4: unit stubs use descriptive skip string messages pointing to implementing plan (05-02)
-- [Phase 05-combat]: Naval gate-keeper: attacker naval wiped -> defender_won immediately, land phase blocked
-- [Phase 05-combat]: Unit stats as JSONB constants inside resolve_battles() body — not a DB table
-- [Phase 05-combat]: Rejected armies (city already in battle): units lost, movement row deleted
-- [Phase 05-combat]: unitAttackStats/unitDefenseStats values match resolve_battles() SQL constants exactly — sync comment enforces manual consistency
-- [Phase 05-combat]: allMyBattlesProvider uses Provider.autoDispose (not StreamProvider) because it merges two async stream values into a synchronous list
-- [Phase 05-combat]: BattleTurn._parseUnits static helper isolates nullable JSONB Map casting in one place — keeps fromJson factory readable
-- [Phase 05-03]: Icons.sword_outlined does not exist in Material Icons — used Icons.gps_fixed_outlined for attacker role icon in battle tile
-- [Phase 05-03]: allMyBattlesProvider returns List<Battle> (not AsyncValue) — BattlesScreen watches provider directly; empty list shown while stream warms up
-- [Phase 05-03]: Icons.sword_outlined does not exist in Material Icons — used Icons.gps_fixed_outlined for attacker role icon in battle tile
-- [Phase 05-03]: allMyBattlesProvider returns List<Battle> (not AsyncValue) — BattlesScreen watches provider directly; empty list shown while stream warms up
-- [Phase 06-01]: Splash removed AFTER await appRunner.runApp(): guarantees first Flutter frame is painted before fade — avoids flash of un-rendered canvas
-- [Phase 06-01]: flutter_bootstrap.js opacity fade (0.4s) with setTimeout DOM removal: smooth UX without layout jank; 400ms matches CSS transition duration
-- [Phase 06-02]: INFR-02 approved exception confirmed: ProfileRepository.updateProfile is only client-side write; all game-state mutations go through Edge Functions
-- [Phase 06-02]: INFR-03 confirmed: all public tables have RLS enabled and at least 1 policy each
-- [Phase 06-02]: INFR-01 human-verified: splash visible before Flutter renders, page never shows blank white
-- [Phase 07-01]: [07-01] Battle for accounts 5-6 seeded directly into battles table (not via unit_movements) — avoids process_arrivals cron dependency, simpler and deterministic
-- [Phase 07-01]: [07-01] dev_trigger_battle accepts city IDs (not user IDs) — toolbar knows city context, resolves owner_id internally via SECURITY DEFINER
-- [Phase 07-01]: [07-01] supabase db reset verification deferred: Docker Desktop not running; SQL follows established SECURITY DEFINER patterns from Phase 5
-- [Phase 07-02]: [07-02] DevRpcService._client is a lazy getter (not constructor field): avoids Supabase.instance.client call during widget construction in tests
-- [Phase 07-02]: [07-02] Widget tests use ProviderScope + _NullCityNotifier subclass of CityNotifier: AsyncNotifierProvider.overrideWith requires same notifier type
-- [Phase 07-02]: [07-02] kDebugMode double-gate in MainShellScreen and DevToolbarWrapper: shell gate prevents constructing wrapper in release, internal check provides defense-in-depth
-- [Phase 07-test-infrastructure]: [07-03] set +e before flutter test captures exit code instead of aborting — allows printing summary before exiting
-- [Phase 07-test-infrastructure]: [07-03] PowerShell uses $LASTEXITCODE after flutter test — $ErrorActionPreference Stop does not catch external CLI exit codes
-- [Phase 07]: [07-03] set +e before flutter test captures exit code instead of aborting — allows printing summary before exiting
-- [Phase 07]: [07-03] 12 expected skips in flutter test: auth/profile stubs need live DB, seed scenario stubs are future Phase 5 integration placeholders
-- [Phase 08-bug-fixes-timer-guards]: [08-01] BASE_MINUTES_PER_GRID_UNIT = 2 declared in dispatch-units/index.ts to match Dart constant
-- [Phase 08-bug-fixes-timer-guards]: [08-01] NaN/finite guard added after calcTravelMinutes call in dispatch-units — returns 500 instead of inserting invalid arrive_at
-- [Phase 08-bug-fixes-timer-guards]: [08-01] Dev toolbar _triggerBattle: capture controller.text into local variable before dispose()
-- [Phase 08-bug-fixes-timer-guards]: [08-02] Engagement fraction applied only in attack/defense summation loops, NOT in casualty loops — double-applying would over-count the fraction
-- [Phase 08-bug-fixes-timer-guards]: [08-02] v_turn_interval resolved once per function call via current_setting — avoids repeated setting lookups in the per-battle loop
-- [Phase 08-bug-fixes-timer-guards]: [08-02] Migration 20260312000009 handles both environments in one function body via v_turn_interval rather than using another conditional DO block
-- [Phase 09-phase2-verification]: 02-VERIFICATION.md score is 12/12 must-haves (not 9/9) because Observable Truths table expands 9 requirements to 12 truths via static/runtime verification splits on BLDG-04, BLDG-05, and Realtime wiring truths
-
-### Roadmap Evolution
-
-- Phase 7 added: Test Infrastructure — multi-account test scenarios, dev toolbar, rich seed scripts, unified test automation CLI
-- Phase 8 added: Bug Fixes & Timer Guards — dispatch-units fix, speed-up environment guard, partial army engagement, dev toolbar fix
-- Phase 9 added: Phase 2 Verification — create missing VERIFICATION.md for 9 RSRC/BLDG requirements
+- [Roadmap]: Trading features (TRAD-01, TRAD-02) deferred to v1.2+ — reduces v1.1 to 3 phases covering 13 requirements
+- [Roadmap]: Phase 10 must audit existing Town Hall gold production in process_resource_tick() before adding population-tax gold — risk of double income stream
+- [Roadmap]: Population column must be NUMERIC (not INTEGER) from schema creation — fractional growth at 5-min tick interval silently truncates to 0 with INTEGER
+- [Roadmap]: Happiness + wine consumption integrated into process_resource_tick() in fixed order — never a separate cron job (race condition on wine row)
+- [Roadmap]: Phase 12 pillage uses SELECT FOR UPDATE on defender resource rows inside resolve_battles() — prevents race with concurrent resource tick
 
 ### Pending Todos
 
@@ -218,18 +70,13 @@ None yet.
 
 ### Blockers/Concerns
 
-- Phase 4/5: Turn-based battle networking over WebSocket is a niche pattern with sparse documentation — research recommended before planning Phase 5
-- Phase 3: flame_tiled integration and multi-city ownership schema (colonies) may need phase-level research before planning
-- Game balance formulas (base costs, production rates, unit stats) not validated — will need iteration post-launch
-
-### Quick Tasks Completed
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 1 | Setup Supabase local dev with Docker - start services, init config, apply migrations | 2026-03-11 | 0b035b5 | [1-setup-supabase-local-dev-with-docker-sta](./quick/1-setup-supabase-local-dev-with-docker-sta/) |
+- [Phase 10 pre-implementation]: Read process_resource_tick() in full before writing happiness/tax migration — gold double-production risk if Town Hall formula is not audited first
+- [Phase 10 post-ship]: Happiness formula constants are design estimates (population * 0.01 * happiness/100 growth rate per tick) — tune after Phase 10 ships via playtesting
+- [Phase 11 pre-implementation]: Verify cargo ship unit model before Phase 11 — confirm city_units tracks cargo ships as garrison stock (not only as active unit_movements)
+- [General]: cities Realtime fan-out: enabling REPLICA IDENTITY FULL on cities broadcasts a city UPDATE to all subscribers every 5 minutes — monitor at 50+ concurrent players
 
 ## Session Continuity
 
-Last session: 2026-03-12T16:50:38.838Z
-Stopped at: Completed 09-01: Phase 2 Core Economy VERIFICATION.md — all 9 RSRC/BLDG requirements verified, v1.0 milestone audit complete
+Last session: 2026-03-13
+Stopped at: Roadmap created for v1.1 — ROADMAP.md, STATE.md, REQUIREMENTS.md traceability written
 Resume file: None
