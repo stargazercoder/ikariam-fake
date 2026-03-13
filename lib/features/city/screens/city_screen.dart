@@ -8,6 +8,7 @@ import '../../../features/profile/providers/profile_provider.dart';
 import '../../../shared/widgets/avatar_widget.dart';
 import '../../../core/constants/building_constants.dart';
 import '../../../core/constants/resource_constants.dart';
+import '../models/city_building.dart';
 import '../models/city_resource.dart';
 import '../models/construction_queue_entry.dart';
 import '../providers/buildings_provider.dart';
@@ -329,9 +330,7 @@ class _ResourcePanel extends StatelessWidget {
                 final totalWorkers = buildingsAsync.whenOrNull(
                       data: (buildings) => buildings.fold<int>(
                         0,
-                        (sum, b) =>
-                            sum +
-                            ((b['assigned_workers'] as num?)?.toInt() ?? 0),
+                        (sum, b) => sum + (b as CityBuilding).assignedWorkers,
                       ),
                     ) ??
                     0;
