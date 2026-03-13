@@ -11,6 +11,7 @@ import '../../../core/constants/resource_constants.dart';
 import '../models/city_resource.dart';
 import '../models/construction_queue_entry.dart';
 import '../providers/buildings_provider.dart';
+import '../providers/city_economy_provider.dart';
 import '../providers/construction_provider.dart';
 import '../providers/resources_provider.dart';
 import '../widgets/countdown_timer_widget.dart';
@@ -125,10 +126,11 @@ class _CityBody extends ConsumerWidget {
     final gridY = island?['grid_y'] as int? ?? 0;
     final luxuryType = island?['luxury_type'] as String? ?? 'unknown';
 
-    // Watch all three economy streams.
+    // Watch all economy streams.
     final resourcesAsync = ref.watch(resourcesStreamProvider(cityId));
     final buildingsAsync = ref.watch(buildingsStreamProvider(cityId));
     final constructionAsync = ref.watch(constructionQueueProvider(cityId));
+    final economyAsync = ref.watch(cityEconomyStreamProvider(cityId));
 
     // Extract active construction entry (may be null if queue is empty).
     final activeConstruction = constructionAsync.whenOrNull(data: (e) => e);
@@ -195,8 +197,12 @@ class _CityBody extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
 
-              // Resource panel.
-              _ResourcePanel(resourcesAsync: resourcesAsync),
+              // Resource panel with economy indicators.
+              _ResourcePanel(
+                resourcesAsync: resourcesAsync,
+                economyAsync: economyAsync,
+                buildingsAsync: buildingsAsync,
+              ),
               const SizedBox(height: 16),
 
               // Construction queue banner (if active).
@@ -251,11 +257,18 @@ class _CityBody extends ConsumerWidget {
 // Resource panel
 // ---------------------------------------------------------------------------
 
-/// Compact card showing all 5 resource types with live amounts.
+/// Compact card showing all 6 resource types with live amounts, plus
+/// happiness indicator and population summary rows.
 class _ResourcePanel extends StatelessWidget {
-  const _ResourcePanel({required this.resourcesAsync});
+  const _ResourcePanel({
+    required this.resourcesAsync,
+    required this.economyAsync,
+    required this.buildingsAsync,
+  });
 
   final AsyncValue<List<CityResource>> resourcesAsync;
+  final AsyncValue<Map<String, dynamic>?> economyAsync;
+  final AsyncValue<List<dynamic>> buildingsAsync;
 
   @override
   Widget build(BuildContext context) {
@@ -273,6 +286,7 @@ class _ResourcePanel extends StatelessWidget {
                   ),
             ),
             const SizedBox(height: 10),
+            // Row 1: Resource chips for all 6 types.
             resourcesAsync.when(
               loading: () => const Center(
                 child: Padding(
@@ -295,12 +309,45 @@ class _ResourcePanel extends StatelessWidget {
                       .where((r) => r.resourceType == type)
                       .firstOrNull;
                   final amount = match?.amount ?? 0.0;
-                  return _ResourceChip(
-                    type: type,
-                    amount: amount,
-                  );
+                  return _ResourceChip(type: type, amount: amount);
                 }).toList(),
               ),
+            ),
+            const SizedBox(height: 4),
+            // Row 2: Happiness + Population summary driven by economy stream.
+            economyAsync.when(
+              loading: () => const SizedBox(height: 20),
+              error: (e, _) => const SizedBox.shrink(),
+              data: (economy) {
+                if (economy == null) return const SizedBox.shrink();
+                final happiness =
+                    (economy['happiness'] as num?)?.toDouble() ?? 0.0;
+                final population =
+                    (economy['population'] as num?)?.toDouble() ?? 0.0;
+
+                // Sum assigned workers across all buildings.
+                final totalWorkers = buildingsAsync.whenOrNull(
+                      data: (buildings) => buildings.fold<int>(
+                        0,
+                        (sum, b) =>
+                            sum +
+                            ((b['assigned_workers'] as num?)?.toInt() ?? 0),
+                      ),
+                    ) ??
+                    0;
+
+                return Row(
+                  children: [
+                    _HappinessChip(happiness: happiness),
+                    const Spacer(),
+                    _PopulationSummary(
+                      population: population,
+                      happiness: happiness,
+                      totalWorkers: totalWorkers,
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),
@@ -360,6 +407,8 @@ class _ResourceChip extends StatelessWidget {
         return Icons.local_fire_department;
       case ResourceType.gold:
         return Icons.monetization_on;
+      case ResourceType.wine:
+        return Icons.wine_bar;
     }
   }
 
@@ -375,6 +424,8 @@ class _ResourceChip extends StatelessWidget {
         return Colors.orange.shade700;
       case ResourceType.gold:
         return Colors.amber.shade700;
+      case ResourceType.wine:
+        return Colors.purple.shade600;
     }
   }
 
@@ -390,7 +441,102 @@ class _ResourceChip extends StatelessWidget {
         return 'Sulfur';
       case ResourceType.gold:
         return 'Gold';
+      case ResourceType.wine:
+        return 'Wine';
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Happiness and population widgets
+// ---------------------------------------------------------------------------
+
+/// Compact chip showing happiness score with emoji and colored text.
+///
+/// Positive happiness: green text with happy emoji.
+/// Negative happiness: red text with sad emoji.
+/// Zero: grey text with neutral emoji.
+class _HappinessChip extends StatelessWidget {
+  const _HappinessChip({required this.happiness});
+
+  final double happiness;
+
+  @override
+  Widget build(BuildContext context) {
+    final String emoji;
+    final Color color;
+    final String label;
+
+    if (happiness > 0) {
+      emoji = '😄';
+      color = Colors.green.shade700;
+      label = '+${happiness.toInt()}';
+    } else if (happiness < 0) {
+      emoji = '😟';
+      color = Colors.red.shade700;
+      label = happiness.toInt().toString();
+    } else {
+      emoji = '😐';
+      color = Colors.grey.shade600;
+      label = '0';
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 16)),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Compact summary showing population count, growth per tick, and tax per hour.
+///
+/// Growth formula: population * 0.01 * (happiness / 100) when happiness > 0.
+/// Tax formula: idle_citizens * 3 gold/hour where idle = population - totalWorkers.
+class _PopulationSummary extends StatelessWidget {
+  const _PopulationSummary({
+    required this.population,
+    required this.happiness,
+    required this.totalWorkers,
+  });
+
+  final double population;
+  final double happiness;
+  final int totalWorkers;
+
+  @override
+  Widget build(BuildContext context) {
+    final int pop = population.floor();
+    final double growthPerTick = happiness > 0
+        ? population * 0.01 * (happiness / 100)
+        : 0.0;
+    final int idle = (pop - totalWorkers).clamp(0, pop);
+    final int taxPerHour = idle * 3;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '\u{1F465} $pop (+${growthPerTick.toStringAsFixed(1)}/tick)',
+          style: const TextStyle(fontSize: 12, color: Colors.grey),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          '\u{1FA99} Tax: +$taxPerHour/hr',
+          style: const TextStyle(fontSize: 12, color: Colors.grey),
+        ),
+      ],
+    );
   }
 }
 
