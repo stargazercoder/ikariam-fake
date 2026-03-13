@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Economy & Combat Depth
 status: ready_to_plan
-stopped_at: Completed 10-economy-foundation/10-01-PLAN.md
-last_updated: "2026-03-13T19:49:54.644Z"
+stopped_at: "Completed 10-economy-foundation/10-03-PLAN.md (awaiting checkpoint:human-verify Task 4)"
+last_updated: "2026-03-13T19:55:24.815Z"
 last_activity: 2026-03-13 — Roadmap created for v1.1 milestone, all 13 requirements mapped
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 ---
@@ -67,6 +67,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 10-economy-foundation P02 | 12 | 2 tasks | 3 files |
 | Phase 10-economy-foundation P01 | 3 | 1 tasks | 2 files |
+| Phase 10-economy-foundation P03 | 18 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ Recent decisions affecting current work:
 - [Phase 10-economy-foundation]: Gold produced ONLY via idle citizen tax — Town Hall worker gold path removed to prevent double income
 - [Phase 10-economy-foundation]: Population stored as NUMERIC for fractional tick growth; negative happiness halts growth and applies 50% production penalty (no population loss)
 - [Phase 10-economy-foundation]: cities table added to supabase_realtime publication with REPLICA IDENTITY FULL for live population/happiness broadcasts
+- [Phase 10-economy-foundation]: Wine icon: Icons.wine_bar + Colors.purple.shade600 — consistent across all UI files
+- [Phase 10-economy-foundation]: _TavernWineSlider syncs initial rate from stream only on first emission to avoid fighting user slider interaction
 
 ### Pending Todos
 
@@ -98,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T19:49:54.643Z
-Stopped at: Completed 10-economy-foundation/10-01-PLAN.md
+Last session: 2026-03-13T19:55:24.814Z
+Stopped at: Completed 10-economy-foundation/10-03-PLAN.md (awaiting checkpoint:human-verify Task 4)
 Resume file: None

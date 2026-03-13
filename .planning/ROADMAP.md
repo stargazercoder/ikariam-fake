@@ -28,7 +28,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 
 **Milestone Goal:** Deepen the economic loop with happiness/population/tax mechanics and make combat victories meaningful with pillage rewards and improved battle reports.
 
-- [ ] **Phase 10: Economy Foundation** — Happiness, population growth, and tax income driven by tavern wine consumption
+- [x] **Phase 10: Economy Foundation** — Happiness, population growth, and tax income driven by tavern wine consumption (completed 2026-03-13)
 - [ ] **Phase 11: Island Upgrades + Resource Rate UI** — Shared island resource building levels and hourly production rate display
 - [ ] **Phase 12: Combat Depth** — Pillage resources on battle victory and turn-by-turn battle report visualization
 
@@ -44,7 +44,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
   3. Every 5-minute pg_cron tick, wine is consumed from city resources at the configured rate and happiness updates accordingly
   4. When happiness is positive, the city's population increases each tick (stored as NUMERIC, not INTEGER)
   5. Idle citizens (population minus assigned workers) generate 3 gold/hour and that gold appears in the city resource bar each tick
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 10-01-PLAN.md — Schema migration: cities economy columns, wine resource type, rewritten process_resource_tick() with 5-step economy loop
 - [ ] 10-02-PLAN.md — set-wine-rate Edge Function + CityRepository.setWineRate method
@@ -85,6 +85,6 @@ Plans:
 | 7. Test Infrastructure | v0.1.0 | 3/3 | Complete | 2026-03-12 |
 | 8. Bug Fixes & Timer Guards | v0.1.0 | 2/2 | Complete | 2026-03-12 |
 | 9. Phase 2 Verification | v0.1.0 | 1/1 | Complete | 2026-03-12 |
-| 10. Economy Foundation | 2/3 | In Progress|  | - |
+| 10. Economy Foundation | 3/3 | Complete   | 2026-03-13 | - |
 | 11. Island Upgrades + Resource Rate UI | v1.1 | 0/? | Not started | - |
 | 12. Combat Depth | v1.1 | 0/? | Not started | - |
