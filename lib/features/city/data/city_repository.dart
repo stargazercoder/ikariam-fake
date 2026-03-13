@@ -4,9 +4,9 @@ import '../../../core/supabase/supabase_provider.dart';
 
 /// Repository for city-related database queries.
 ///
-/// Queries are read-only — the cities table has SELECT-only RLS for
-/// authenticated users.  No client-side mutations are allowed; the
-/// handle_new_user trigger creates the city at sign-up time.
+/// Read queries use SELECT-only RLS for authenticated users.
+/// Mutations (e.g. setWineRate) are routed through Edge Functions per
+/// decision INFR-02 — no client writes directly to game-state tables.
 class CityRepository {
   const CityRepository();
 
@@ -21,6 +21,27 @@ class CityRepository {
         .select('*, islands(*)')
         .eq('owner_id', ownerId)
         .maybeSingle();
+  }
+
+  /// Updates the wine spending rate for [cityId] to [wineSpendingRate].
+  ///
+  /// [wineSpendingRate] must be an integer between 0 and 100 inclusive.
+  /// The Edge Function validates auth, city ownership, and range — this
+  /// method throws if the server returns a non-200 status.
+  Future<void> setWineRate({
+    required String cityId,
+    required int wineSpendingRate,
+  }) async {
+    final response = await supabaseClient.functions.invoke(
+      'set-wine-rate',
+      body: {
+        'city_id': cityId,
+        'wine_spending_rate': wineSpendingRate,
+      },
+    );
+    if (response.status != 200) {
+      throw Exception('Failed to set wine rate: ${response.data}');
+    }
   }
 }
 
