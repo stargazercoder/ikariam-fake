@@ -281,6 +281,8 @@ class _BuildingUpgradeCardState extends ConsumerState<BuildingUpgradeCard> {
         return Icons.local_fire_department;
       case ResourceType.gold:
         return Icons.monetization_on;
+      case ResourceType.wine:
+        return Icons.wine_bar;
     }
   }
 }

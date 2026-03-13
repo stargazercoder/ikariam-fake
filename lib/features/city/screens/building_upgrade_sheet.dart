@@ -1,4 +1,6 @@
-// Modal bottom sheet for building upgrade details and confirmation.
+// Building upgrade dialog — popup for building details and upgrade confirmation.
+
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,15 +8,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/building_constants.dart';
 import '../../../core/constants/resource_constants.dart';
 import '../data/buildings_repository.dart';
+import '../data/city_repository.dart';
 import '../models/city_building.dart';
 import '../models/city_resource.dart';
 import '../models/construction_queue_entry.dart';
+import '../providers/city_economy_provider.dart';
+import '../providers/resources_provider.dart';
 import '../widgets/countdown_timer_widget.dart';
 
-/// Shows the building upgrade modal bottom sheet.
+/// Shows the building upgrade dialog as a centered popup.
 ///
 /// Returns a [Future<bool?>] that resolves to true if an upgrade was started,
-/// false/null if the sheet was dismissed.
+/// false/null if the dialog was dismissed.
 Future<bool?> showBuildingUpgradeSheet(
   BuildContext context, {
   required CityBuilding building,
@@ -22,24 +27,26 @@ Future<bool?> showBuildingUpgradeSheet(
   required List<CityResource> currentResources,
   required ConstructionQueueEntry? activeConstruction,
 }) {
-  return showModalBottomSheet<bool>(
+  return showDialog<bool>(
     context: context,
-    isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (ctx) => _BuildingUpgradeSheet(
-      building: building,
-      cityId: cityId,
-      currentResources: currentResources,
-      activeConstruction: activeConstruction,
+    builder: (ctx) => Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: _BuildingUpgradeContent(
+          building: building,
+          cityId: cityId,
+          currentResources: currentResources,
+          activeConstruction: activeConstruction,
+        ),
+      ),
     ),
   );
 }
 
-/// Internal StatefulWidget for the upgrade bottom sheet content.
-class _BuildingUpgradeSheet extends ConsumerStatefulWidget {
-  const _BuildingUpgradeSheet({
+/// Internal StatefulWidget for the upgrade dialog content.
+class _BuildingUpgradeContent extends ConsumerStatefulWidget {
+  const _BuildingUpgradeContent({
     required this.building,
     required this.cityId,
     required this.currentResources,
@@ -52,11 +59,12 @@ class _BuildingUpgradeSheet extends ConsumerStatefulWidget {
   final ConstructionQueueEntry? activeConstruction;
 
   @override
-  ConsumerState<_BuildingUpgradeSheet> createState() =>
-      _BuildingUpgradeSheetState();
+  ConsumerState<_BuildingUpgradeContent> createState() =>
+      _BuildingUpgradeContentState();
 }
 
-class _BuildingUpgradeSheetState extends ConsumerState<_BuildingUpgradeSheet> {
+class _BuildingUpgradeContentState
+    extends ConsumerState<_BuildingUpgradeContent> {
   bool _isLoading = false;
 
   /// Map from ResourceType to current amount for quick lookup.
@@ -145,31 +153,13 @@ class _BuildingUpgradeSheetState extends ConsumerState<_BuildingUpgradeSheet> {
     final durationMinutes =
         upgradeDurationMinutes(building.buildingType, building.level);
 
-    return SafeArea(
+    return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 20,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-        ),
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header drag handle
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
             // Building name + current level
             Row(
               children: [
@@ -200,9 +190,23 @@ class _BuildingUpgradeSheetState extends ConsumerState<_BuildingUpgradeSheet> {
                     ],
                   ),
                 ),
+                // Close button
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(false),
+                ),
               ],
             ),
-            const Divider(height: 32),
+            const Divider(height: 24),
+
+            // Tavern wine slider — shown only for tavern buildings.
+            if (building.buildingType == BuildingType.tavern) ...[
+              _TavernWineSlider(
+                cityId: widget.cityId,
+                tavernLevel: building.level,
+              ),
+              const Divider(height: 24),
+            ],
 
             // If this building is actively being upgraded — show countdown
             if (_isBeingUpgraded) ...[
@@ -342,7 +346,7 @@ class _BuildingUpgradeSheetState extends ConsumerState<_BuildingUpgradeSheet> {
                 onPressed: _isLoading
                     ? null
                     : () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
+                child: const Text('Close'),
               ),
             ],
           ],
@@ -363,6 +367,8 @@ class _BuildingUpgradeSheetState extends ConsumerState<_BuildingUpgradeSheet> {
         return Icons.local_fire_department;
       case ResourceType.gold:
         return Icons.monetization_on;
+      case ResourceType.wine:
+        return Icons.wine_bar;
     }
   }
 
@@ -378,7 +384,234 @@ class _BuildingUpgradeSheetState extends ConsumerState<_BuildingUpgradeSheet> {
         return 'Sulfur';
       case ResourceType.gold:
         return 'Gold';
+      case ResourceType.wine:
+        return 'Wine';
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tavern wine slider
+// ---------------------------------------------------------------------------
+
+/// Wine spending slider shown inside the Tavern building upgrade sheet.
+///
+/// Allows the player to set the city's wine spending rate (0–100%).
+/// - Reads initial value from [cityEconomyStreamProvider] (wine_spending_rate).
+/// - Updates local state immediately on slider move for snappy feedback.
+/// - Debounces Edge Function calls at 300ms to avoid spamming the server.
+/// - Displays happiness contribution, wine consumed per tick, and wine stock.
+class _TavernWineSlider extends ConsumerStatefulWidget {
+  const _TavernWineSlider({
+    required this.cityId,
+    required this.tavernLevel,
+  });
+
+  final String cityId;
+  final int tavernLevel;
+
+  @override
+  ConsumerState<_TavernWineSlider> createState() => _TavernWineSliderState();
+}
+
+class _TavernWineSliderState extends ConsumerState<_TavernWineSlider> {
+  /// Local slider value in [0.0, 1.0] — maps to 0–100%.
+  double _rate = 0.0;
+
+  /// Whether we've received the initial value from the stream yet.
+  bool _initialized = false;
+
+  /// Debounce timer for Edge Function calls.
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSliderChanged(double value) {
+    setState(() => _rate = value);
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () async {
+      if (!mounted) return;
+      try {
+        await ref.read(cityRepositoryProvider).setWineRate(
+              cityId: widget.cityId,
+              wineSpendingRate: (_rate * 100).round(),
+            );
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to update wine rate: $e'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // Sync initial rate from economy stream (only on first emission).
+    final economyAsync = ref.watch(cityEconomyStreamProvider(widget.cityId));
+    economyAsync.whenData((economy) {
+      if (!_initialized && economy != null) {
+        final serverRate =
+            ((economy['wine_spending_rate'] as num?)?.toInt() ?? 0) / 100.0;
+        if (mounted) {
+          setState(() {
+            _rate = serverRate;
+            _initialized = true;
+          });
+        }
+      }
+    });
+
+    // Read wine stock from resources stream.
+    final resourcesAsync =
+        ref.watch(resourcesStreamProvider(widget.cityId));
+    final wineAmount = resourcesAsync.whenOrNull(
+          data: (resources) => resources
+              .where((r) => r.resourceType == ResourceType.wine)
+              .firstOrNull
+              ?.amount,
+        ) ??
+        0.0;
+
+    // Derived display values.
+    final int ratePercent = (_rate * 100).round();
+    final double happinessContribution = _rate * widget.tavernLevel;
+    final double winePerTick = _rate * widget.tavernLevel * 5.0;
+    final bool tavernActive = widget.tavernLevel > 0;
+    final bool hasWine = wineAmount > 0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.wine_bar, size: 20, color: Colors.purple),
+            const SizedBox(width: 8),
+            Text(
+              'Wine Spending',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+
+        if (!tavernActive) ...[
+          // Tavern not yet built — disable slider with message.
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              'Upgrade the Tavern to start consuming wine.',
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Slider(
+            value: 0,
+            onChanged: null,
+            min: 0,
+            max: 1,
+            divisions: 100,
+            label: '0%',
+          ),
+        ] else ...[
+          // Wine stock warning.
+          if (!hasWine)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber,
+                      size: 16, color: Colors.orange.shade700),
+                  const SizedBox(width: 6),
+                  Text(
+                    'No wine available',
+                    style: TextStyle(
+                        color: Colors.orange.shade700, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+
+          // Slider row.
+          Row(
+            children: [
+              Expanded(
+                child: Slider(
+                  value: _rate,
+                  min: 0,
+                  max: 1,
+                  divisions: 100,
+                  label: '$ratePercent%',
+                  onChanged: _onSliderChanged,
+                ),
+              ),
+              SizedBox(
+                width: 44,
+                child: Text(
+                  '$ratePercent%',
+                  textAlign: TextAlign.end,
+                  style: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+
+          // Stats row.
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(
+              children: [
+                Text(
+                  '😄 +${happinessContribution.toStringAsFixed(1)} happiness',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: happinessContribution > 0
+                        ? Colors.green.shade700
+                        : Colors.grey.shade600,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '🍷 ${winePerTick.toStringAsFixed(1)}/tick',
+                  style: const TextStyle(fontSize: 12, color: Colors.purple),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              'Wine stock: ${wineAmount.toInt()}',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+          ),
+        ],
+      ],
+    );
   }
 }
 

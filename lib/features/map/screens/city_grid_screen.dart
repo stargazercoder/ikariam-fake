@@ -475,6 +475,8 @@ class _ResourceChip extends StatelessWidget {
         return Icons.local_fire_department;
       case ResourceType.gold:
         return Icons.monetization_on;
+      case ResourceType.wine:
+        return Icons.wine_bar;
     }
   }
 
@@ -490,6 +492,8 @@ class _ResourceChip extends StatelessWidget {
         return Colors.orange.shade700;
       case ResourceType.gold:
         return Colors.amber.shade700;
+      case ResourceType.wine:
+        return Colors.purple.shade600;
     }
   }
 
@@ -505,6 +509,8 @@ class _ResourceChip extends StatelessWidget {
         return 'Sulfur';
       case ResourceType.gold:
         return 'Gold';
+      case ResourceType.wine:
+        return 'Wine';
     }
   }
 }
