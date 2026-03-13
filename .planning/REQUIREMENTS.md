@@ -10,7 +10,7 @@
 - [ ] **ECON-01**: User can see happiness score for their city (derived from tavern level + wine spending - population)
 - [ ] **ECON-02**: Population grows automatically when happiness is positive (pg_cron tick, NUMERIC storage)
 - [ ] **ECON-03**: Idle citizens generate gold tax income (population - workers = idle, idle x 3 gold/hour)
-- [ ] **ECON-04**: User can adjust wine spending rate in tavern (slider UI, affects happiness per tick)
+- [x] **ECON-04**: User can adjust wine spending rate in tavern (slider UI, affects happiness per tick)
 - [ ] **ECON-05**: Tavern consumes wine from city resources each tick based on configured spending rate
 
 ### Resources
@@ -69,7 +69,7 @@
 | ECON-01 | Phase 10 | Pending |
 | ECON-02 | Phase 10 | Pending |
 | ECON-03 | Phase 10 | Pending |
-| ECON-04 | Phase 10 | Pending |
+| ECON-04 | Phase 10 | Complete |
 | ECON-05 | Phase 10 | Pending |
 | RSRC-01 | Phase 11 | Pending |
 | RSRC-02 | Phase 11 | Pending |

@@ -44,7 +44,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
   3. Every 5-minute pg_cron tick, wine is consumed from city resources at the configured rate and happiness updates accordingly
   4. When happiness is positive, the city's population increases each tick (stored as NUMERIC, not INTEGER)
   5. Idle citizens (population minus assigned workers) generate 3 gold/hour and that gold appears in the city resource bar each tick
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 Plans:
 - [ ] 10-01-PLAN.md — Schema migration: cities economy columns, wine resource type, rewritten process_resource_tick() with 5-step economy loop
 - [ ] 10-02-PLAN.md — set-wine-rate Edge Function + CityRepository.setWineRate method
@@ -85,6 +85,6 @@ Plans:
 | 7. Test Infrastructure | v0.1.0 | 3/3 | Complete | 2026-03-12 |
 | 8. Bug Fixes & Timer Guards | v0.1.0 | 2/2 | Complete | 2026-03-12 |
 | 9. Phase 2 Verification | v0.1.0 | 1/1 | Complete | 2026-03-12 |
-| 10. Economy Foundation | v1.1 | 0/3 | Planning complete | - |
+| 10. Economy Foundation | 1/3 | In Progress|  | - |
 | 11. Island Upgrades + Resource Rate UI | v1.1 | 0/? | Not started | - |
 | 12. Combat Depth | v1.1 | 0/? | Not started | - |
