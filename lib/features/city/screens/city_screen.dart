@@ -14,6 +14,7 @@ import '../models/construction_queue_entry.dart';
 import '../providers/buildings_provider.dart';
 import '../providers/city_economy_provider.dart';
 import '../providers/construction_provider.dart';
+import '../providers/production_rate_provider.dart';
 import '../providers/resources_provider.dart';
 import '../widgets/countdown_timer_widget.dart';
 
@@ -198,8 +199,9 @@ class _CityBody extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
 
-              // Resource panel with economy indicators.
+              // Resource panel with economy indicators and hourly rate labels.
               _ResourcePanel(
+                cityId: cityId,
                 resourcesAsync: resourcesAsync,
                 economyAsync: economyAsync,
                 buildingsAsync: buildingsAsync,
@@ -260,19 +262,27 @@ class _CityBody extends ConsumerWidget {
 
 /// Compact card showing all 6 resource types with live amounts, plus
 /// happiness indicator and population summary rows.
-class _ResourcePanel extends StatelessWidget {
+///
+/// Production resources (wood, marble, crystal, sulfur) also show a +X/hr
+/// label below the amount and are tappable to show a breakdown sheet.
+class _ResourcePanel extends ConsumerWidget {
   const _ResourcePanel({
+    required this.cityId,
     required this.resourcesAsync,
     required this.economyAsync,
     required this.buildingsAsync,
   });
 
+  final String cityId;
   final AsyncValue<List<CityResource>> resourcesAsync;
   final AsyncValue<Map<String, dynamic>?> economyAsync;
   final AsyncValue<List<dynamic>> buildingsAsync;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Hourly production rates map keyed by resource name.
+    final rates = ref.watch(productionRateProvider(cityId));
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -310,7 +320,31 @@ class _ResourcePanel extends StatelessWidget {
                       .where((r) => r.resourceType == type)
                       .firstOrNull;
                   final amount = match?.amount ?? 0.0;
-                  return _ResourceChip(type: type, amount: amount);
+
+                  // Only production resources get hourly rate + tap.
+                  final isProduction = type == ResourceType.wood ||
+                      type == ResourceType.marble ||
+                      type == ResourceType.crystal ||
+                      type == ResourceType.sulfur;
+
+                  final hourlyRate =
+                      isProduction ? rates[type.value] : null;
+
+                  return _ResourceChip(
+                    type: type,
+                    amount: amount,
+                    hourlyRate: hourlyRate,
+                    onTap: isProduction
+                        ? () => showModalBottomSheet<void>(
+                              context: context,
+                              builder: (_) => _ProductionBreakdownSheet(
+                                cityId: cityId,
+                                resourceTypeName: type.value,
+                                resourceType: type,
+                              ),
+                            )
+                        : null,
+                  );
                 }).toList(),
               ),
             ),
@@ -356,15 +390,29 @@ class _ResourcePanel extends StatelessWidget {
 }
 
 /// A compact chip showing one resource type and its current amount.
+///
+/// Production resources optionally show a "+X/hr" label and can be tapped
+/// to open a production breakdown sheet.
 class _ResourceChip extends StatelessWidget {
-  const _ResourceChip({required this.type, required this.amount});
+  const _ResourceChip({
+    required this.type,
+    required this.amount,
+    this.hourlyRate,
+    this.onTap,
+  });
 
   final ResourceType type;
   final double amount;
 
+  /// When non-null and positive, shows a "+X/hr" label below the amount.
+  final double? hourlyRate;
+
+  /// When non-null, wraps the chip in a GestureDetector.
+  final VoidCallback? onTap;
+
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final chip = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
@@ -388,10 +436,21 @@ class _ResourceChip extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            if (hourlyRate != null && hourlyRate! > 0)
+              Text(
+                '+${hourlyRate!.toStringAsFixed(0)}/hr',
+                style: TextStyle(
+                  fontSize: 9,
+                  color: Colors.green.shade600,
+                ),
+              ),
           ],
         ),
       ],
     );
+
+    if (onTap == null) return chip;
+    return GestureDetector(onTap: onTap, child: chip);
   }
 
   IconData _icon(ResourceType type) {
@@ -443,6 +502,154 @@ class _ResourceChip extends StatelessWidget {
       case ResourceType.wine:
         return 'Wine';
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Production breakdown sheet
+// ---------------------------------------------------------------------------
+
+/// Bottom sheet showing a breakdown of hourly production for one resource.
+class _ProductionBreakdownSheet extends ConsumerWidget {
+  const _ProductionBreakdownSheet({
+    required this.cityId,
+    required this.resourceTypeName,
+    required this.resourceType,
+  });
+
+  final String cityId;
+  final String resourceTypeName;
+  final ResourceType resourceType;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final breakdown = ref.watch(
+      productionBreakdownProvider((cityId, resourceTypeName)),
+    );
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title row.
+            Row(
+              children: [
+                Icon(
+                  _resourceIcon(resourceType),
+                  size: 22,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '${_resourceLabel(resourceType)} Production Breakdown',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Breakdown rows.
+            _BreakdownRow(
+              label: 'Base Rate',
+              value: '+${breakdown.baseRate.toStringAsFixed(1)}/hr',
+            ),
+            _BreakdownRow(
+              label: 'Building Level Bonus',
+              value: '+${breakdown.buildingBonus.toStringAsFixed(1)}/hr',
+            ),
+            _BreakdownRow(
+              label: 'Island Level Bonus',
+              value: '+${breakdown.islandBonus.toStringAsFixed(1)}/hr',
+            ),
+            _BreakdownRow(
+              label: 'Research Bonus',
+              value: '+${breakdown.researchBonus.toStringAsFixed(1)}/hr',
+            ),
+            const Divider(height: 20),
+            // Total row.
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                Text(
+                  '+${breakdown.total.toStringAsFixed(1)}/hr',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _resourceIcon(ResourceType type) {
+    switch (type) {
+      case ResourceType.wood:
+        return Icons.forest;
+      case ResourceType.marble:
+        return Icons.square;
+      case ResourceType.crystal:
+        return Icons.diamond;
+      case ResourceType.sulfur:
+        return Icons.local_fire_department;
+      default:
+        return Icons.help_outline;
+    }
+  }
+
+  String _resourceLabel(ResourceType type) {
+    switch (type) {
+      case ResourceType.wood:
+        return 'Wood';
+      case ResourceType.marble:
+        return 'Marble';
+      case ResourceType.crystal:
+        return 'Crystal';
+      case ResourceType.sulfur:
+        return 'Sulfur';
+      default:
+        return type.name;
+    }
+  }
+}
+
+/// A simple label + value row used in the breakdown sheet.
+class _BreakdownRow extends StatelessWidget {
+  const _BreakdownRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.green.shade700,
+                ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
