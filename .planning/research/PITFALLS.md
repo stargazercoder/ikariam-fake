@@ -1,195 +1,206 @@
 # Pitfalls Research
 
-**Domain:** Browser-based multiplayer city-building / strategy game (Ikariam-style)
-**Stack:** Flutter + Flame (web), Supabase (Auth/DB/Realtime/Edge Functions), pg_cron, Riverpod
-**Researched:** 2026-03-11
-**Confidence:** HIGH (stack-specific issues verified via official docs and GitHub issues); MEDIUM (design/balance issues from community sources)
+**Domain:** Browser-based multiplayer strategy game — v1.1 Economy & Combat Depth additions to existing Supabase/Flutter system
+**Stack:** Flutter web + Supabase (Auth/DB/Realtime/Edge Functions/pg_cron) + Riverpod (manual providers)
+**Researched:** 2026-03-13
+**Confidence:** HIGH (Supabase/PostgreSQL-specific pitfalls verified via official docs and GitHub issues); MEDIUM (game design pitfalls from community sources and original Ikariam mechanics research)
 
 ---
 
 ## Critical Pitfalls
 
-### Pitfall 1: Client-Side Resource Calculation
+### Pitfall 1: Happiness/Population Tick Ordering — Wine Consumed Before It Is Available
 
 **What goes wrong:**
-Developers calculate resource amounts or building costs in Flutter and send the result to Supabase. A player modifies the request (via DevTools, proxying, or script injection) and gives themselves unlimited resources or skips upgrade costs entirely.
+The resource production tick runs every 5 minutes and updates `city_resources.amount` for all resource types including wine. A separate happiness tick (or the same tick) reads wine amount to deduct wine consumption and update happiness. If the happiness tick runs in the same cron invocation *before* the resource production portion updates wine, the tick sees last-cycle's wine balance. If it runs *after*, it sees this cycle's wine. The order is undefined unless explicitly controlled. In the worst variant, wine is deducted twice in one tick period (deducted in production tick's cap calculation AND in a separate happiness deduction step) because the two operations use different read timestamps on the same row.
 
 **Why it happens:**
-Flutter/Flame state feels "server-like" because Riverpod caches server data. It is tempting to compute `current_wood + production_rate * elapsed_seconds` on the client and PATCH the row. This is fast to develop but fatally insecure.
+Developers model happiness as a separate concern from resource production and write two independent functions or two loop sections. Both touch `city_resources` wine row but use separate `UPDATE` statements without coordinating. The existing `process_resource_tick()` already iterates city resources; adding happiness logic as a separate pg_cron job running at the same minute causes read-write skew on the wine row.
 
 **How to avoid:**
-All writes that mutate resource/building state must go through a Supabase Edge Function or a PostgreSQL function (security definer). The function re-reads the last tick timestamp, recalculates production server-side using `NOW()`, applies the delta, and writes the result atomically. The client never sends a computed quantity — it sends only an intent: `{ action: "upgrade_building", building_id: "..." }`. The server validates affordability, deducts cost, and queues the upgrade.
+Extend `process_resource_tick()` to handle happiness and population in a single per-city loop iteration, in this fixed order: (1) produce resources including wine, (2) deduct wine for tavern consumption, (3) calculate new happiness score, (4) calculate population delta, (5) apply population change. This keeps all mutations in one transaction per city. Do not add a separate cron job for happiness — it must be the same job. Add a `city_happiness` table (or columns on cities) that stores `happiness_score`, `population`, `wine_per_tick_rate` so the tick reads and writes from one place.
 
 **Warning signs:**
-- Any Supabase `UPDATE resources SET wood = $clientValue` from the Flutter client layer
-- Direct `.update()` calls on resource/building tables from the frontend
-- Riverpod notifiers that compute balances and write them back to Supabase
+- Two separate pg_cron jobs touching the same `city_resources` wine row in the same 5-minute window
+- `process_resource_tick()` not modified — happiness logic added as a new standalone function scheduled independently
+- Negative wine amount appearing in test data (wine deducted but not yet produced)
+- Population oscillating rapidly between two values each tick
 
 **Phase to address:**
-Foundation phase (auth + schema + first resource tick). Establish the server-authority pattern before any feature is built on top of it.
+Happiness/Population phase (Phase 1 of v1.1). Design the extended tick schema before writing any SQL — define all columns needed, then write one unified tick function.
 
 ---
 
-### Pitfall 2: pg_cron + Edge Function 5-Second UI Timeout
+### Pitfall 2: Pillage Deducts Resources After Battle Ends — Double Deduct Race on Concurrent Pillage + Ongoing Production Tick
 
 **What goes wrong:**
-When scheduling an Edge Function via Supabase's Cron UI, the HTTP timeout defaults to 5000ms. A game tick that processes all active players' resource production will exceed 5 seconds as the player count grows — causing silent failures where some players' resources are never updated.
+When `resolve_battles()` sets `status = 'attacker_won'` and proceeds to pillage, it calculates the steal amount by reading `city_resources` at that moment. However, the 5-minute resource production tick may also be running concurrently (pg_cron fires the battle tick every minute, resource tick every 5 minutes — they can overlap). If the resource tick commits an update to the defender's resources *while* the pillage UPDATE is in flight, the pillage reads a pre-tick balance but the resource tick also committed a delta to the same row, resulting in one of the two updates silently winning and the other's delta being lost (last-writer-wins under READ COMMITTED).
 
 **Why it happens:**
-The 5000ms limit is a Supabase Cron UI decision (not an inherent pg_net or pg_cron limit). Developers use the UI to set up the cron job and do not realize there is a lower timeout cap applied than the Edge Function's own 150-second wall-clock limit.
+`resolve_battles()` uses `SELECT ... FOR UPDATE SKIP LOCKED` on the battles table to prevent concurrent battle processing, but it does not lock the `city_resources` row of the defender before the pillage UPDATE. The resource production tick updates `city_resources` without locking against the battle function. Both functions run as independent transactions with READ COMMITTED isolation (Supabase/Postgres default), so they see each other's committed values but can still race on the write.
 
 **How to avoid:**
-Create the cron job directly via SQL using `pg_net.http_post()` with an explicit `timeout_milliseconds` parameter instead of using the Supabase dashboard Cron UI. Example:
-
-```sql
-SELECT cron.schedule(
-  'resource-tick',
-  '*/5 * * * *',
-  $$
-    SELECT net.http_post(
-      url := 'https://<project>.supabase.co/functions/v1/resource-tick',
-      headers := '{"Authorization": "Bearer <service_role_key>"}'::jsonb,
-      timeout_milliseconds := 30000
-    );
-  $$
-);
-```
-
-Additionally, design the tick function to batch-process players (chunked queries with LIMIT/OFFSET or cursor-based pagination) so a single invocation never needs more than a few seconds even at scale.
+Inside the pillage logic of `resolve_battles()`, lock the defender's resource rows before reading them using `SELECT amount FROM city_resources WHERE city_id = v_defender_city_id FOR UPDATE`. This pins the rows until the pillage UPDATE commits. The production tick should use the same `deduct_resource` / atomic update pattern that already exists in the codebase. Cap the pillage amount at a percentage of current balance (e.g., 20-50% of each resource capped by warehouse level) to reduce the impact of any edge-case skew. Non-atomic resource deduction is accepted for v1 (per PROJECT.md), but pillage is a security-sensitive write — it must be atomic.
 
 **Warning signs:**
-- Cron job created through the Supabase dashboard UI (not raw SQL)
-- Edge Function executes a single `UPDATE resources SET ...` across all players without batching
-- pg_cron job history shows frequent failures or no rows updated after a certain player count
+- Pillage logic reads `city_resources` with a plain `SELECT` before the pillage `UPDATE` (two separate statements, not atomic)
+- No `FOR UPDATE` lock on defender resource rows inside `resolve_battles()`
+- Test scenario: trigger battle resolution at exactly the same second as a resource tick and observe defender resource balance for inconsistency
 
 **Phase to address:**
-Resource production phase. Before shipping, test tick with 100 simulated rows and measure execution time.
+Pillage phase. The pillage SQL must be written with the lock pattern from the start; retrofitting is risky because `resolve_battles()` is a long function with multiple failure modes.
 
 ---
 
-### Pitfall 3: Race Conditions on Resource Spend (Double-Spend)
+### Pitfall 3: Marketplace Order Matching — Partial Fill Leaving Orphaned Orders
 
 **What goes wrong:**
-A player rapidly sends two "start building upgrade" requests within milliseconds (or two browser tabs submit simultaneously). Both requests read the current resource balance, both see enough resources, and both deduct the cost — leaving the player with a negative resource balance or two buildings in the queue when only one should have been allowed.
+A player places a buy order for 500 wood at 2 gold each. A seller places a sell order for 300 wood at 2 gold each. The match function fills 300 wood, removes the sell order, and reduces the buy order to 200 remaining. A concurrent second seller places a sell order for 400 wood at 2 gold. The match function tries to fill the remaining 200 from the buy order but concurrently another function (e.g., a cancellation or expiry job) has already marked the buy order as cancelled. Both functions read the buy order as "open" (READ COMMITTED snapshot before the cancellation committed) and both attempt to fill it — the second seller deducts 200 from their inventory and expects 400 gold, but the order state after concurrent cancellation is inconsistent.
 
 **Why it happens:**
-Without advisory locks or atomic check-and-deduct, two concurrent transactions read the same row (snapshot isolation) and both pass the affordability check before either commits.
+Order matching engines require serializable semantics for correctness but most developers reach for SELECT + UPDATE (non-atomic check-then-modify) because it is simpler to write. Without `SELECT ... FOR UPDATE` on the matched order row, two concurrent transactions can read the same partially-filled order and both conclude it has remaining quantity.
 
 **How to avoid:**
-Use `SELECT ... FOR UPDATE` (pessimistic locking) inside a PostgreSQL transaction, or use atomic SQL patterns:
-
-```sql
-UPDATE resources
-SET wood = wood - $cost
-WHERE player_id = $player_id
-  AND wood >= $cost
-RETURNING wood;
-```
-
-If zero rows are returned, the action is rejected (insufficient funds). Implement this in a `SECURITY DEFINER` function called from the Edge Function. Never check-then-update in two separate statements.
+Use `SELECT ... FOR UPDATE` on the specific order row being matched at the start of the match function — before reading its remaining quantity. Use a PostgreSQL `SECURITY DEFINER` function for all order book operations (place-order, cancel-order, match-order). Resource escrow: deduct the buyer's gold (or seller's resource) at order placement time, not at match time. This eliminates the window where both a match and a cancellation attempt to act on the same balance. Cap order quantity to prevent enormous orders that lock rows for long periods.
 
 **Warning signs:**
-- Resource deduction implemented as: read balance → check in app code → write new balance
-- No database-level constraint preventing negative resource values
-- Missing `CHECK (wood >= 0)` constraints on resource columns
+- Order matching SQL reads `remaining_quantity` in one statement and updates it in a separate statement without a row lock between them
+- No escrow: buyer's gold is only deducted when matched, not when order is placed
+- `marketplace_orders` table has no `FOR UPDATE` lock in the match function
+- Test: place buy and sell orders and fire two concurrent match calls; check for negative `remaining_quantity`
 
 **Phase to address:**
-Core economy phase (building upgrades, unit training). Add `CHECK` constraints in the initial schema migration and never remove them.
+Marketplace phase. Write the match function as a single PostgreSQL stored procedure with row-level locking from day one. Do not write it in TypeScript Edge Function logic with multiple sequential Supabase calls.
 
 ---
 
-### Pitfall 4: Supabase RLS Disabled on New Tables (Public Data Leak)
+### Pitfall 4: Shared Island Upgrade — Concurrent City Owners Trigger Multiple Upgrades
 
 **What goes wrong:**
-By default, every new Supabase table has RLS disabled. Any player can query the entire table with the anon key — including other players' private data (alliance membership, messages, resource counts, battle reports).
+Island resource upgrades (wood_level and luxury_level on the `islands` table) are shared among all cities on the island. Multiple players on the same island all see "Upgrade available" and click simultaneously. The upgrade Edge Function checks `islands.wood_level < max_allowed_level`, sees it as upgradeable, deducts wood from each contributing city, and increments `wood_level`. Because multiple requests pass the level check before any of them commit, the island level is incremented multiple times — exceeding the max level or draining resources from players who did not intend to pay for an already-in-progress upgrade.
 
 **Why it happens:**
-Supabase scaffolds tables without RLS for developer convenience. Developers enable RLS only on "obviously sensitive" tables (users, messages) and forget to enable it on game tables (resources, buildings, armies, trade_orders). Because the game works correctly during single-user testing, the leak is not noticed until a player discovers they can query everyone's army composition.
+The `islands` row is shared state with no per-upgrade lock. The upgrade function reads `wood_level`, checks it, deducts resources, and increments — all as separate SQL statements in a TypeScript Edge Function rather than inside one atomic PostgreSQL transaction. Two concurrent Edge Function invocations pass the check before either increments the level.
 
 **How to avoid:**
-Enable RLS on every table immediately in the migration that creates it — even before writing the policies. The first policy written is always the most restrictive (deny all), then selectively open what is needed. Add a CI/lint check that asserts `SELECT count(*) FROM pg_tables WHERE rowsecurity = false AND schemaname = 'public'` returns 0.
+Implement island upgrades as a `SECURITY DEFINER` PostgreSQL function. Inside the function, use `SELECT wood_level FROM islands WHERE id = p_island_id FOR UPDATE` to lock the island row for the duration of the upgrade transaction. Validate max-level constraint inside the same transaction after acquiring the lock. Add `CHECK (wood_level BETWEEN 1 AND 10)` constraint on the islands table so any over-increment fails at the DB level. Introduce an `island_upgrade_in_progress` boolean or a separate `island_upgrades` queue table (analogous to the existing `construction_queue`) to gate concurrent upgrade attempts.
 
 **Warning signs:**
-- Any table created without an accompanying `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` in the same migration
-- Supabase dashboard shows tables with RLS toggle OFF
-- Players can call `supabase.from('armies').select('*')` and see all armies in the game
+- Island upgrade logic split across multiple Edge Function `.from().update()` calls without a wrapping DB function
+- No `FOR UPDATE` lock on the `islands` row in the upgrade path
+- Two players on the same island can both click "Upgrade" within milliseconds — test this scenario before release
+- No `CHECK` constraint preventing `wood_level` exceeding its maximum
 
 **Phase to address:**
-Schema foundation phase. Make RLS-enabled-by-default a migration convention from day one.
+Island Upgrades phase. The shared-row pattern is the core architectural challenge here — get the locking right before adding UI.
 
 ---
 
-### Pitfall 5: Flutter Web CanvasKit Initial Load Blocking Game Entry
+### Pitfall 5: Wine Escrow — Tavern Consumes From Global Wine Pool, Not Per-City Escrow
 
 **What goes wrong:**
-Flutter Web with CanvasKit/WASM requires downloading a ~3-10 MB WASM binary before painting a single pixel. On slow connections, players see a blank white screen for 5-15 seconds, interpret it as a broken page, and leave before the game loads.
+Wine is produced on islands (shared resource). Cities on the same island all draw from the island wine pool (or each city's personal wine storage). If the happiness tick deducts wine from the city's warehouse without checking whether the city's trading port has committed wine to outbound trade, the same wine units can be both "consumed by the tavern" and "in transit as a trade cargo" simultaneously — the city goes into negative wine, happiness drops unexpectedly, and the incoming trade shipment then pushes resources above warehouse capacity (wasted production).
 
 **Why it happens:**
-Flame requires CanvasKit (not the HTML renderer) for canvas-based game rendering. Developers build the game, deploy it, and test on their fast local connection — never experiencing the cold-load penalty that new players face.
+Resource trading and happiness consumption are implemented in different phases without coordinating on a shared "reserved" concept. The city's wine `amount` in `city_resources` represents all wine — the tick deducts from it regardless of whether some of it is already escrowed for an outbound trade.
 
 **How to avoid:**
-- Host the CanvasKit WASM file on your own CDN (not unpkg) to avoid third-party latency
-- Add an HTML/CSS splash screen that renders immediately (before Flutter boots) using a static `index.html` loading indicator
-- Enable service worker caching so returning players load from cache
-- Benchmark first-load time on a throttled (3G) connection before launch
+Escrow trade resources at dispatch time, not at arrival time. When a trade cargo ship departs, deduct the traded wine from `city_resources.amount` immediately (reducing the visible balance). The tavern tick then only consumes from the remaining available balance. This is consistent with how other strategy games handle resource-in-transit (Ikariam itself deducts resources on departure). Add a `UNIQUE` constraint check: `city_resources.amount >= 0` (already present in v0.1.0 schema via `CHECK (amount >= 0)`) — enforce that the escrow deduction itself cannot push amount negative.
 
 **Warning signs:**
-- No loading indicator visible before Flutter paints
-- CanvasKit loaded from `unpkg.com` (the default hardcoded URL in older Flutter versions)
-- No PWA/service worker configured in `web/` directory
+- Trade dispatch function creates the `unit_movements`-style cargo row but does NOT deduct resources from `city_resources` at departure
+- Wine in transit still appears in the city's resource display
+- Tavern consumes wine in the tick and the cargo also delivers wine — city ends up with more wine than warehouse capacity
 
 **Phase to address:**
-Deployment/polish phase. But set up the loading screen in the initial Flutter web scaffold, not as an afterthought.
+Trading/Cargo phase (before happiness phase if possible, or coordinated in the same phase). Clarify the resource-in-transit model in the schema design step.
 
 ---
 
-### Pitfall 6: Battle State Desynchronization During 5-Minute Turns
+### Pitfall 6: Battle Report Visualization — Realtime Subscription on `battle_turns` Floods Client During Multi-Turn Battles
 
 **What goes wrong:**
-The 5-minute turn-based battle system processes a turn via pg_cron. If the cron job is delayed or skipped (network hiccup, Supabase cold start), the battle timer still runs client-side. Players see "Turn ends in: 0:00" but the next battle state never arrives. The game appears frozen. Players refresh, get stale state, and assume the battle was lost or won erroneously.
+The existing `battle_turns` table is in the `supabase_realtime` publication. The `BattleDetailScreen` subscribes via `battleTurnsProvider(battleId)` which streams all turns for a battle. During a long battle (10+ turns), each new turn INSERT triggers a Realtime event that re-emits the entire list from the StreamProvider (or appends an item). If the battle report widget rebuilds on every new turn and each rebuild re-renders all previous turn cards, the Flutter frame budget (16ms) is easily blown on a long battle with complex card layouts. A 20-turn battle re-renders 20 cards on every new turn arrival.
 
 **Why it happens:**
-Using wall-clock time as the source of truth without a fallback reconciliation step. The client shows a countdown derived from `battle_turn_deadline` but has no mechanism to detect or recover from missed server ticks.
+The `StreamProvider` for turns appends to a growing list each time a Realtime INSERT arrives. The `ListView` or `Column` in `BattleDetailScreen` re-renders all children on state change because there is no key-based diffing or `ListView.builder` with item caching. The current implementation uses a `Column` with `.map()` to build turn cards — every state update rebuilds all cards.
 
 **How to avoid:**
-- Store all battle state server-side: `current_turn`, `turn_deadline`, `last_processed_at`
-- Client polls battle state via Supabase Realtime subscription — it never drives state
-- If `last_processed_at` is more than `turn_duration + 30s` behind `NOW()`, the client shows a "Waiting for server..." notice (not a frozen timer)
-- Edge Function for battle ticks must be idempotent: processing an already-processed turn is a no-op, not an error
-- Add a reconciliation query that detects stuck battles: `WHERE last_processed_at < NOW() - INTERVAL '6 minutes' AND status = 'active'`
+Switch the turns list widget from `Column(children: reversed.map(...).toList())` to `ListView.builder` with `itemCount` and `itemBuilder` — Flutter only builds visible items. Assign a `ValueKey(turn.id)` to each `BattleTurnCard` widget so Flutter's diffing algorithm can skip unchanged cards. The `battleTurnsProvider` stream should append new turns rather than replacing the whole list (check whether the repository uses `.stream()` which re-emits full snapshots or `.on('INSERT')` which emits only new rows). For visualization, consider rendering unit casualty counts as simple `Row`/`Text` widgets rather than a charting library — charting libraries add ~1-2MB to WASM bundle and excessive repaint cost for what is essentially a table of numbers.
 
 **Warning signs:**
-- Battle tick function throws an exception if called twice for the same turn
-- Client countdown timer derived purely from local `Date.now()` without polling server state
-- No `last_processed_at` column on the battles table
+- `BattleDetailScreen` uses `Column(children: turns.map(...))` instead of `ListView.builder`
+- Turn cards have no `key:` argument
+- `battleTurnsProvider` receives full list snapshots on each new turn (Supabase `.stream()` re-emits all rows for a filter match on INSERT)
+- Frame render time exceeds 16ms when viewing a battle with 5+ turns (measure in Flutter DevTools)
 
 **Phase to address:**
-Battle system phase. Design idempotent tick processing from the start.
+Battle Report Visualization phase. Switch to `ListView.builder` at the point the visualization is built — do not add it as a post-ship optimization.
 
 ---
 
-### Pitfall 7: Island Slot Exhaustion by Inactive Players (Ghost Cities)
+### Pitfall 7: Population as an Integer — Growth Accumulation Lost Between Ticks
 
 **What goes wrong:**
-A player creates a city on an island, plays for 2 days, and quits. Their city permanently occupies one of the 16-17 island slots forever. In a small community game, this means popular islands fill up with ghost cities, and active players cannot settle there. The map feels dead and new players have no desirable neighbors.
+Population growth rate is `happiness_score / 34.65` citizens per hour (Ikariam formula). At a 5-minute tick interval, the per-tick delta is approximately `happiness_score / 34.65 / 12`. For a small city with happiness = 50, that is `50 / 34.65 / 12 ≈ 0.12` citizens per tick. If population is stored as `INTEGER` and the tick does `population = population + 0.12`, PostgreSQL floor-truncates to 0. The city's population never grows even though it should gain ~1.44 citizens per hour.
 
 **Why it happens:**
-The initial design focuses on city creation mechanics without specifying what happens to cities of players who never return. There is no abandonment or inactivity system planned for v1.
+Population feels like a whole-number concept and developers use `INTEGER` column type. The per-tick fractional accumulation is discarded silently. This is exactly the same trap that affects any "slow accumulation" mechanic — the existing `city_resources.amount` correctly uses `NUMERIC` to avoid this, but population is a new column and developers may reach for `INTEGER` reflexively.
 
 **How to avoid:**
-Design a grace period + abandonment mechanic early:
-- After 14 days of inactivity (no login), city enters "Abandoned" status (visible on map, resources stop producing)
-- After 30 days, city is removed and the slot is freed
-- Send an email notification at 7 days and 13 days via Supabase Auth trigger or Edge Function
-- Alternatively: protect cities with an "Inactive Shield" (no attacking) but show them as low-priority neighbors
+Store population as `NUMERIC` (not `INTEGER`) in the database. The display layer in Flutter can `floor()` the value for display purposes. Alternatively, store `population` as `INTEGER` and `population_growth_accum NUMERIC` — the tick adds to the accumulation, and when it crosses 1.0 it increments the integer and resets the fractional part. This is the more common "fixed-point growth" pattern in browser strategy games and avoids displaying fractional citizens to the user while still accumulating correctly.
 
 **Warning signs:**
-- No `last_login_at` column on player profile
-- No pg_cron job checking for inactive accounts
-- Island map showing cities with 0 production and no recent activity after 2 weeks of operation
+- `population` column defined as `INTEGER` in the migration
+- Tick formula uses `FLOOR()` or integer arithmetic on a fractional growth rate
+- Test: set happiness = 50, run 50 ticks, check if population has increased by at least 6 citizens (expected ~6 over 50 ticks × 0.12/tick)
 
 **Phase to address:**
-Player management phase or World Map phase. Define the policy in schema design even if the enforcement job is built later.
+Happiness/Population schema design — column type decision must be made in the migration, not fixed later (changing `INTEGER` to `NUMERIC` requires a migration with a `ALTER COLUMN ... TYPE` that can lock the table).
+
+---
+
+### Pitfall 8: Marketplace Orders Not Expired / Cleaned Up — Order Book Grows Without Bound
+
+**What goes wrong:**
+Players place buy/sell orders and forget about them. Orders that are never matched accumulate indefinitely. After a few weeks of play with a small community, the `marketplace_orders` table has hundreds of stale orders. Every call to the match function must scan all open orders to find matches — query time grows linearly with the number of open orders. Players also see a flooded order book UI showing 3-gold wood offers from players who quit 2 weeks ago.
+
+**Why it happens:**
+Order expiry is not part of the "minimum viable" order book feature and gets deferred. There is no pg_cron job to expire old orders and no UI to show order age.
+
+**How to avoid:**
+Add `expires_at TIMESTAMPTZ NOT NULL` to `marketplace_orders` at schema creation time (default 48 hours from placement). Add a partial index: `CREATE INDEX marketplace_orders_open ON marketplace_orders (resource_type, price) WHERE status = 'open' AND expires_at > NOW()`. The match function's WHERE clause filters on `status = 'open' AND expires_at > NOW()` — expired orders are invisible to matching without needing cleanup. Add a pg_cron job (weekly is fine for a small community) that sets `status = 'expired'` on orders past their expiry and refunds escrowed resources.
+
+**Warning signs:**
+- `marketplace_orders` table has no `expires_at` column
+- The match function's WHERE clause only filters on `status = 'open'` without expiry check
+- No pg_cron job for order expiry and refund
+- Order book UI shows orders with no "placed X hours ago" timestamp
+
+**Phase to address:**
+Marketplace/Order Book phase. The `expires_at` column and expiry index must be in the initial marketplace migration.
+
+---
+
+### Pitfall 9: Trade Cargo Ship — No Interception Mechanic But Attacks Are Possible During Transit
+
+**What goes wrong:**
+v1.1 adds player-to-player resource trading via cargo ships. Cargo ships travel using the same `unit_movements` table and `process_arrivals()` function as military units. An attacker can dispatch military units to arrive at the defender's city at approximately the same time as a cargo ship arrives. The arrival processor triggers both: cargo resources are added to the city, then the battle begins with the city's post-delivery resource balance. The cargo delivery and battle arrival processing are sequential in one tick, but if cargo arrives at `T` and the attacker arrives at `T+1 minute`, the defender benefits from the resources before the battle. This may be intentional, but needs explicit design decision. Worse: there is no interception mechanic (attack cargo in transit), and if the feature is not defined, players will ask for it and the schema has no way to express "intercepted cargo movement."
+
+**Why it happens:**
+Trading and military movement share the `unit_movements` table (`movement_type` discriminator already exists as `'attack'` / `'return'`). A new `'trade'` movement type is added but no thought is given to whether military movement can target a trade movement.
+
+**How to avoid:**
+Explicitly decide: "cargo interception is out of scope for v1.1." Document this in code comments on the trade dispatch Edge Function and in the cargo movement handler. Add `'trade'` and optionally `'trade_return'` to the `movement_type` CHECK constraint. In `process_arrivals()`, branch on movement type — trade arrivals add resources to the destination city, military arrivals start a battle. Ensure these branches are mutually exclusive and do not attempt to battle a cargo movement. Deferred: interception can be added in v1.2 by adding an `intercepted_by` foreign key to `unit_movements`.
+
+**Warning signs:**
+- `movement_type` CHECK constraint not updated to include `'trade'`
+- `process_arrivals()` treats all arrivals the same (tries to start a battle for a cargo movement)
+- No code comment explicitly deferring interception mechanic
+- Two cargo ships dispatched simultaneously to the same city — test whether both resources are credited correctly
+
+**Phase to address:**
+Trading/Cargo phase. Update `process_arrivals()` and `movement_type` constraint before writing the trade Edge Function.
 
 ---
 
@@ -197,12 +208,14 @@ Player management phase or World Map phase. Define the policy in schema design e
 
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
 |----------|-------------------|----------------|-----------------|
-| Direct `supabase.from('resources').update()` from client | Faster to code initially | Any player can forge requests; full rewrite of economy layer needed | Never — server authority is non-negotiable for game integrity |
-| Hardcoded building costs/formulas in Flutter | No server round-trip for UI display | Formula changes require app rebuild and re-deploy; client and server diverge | Never for calculations that gate server actions; OK for display hints with server re-validation |
-| Single SQL UPDATE for all players per tick | Simple to write | Locks the entire resources table for seconds; breaks under concurrent play | Never in production; acceptable only for local single-player testing |
-| Skip RLS on "read-only" tables like `technologies` | Slightly simpler setup | Creates a habit of skipping RLS; one forgotten table leaks private data | Acceptable for truly static reference data (no player-specific rows) |
-| Client-side battle countdown without server polling | Smooth UX without network calls | Desynchronizes when server tick is late; players see wrong state | Never for authoritative game state; OK for cosmetic animations between known events |
-| pg_cron job created via Supabase UI | Quick to set up | Hidden 5000ms timeout cap causes silent failures at scale | Never — always create via raw SQL for game-critical ticks |
+| Separate pg_cron job for happiness (instead of extending existing tick) | Easier to develop in isolation | Wine consumed twice in same tick window; ordering bugs; harder to reason about state | Never — extend the existing tick function |
+| Store population as `INTEGER` | Simpler schema, intuitive | Fractional growth silently truncated to 0; small cities never grow | Never — use `NUMERIC` with display-layer flooring |
+| Marketplace match logic in TypeScript Edge Function (multiple `.from().select().update()` calls) | Familiar syntax, easy to prototype | No atomicity between read and update; partial fills leave inconsistent state under concurrent load | Never for order matching — must be a single PostgreSQL stored procedure |
+| Pillage: read defender resources in separate SELECT then UPDATE | Simple to write | Race with resource production tick; potential double-deduct | Never — use `SELECT ... FOR UPDATE` within the battle resolution function |
+| Trade resources escrowed on arrival (not departure) | No upfront deduction | Wine shows as available for tavern consumption even though it is in transit; city can over-commit | Never — escrow at dispatch time |
+| Order book with no `expires_at` | Simpler schema initially | Table grows unbounded; query times increase; stale orders pollute the UI | Never — `expires_at` belongs in the initial migration |
+| Battle turns rendered in `Column.map()` instead of `ListView.builder` | One less refactor | Full list rebuild on every new Realtime event; frame drops on long battles | OK for 1-5 turns (MVP test); unacceptable for production with 10+ turn battles |
+| Island upgrade as sequential Edge Function calls (no DB-level lock) | Faster to write | Concurrent upgrades from multiple island neighbors bypass level cap | Never — use a PostgreSQL function with `FOR UPDATE` on the island row |
 
 ---
 
@@ -210,12 +223,12 @@ Player management phase or World Map phase. Define the policy in schema design e
 
 | Integration | Common Mistake | Correct Approach |
 |-------------|----------------|------------------|
-| Supabase pg_cron | Create tick job via dashboard UI, unaware of 5000ms HTTP timeout | Create via SQL with explicit `timeout_milliseconds := 30000` in `net.http_post()` |
-| Supabase Realtime | Subscribe to entire table with `supabase.from('battles').on('*')` — receives all battles for all players | Subscribe to filtered channels: `.eq('attacker_id', userId).or('defender_id.eq.' + userId)` |
-| Supabase Edge Functions | Call `supabase.createClient()` inside the function with the `anon` key — RLS applies but function needs elevated access | Use `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` inside Edge Functions; never expose service key to client |
-| Supabase Auth | Trust `user_metadata` in RLS policies (user can write their own metadata) | Use `auth.uid()` as the trust anchor; store server-controlled data in a separate `profiles` table with RLS tied to `auth.uid()` |
-| Flutter Flame + CanvasKit | Load CanvasKit from default unpkg.com CDN | Self-host or configure `canvasKitBaseUrl` to a reliable CDN in `index.html` |
-| Flutter Riverpod + Supabase Realtime | Manage Realtime subscription lifecycle manually in widgets | Use `ref.onDispose()` to cancel subscriptions when providers are destroyed; prevent memory leaks and duplicate listeners |
+| Supabase Realtime + `battle_turns` | `.stream()` re-emits the full list on each INSERT — grows quadratically with turn count | Use `.on('INSERT', ...)` to append only new rows; or switch to polling after battle ends |
+| Supabase pg_cron + happiness tick | Scheduling a separate happiness cron job at the same minute as resource tick causes concurrent writes to wine row | Use a single pg_cron job; order sub-steps within one function |
+| Supabase Edge Function + island upgrade | Multiple `.from('islands').update()` calls from different players' requests race on the same row | Wrap in a `SECURITY DEFINER` PostgreSQL function with `SELECT ... FOR UPDATE` |
+| Supabase Edge Function + marketplace match | Writing match logic as sequential `.select()` + `.update()` in TypeScript | Write the entire match as one `CALL match_order(...)` to a stored procedure |
+| Flutter Realtime + `marketplace_orders` table | Subscribing to all open orders for a resource type sends updates for every other player's orders too | Subscribe only to own orders (`eq('owner_id', userId)`) for own-order status; use a separate RPC for the public order book display |
+| Flutter Riverpod + population/happiness display | `StreamProvider` for `city_happiness` triggers full widget rebuild on each tick update | Use `select:` parameter or a derived provider to expose only the fields the widget needs, preventing unnecessary rebuilds of unrelated widgets |
 
 ---
 
@@ -223,11 +236,11 @@ Player management phase or World Map phase. Define the policy in schema design e
 
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
-| `UPDATE resources SET ... WHERE TRUE` (all players in one query) | Tick takes 30+ seconds; Supabase CPU spikes; some updates missed | Batch with `LIMIT 500` per invocation; use cursor-based pagination across tick calls | ~200 concurrent players |
-| N+1 Supabase queries per component re-render | Flutter UI pauses 200-500ms on every Riverpod state change; network tab shows dozens of requests per second | Join data in a single Edge Function query or a PostgreSQL view; cache aggressively in Riverpod | ~10 simultaneous players using the game actively |
-| Realtime subscription to high-churn tables (e.g., `battle_events`) | WebSocket floods client with 100s of events per minute; browser tab becomes sluggish | Use Postgres Functions to aggregate events server-side; push summary notifications, not raw rows | ~3-5 simultaneous battles |
-| Flame `update()` loop triggering Supabase reads on every frame | 60 HTTP requests/second per player; Supabase rate limit hit immediately | Never read from network in `update()`; drive UI from Riverpod state that is updated via Realtime | Immediately, even single player |
-| No database indexes on foreign keys and filter columns | Alliance member queries, island city lists, battle lookups slow as data grows | Add indexes at migration time on `player_id`, `island_id`, `alliance_id`, `status`, `created_at` columns | ~1000 rows per table |
+| `process_resource_tick()` extended with happiness loop — now iterates all cities twice (once for resources, once for happiness) | Tick duration doubles; may exceed pg_cron timeout | Keep single loop: produce resources AND compute happiness in same per-city iteration | ~100 cities (each with 2 passes instead of 1) |
+| Marketplace match function scans all open orders without index | Order matching slows as order book grows; players notice delayed fill confirmation | Partial index on `(resource_type, price) WHERE status = 'open' AND expires_at > NOW()` | ~500 open orders |
+| Battle turns `Column.map()` rebuilds all cards on each new Realtime event | Flutter frame drops from 60fps to 20fps on 10+ turn battle | `ListView.builder` with `ValueKey` per turn card | 8+ turns visible simultaneously |
+| Population tick adds ~0.1 citizens per tick using `NUMERIC` — triggers Realtime `UPDATE` on `cities` table every 5 minutes for every city | Supabase Realtime broadcasts city row updates to all subscribers every tick; unnecessary UI re-renders | Do not put population on the `cities` table if it is realtime-published; use a separate `city_population` table not in the realtime publication, or batch population updates hourly | 50+ concurrent players watching city screen |
+| Trade order book UI subscribes to full `marketplace_orders` for a resource type | Every order placed or matched by any player triggers a UI re-render for all players viewing the same resource | Use a server-rendered RPC to fetch the order book snapshot; only subscribe to own orders via Realtime | 10+ concurrent players trading same resource |
 
 ---
 
@@ -235,12 +248,12 @@ Player management phase or World Map phase. Define the policy in schema design e
 
 | Mistake | Risk | Prevention |
 |---------|------|------------|
-| Service role key exposed in Flutter web build | Attacker bypasses all RLS, reads/writes all data in the database | Service role key is server-only (Edge Functions, pg_cron). Use `anon` key in Flutter; restrict with RLS |
-| No rate limiting on action endpoints | Bot scripts train unlimited units or upgrade buildings thousands of times per second | Add rate limiting per `auth.uid()` in Edge Functions (e.g., max 10 requests/5 seconds per player); use Supabase's built-in rate limiting |
-| Battle outcome calculated client-side | Player sends `{ winner: "me", resources_stolen: 999999 }` | Battle resolution is exclusively server-side in a pg_cron tick or Edge Function; client only observes via Realtime |
-| Negative resource values allowed in DB | Exploit: trigger two simultaneous spends, one goes negative, second uses negative balance as credit | `CHECK (wood >= 0, marble >= 0, ...)` constraints on resource columns + atomic deduct-only SQL patterns |
-| Alliance role checked only client-side | Any alliance member can invoke leader-only actions (war declarations, kick members) | Every privileged action checks `alliance_members.role` in the Edge Function, not trusting any client-supplied role claim |
-| Open CORS on Edge Functions | Third-party sites can impersonate players' browsers and fire actions | Restrict CORS to your own Flutter web origin; validate `Authorization: Bearer <user JWT>` on every request |
+| Pillage amount computed client-side and sent in Edge Function body | Attacker sets steal amount to 999999 regardless of actual resources | Pillage calculation must be entirely inside `resolve_battles()` PostgreSQL function — client never sends a steal amount |
+| Marketplace order placed without resource escrow validation | Player places sell order for 1000 wood but only has 500; creates order that can never fill but occupies order book | Deduct escrowed resources atomically in the same DB transaction that creates the order row |
+| Island upgrade Edge Function trusts client-supplied `contribution_amount` | Player sends 0 contribution but claims upgrade credit | Server calculates required contribution from the upgrade formula; client sends only `{ island_id, upgrade_type }` |
+| `marketplace_orders` table has `SELECT authenticated` policy with no filter | Any player can read all orders including cancellation history revealing another player's trade strategy | Fine for the public order book view; but if orders contain private notes or the buyer's identity should be hidden, restrict SELECT to `owner_id = auth.uid()` for private fields |
+| Happiness configuration (wine spending rate) accepted from client without server-side bounds check | Player sets wine rate to 0.0001 (near-zero) to bypass wine consumption while keeping happiness benefit | Clamp wine spending rate server-side: minimum = tavern_level * base_consumption; maximum = current_wine_stock |
+| Trade cargo ship arrival adds resources without RLS-aware check | Cargo arrives at a city not owned by the recipient player (city transferred or wrong ID) | In `process_arrivals()` for trade movements, verify `destination_city_id` owner matches the trade order recipient before crediting resources |
 
 ---
 
@@ -248,24 +261,25 @@ Player management phase or World Map phase. Define the policy in schema design e
 
 | Pitfall | User Impact | Better Approach |
 |---------|-------------|-----------------|
-| No feedback during building upgrade queue | Player clicks "Upgrade" and nothing visibly changes; they click again creating a duplicate queue entry | Optimistic UI update immediately in Riverpod state; show spinner/progress bar; disable the upgrade button while in-flight |
-| Resource display shows stale value from last tick | Player resource count appears frozen; player doesn't know production is running | Display a client-side "estimated current" value (last_tick_value + rate * elapsed_seconds) as a live counter; reconcile on next Realtime event |
-| 5-minute battle turn with no activity indicator | Player waits 5 minutes unsure if anything is happening; they leave | Show live battle log via Realtime as reinforcements and turn timer update; display countdown clock with server-derived deadline |
-| New player overwhelmed by empty city with no tutorial | Bounce rate is high in first 10 minutes; players quit before placing their first building | Minimal onboarding flow: auto-place Town Hall on first login, surface a "First Steps" quest panel pointing at Wood Camp → Townhall upgrade path |
-| Inactive player cities appear indistinguishable from active ones on the world map | Player wastes diplomacy or attack resources targeting dead cities | Show "Last Active" badge or gray-out cities inactive for 7+ days on the island view |
-| Alliance chat and global chat in the same UI | Private alliance strategy exposed to public; players post in wrong channel by accident | Clearly separate tabs with distinct visual styles (color-coded, labeled); default focus to alliance chat when in an alliance |
+| Happiness score displayed as a raw number (e.g., "247") with no context | Player does not know if 247 is good or bad; cannot make decisions | Show happiness as "247 / 310 population" or a color-coded sentiment label ("Happy", "Neutral", "Unhappy") with a tooltip explaining the formula |
+| Production rate displayed per-tick (every 5 min) instead of per-hour | "You produce 3.2 wood" is meaningless; Ikariam displays per-hour rates | Multiply tick production by 12 for the displayed hourly rate: `workers * level * 12` |
+| Marketplace order book shows all orders in creation order (not price order) | Players cannot find best-price offers without scrolling through old orders | Sort sell orders ascending by price, buy orders descending by price — standard order book display |
+| Battle report shows raw casualty numbers but no "who won this turn" summary | Players spend time adding up numbers to figure out which side is winning | Add a per-turn outcome badge (green "Defender advantage" / red "Attacker advantage") derived from `land_outcome` and `naval_outcome` fields already stored in `battle_turns` |
+| Island upgrade UI shows upgrade cost without showing who else on the island has already contributed | Players over-contribute; later contributors see the upgrade succeed without knowing their resources were wasted | Show total required vs. total contributed by all island cities; make contribution a partial-payment model like original Ikariam |
+| Wine rate slider in Tavern configuration snaps to preset levels (0, 25%, 50%, 75%, 100%) but the server stores an arbitrary rate | The Flutter UI creates a false impression of finer control; rate mismatches cause confusion | Store wine rate as one of {0, 0.25, 0.5, 0.75, 1.0} in DB to match the UI options; validate server-side that submitted rate is one of the allowed values |
 
 ---
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **Resource production:** Tick runs every 5 minutes — verify it also respects warehouse capacity caps and does not produce above `warehouse_max`. A resource that ignores the cap is an exploit vector (unlimited storage).
-- [ ] **Building upgrade queue:** Single-slot queue appears to work for one building — verify that a second `start_upgrade` request while a building is in progress is rejected server-side (not just blocked in the UI).
-- [ ] **Turn-based battle:** Battle reports show winner and loser — verify that resources are actually transferred server-side (pillag logic) and that occupation conditions (city takeover) are checked and enforced, not just displayed.
-- [ ] **Trade routes:** Cargo ships depart and arrive in the UI — verify that the travel-time delay is enforced server-side (not instant), that ships can be intercepted during travel, and that resources are escrowed at departure (not deducted on arrival).
-- [ ] **Alliance war declarations:** UI shows "War Declared" — verify that the war status gates actual attack permissions (players in NAP cannot attack each other server-side).
-- [ ] **Ranking system:** Scores display in leaderboard — verify score is recalculated server-side on a schedule, not derived from client-supplied values, and that deleted/abandoned buildings reduce score correctly.
-- [ ] **Player messaging:** Message appears in inbox — verify unread count badge updates via Realtime (not requiring a page refresh) and that message content is not readable by other players via direct Supabase query (RLS).
+- [ ] **Happiness system:** Tavern building exists and tavern level is stored — verify wine is *actually deducted* from `city_resources` each tick and that deduction runs *after* wine production (not before) in the same tick iteration.
+- [ ] **Population growth:** Population value increments visibly over time in test — verify it still increments for a city with happiness = 50 (fractional growth); it likely does not if column is `INTEGER`.
+- [ ] **Tax income (gold):** Gold is produced each tick based on `population * tax_rate` — verify this does NOT double-count the Town Hall production that already exists in v0.1.0 (Town Hall already generates gold via `process_resource_tick()`; adding a population-tax gold source on top creates two gold production streams for the same city).
+- [ ] **Island upgrades:** Upgrade button works for one player — verify that a second player on the same island clicking within 500ms does NOT trigger a second upgrade (concurrent lock test).
+- [ ] **Marketplace order placement:** Order appears in the order book — verify the seller's resources were *immediately deducted* from `city_resources` at placement (not at match time); check `city_resources` in Supabase dashboard immediately after placing a sell order.
+- [ ] **Trade cargo dispatch:** Cargo ship departs and resources appear to be in transit — verify sender's resource balance *decreased immediately* on dispatch (escrow), not after arrival.
+- [ ] **Pillage on battle win:** Battle report shows "resources stolen" — verify (a) the defender's `city_resources` decreased by the stolen amount server-side, (b) the attacker's resources increased by the stolen amount after the return travel, and (c) the steal happened in `resolve_battles()` not in a client-triggered Edge Function.
+- [ ] **Battle turn visualization:** Turn-by-turn cards render for a 3-turn battle — verify they also render without layout overflow or performance degradation for a 15-turn battle (simulate by seeding 15 battle_turns rows in dev).
 
 ---
 
@@ -273,12 +287,12 @@ Player management phase or World Map phase. Define the policy in schema design e
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Client-side resource calculation discovered in production | HIGH | Audit all `.update()` calls from Flutter; rewrite economy mutations as Edge Functions; run a data integrity check to find exploited accounts; consider resetting or auditing affected players |
-| pg_cron tick failing silently (5s timeout) | MEDIUM | Re-create cron job via SQL with explicit timeout; add a `cron_job_log` table that the tick function writes to on each run; set up alerting if no log entry in last 7 minutes |
-| RLS missing on a game table discovered post-launch | MEDIUM | Enable RLS immediately via migration; default-deny policy first; audit Supabase logs for unauthorized reads; notify affected players if private data was exposed |
-| Race condition exploited for free resources | HIGH | Restore affected player resources from backup; add `CHECK` constraints and `SELECT FOR UPDATE` patterns; audit for other double-spend surfaces; consider temporary maintenance window |
-| Island slots all taken by ghost cities | MEDIUM | Run a one-time cleanup migration removing cities with `last_login > 30 days`; implement ongoing inactivity check as a pg_cron job; compensate active players who lost turns attacking ghost cities |
-| Flutter web WASM cold load too slow for user retention | LOW | Self-host CanvasKit WASM on CDN; add HTML splash screen to `index.html`; enable PWA service worker caching; no data migration needed |
+| Wine double-deducted (separate happiness cron + resource tick both touch wine) | MEDIUM | Disable the separate happiness cron job immediately; audit `city_resources` wine balances; add a one-time correction script adding back the over-deducted amounts; merge happiness logic into the resource tick function |
+| Pillage race condition found in production (defender's resources went negative) | HIGH | Run integrity check: `SELECT * FROM city_resources WHERE amount < 0` (should be impossible with CHECK constraint — if found, constraint was never added); restore from backup for affected rows; add `FOR UPDATE` lock in `resolve_battles()` |
+| Marketplace partial-fill inconsistency (buyer's gold deducted but seller's resources not credited) | HIGH | Freeze marketplace (disable place-order and match endpoints); audit order book for orders with `status = 'matched'` but no corresponding resource transfer log; implement compensating transactions or restore from backup; rewrite match function as atomic stored procedure |
+| Island over-upgraded (level exceeds max due to concurrent requests) | LOW | Run: `UPDATE islands SET wood_level = 10 WHERE wood_level > 10`; add CHECK constraint; add FOR UPDATE lock in upgrade function |
+| Population never grows (INTEGER truncation) | MEDIUM | Migrate column: `ALTER TABLE city_population ALTER COLUMN population TYPE NUMERIC`; no data loss, but requires downtime window; alternatively keep INTEGER and add `population_growth_accum NUMERIC` column |
+| Battle report UI freezing on long battles | LOW | Switch `Column.map()` to `ListView.builder` in `BattleDetailScreen`; no schema changes needed; hot-reload compatible |
 
 ---
 
@@ -286,41 +300,37 @@ Player management phase or World Map phase. Define the policy in schema design e
 
 | Pitfall | Prevention Phase | Verification |
 |---------|------------------|--------------|
-| Client-side resource calculation | Phase 1: Foundation / Schema | Code review rule: zero `.update()` on game state tables from Flutter; all mutations through Edge Functions |
-| pg_cron 5s timeout | Phase 2: Resource Production | Check `cron_job_log` table after tick runs; measure tick duration with 100 test rows |
-| Race condition double-spend | Phase 3: Economy (Building Upgrades) | Write integration test sending two simultaneous upgrade requests; assert only one succeeds |
-| RLS disabled on tables | Phase 1: Schema Foundation | CI migration linter asserts all public tables have `rowsecurity = true` |
-| Flutter WASM cold load | Phase 6: Deployment | Throttle test (3G) and measure time-to-interactive; must be < 10 seconds |
-| Battle state desynchronization | Phase 4: Battle System | Integration test: manually skip a tick and verify client shows "Waiting for server" state |
-| Ghost city island exhaustion | Phase 3 or 5: World Map / Player Management | Seed test data with 30-day-old players; verify pg_cron abandonment job removes them |
-| RLS policy trusting user_metadata | Phase 1: Auth / Schema | Security review: grep all RLS policies for `user_metadata` references; replace with `profiles` table lookup |
-| Missing indexes | Phase 1: Schema Foundation | EXPLAIN ANALYZE on island city list query and alliance member query; all must use index scans |
-| Realtime subscription to high-churn tables | Phase 4: Battle System | Profile WebSocket traffic during a simulated battle; max 5 events/second per client |
+| Happiness/wine tick ordering | Phase: Happiness/Population (first v1.1 phase) | Run 10 ticks with wine at borderline capacity; verify wine not double-deducted |
+| Pillage race with production tick | Phase: Pillage mechanic | Integration test: trigger resolve_battles() and process_resource_tick() simultaneously; check defender resources |
+| Marketplace partial fill orphans | Phase: Marketplace order book | Concurrent test: two sell orders arrive at same time for one buy order; verify only one fills |
+| Island upgrade concurrent over-upgrade | Phase: Island Upgrades | Two simultaneous upgrade requests from different players; verify level incremented exactly once |
+| Wine escrow (trade vs. tavern consumption) | Phase: Trading/Cargo ships | Dispatch cargo, immediately check city_resources; wine must be deducted at departure |
+| Battle turns Realtime flood | Phase: Battle Report Visualization | Profile Realtime events during a 10-turn battle; verify rebuild count per turn arrival |
+| Population INTEGER truncation | Phase: Happiness/Population schema | Seed test: happiness = 50, run 100 ticks, assert population > 0 |
+| Marketplace order expiry | Phase: Marketplace order book | Check marketplace_orders migration for expires_at column and expiry index |
+| Trade cargo collision with military arrival | Phase: Trading/Cargo ships | Verify process_arrivals() branches on movement_type; cargo arrival does not trigger battle |
+| Gold double-production (Town Hall + tax) | Phase: Population tax | Check process_resource_tick() after tax income is added; gold production should be one source only |
 
 ---
 
 ## Sources
 
-- [Supabase pg_cron debugging guide](https://supabase.com/docs/guides/troubleshooting/pgcron-debugging-guide-n1KTaz)
-- [Supabase Cron UI 5000ms timeout issue (GitHub Discussion #37574)](https://github.com/orgs/supabase/discussions/37574)
-- [Supabase Cron UI 5000ms timeout issue (GitHub Issue #37629)](https://github.com/supabase/supabase/issues/37629)
-- [Supabase Realtime Limits](https://supabase.com/docs/guides/realtime/limits)
-- [Supabase Scheduling Edge Functions](https://supabase.com/docs/guides/functions/schedule-functions)
-- [Supabase Processing large jobs with Edge Functions, Cron, and Queues](https://supabase.com/blog/processing-large-jobs-with-edge-functions)
-- [Supabase RLS Security Flaw: 170+ Apps Exposed](https://byteiota.com/supabase-security-flaw-170-apps-exposed-by-missing-rls/)
-- [Row-Level Recklessness: Testing Supabase Security](https://www.precursorsecurity.com/security-blog/row-level-recklessness-testing-supabase-security)
-- [Flame Engine Performance Docs](https://docs.flame-engine.org/latest/flame/other/performance.html)
-- [Flutter Web CanvasKit WASM slow load (GitHub Issue #82810)](https://github.com/flutter/flutter/issues/82810)
-- [Flutter Web CanvasKit optimization best practices](https://blog.flutter.dev/best-practices-for-optimizing-flutter-web-loading-speed-7cc0df14ce5c)
-- [Flutter Web Performance 2025: CanvasKit vs HTML vs Wasm](https://coldfusion-example.blogspot.com/2026/01/flutter-web-performance-2025-canvaskit.html)
-- [Networking of a turn-based game (Longwelwind)](https://longwelwind.net/blog/networking-turn-based-game/)
-- [Web Race Conditions: PortSwigger Research](https://portswigger.net/research/smashing-the-state-machine)
-- [Designing Game Economies: Inflation, Resource Management, and Balance](https://medium.com/@msahinn21/designing-game-economies-inflation-resource-management-and-balance-fa1e6c894670)
-- [I Designed Economies for $150M Games](https://www.gamedeveloper.com/production/i-designed-economies-for-150m-games-here-s-my-ultimate-handbook)
-- [Flame simplest optimization techniques](https://asgalex.medium.com/flutter-flame-simplest-optimization-techniques-372dbe6815f)
-- [AnandTech forum: working on a game similar to Ikariam](https://forums.anandtech.com/threads/working-on-a-web-game-similar-in-some-respects-to-ikariam.325496/)
+- [Ikariam Happiness Wiki (Fandom)](https://ikariam.fandom.com/wiki/Happiness) — population formula, wine consumption rate, happiness decay
+- [Ikariam Tavern Wiki (Fandom)](https://ikariam.fandom.com/wiki/Building:Tavern) — wine-per-level bonus, happiness per load
+- [Ikariam Forum: Happiness calculation in Tavern slider](https://forum.ikariam.gameforge.com/forum/thread/96997-fixed-happiness-calculation-in-tavern-slider-does-not-account-for-corruption/) — edge case: happiness preview not matching server reality
+- [PostgreSQL Explicit Locking Documentation](https://www.postgresql.org/docs/current/explicit-locking.html) — `SELECT ... FOR UPDATE`, `SKIP LOCKED` semantics
+- [The Unreasonable Effectiveness of SKIP LOCKED in PostgreSQL (Inferable.ai)](https://www.inferable.ai/blog/posts/postgres-skip-locked) — SKIP LOCKED gives inconsistent view; not suitable for order book matching
+- [PostgreSQL Row-Level Locks Guide (ScalableArchitect)](https://scalablearchitect.com/postgresql-row-level-locks-a-complete-guide-to-for-update-for-share-skip-locked-and-nowait/) — join locking pitfalls, same-row contention under concurrency
+- [Order Matching Engine in PostgreSQL Stored Procedures (GitHub: anders94)](https://github.com/anders94/order-matching-engine) — reference for atomic order matching patterns
+- [Order Matching Engine: Everything You Need to Know (DEV Community)](https://dev.to/devexperts/order-matching-engine-everything-you-need-to-know-638) — partial fill mechanics, price/time priority
+- [Supabase Realtime Client-Side Memory Leak (drdroid.io)](https://drdroid.io/stack-diagnosis/supabase-realtime-client-side-memory-leak) — subscription lifecycle management
+- [Supabase Realtime Channel Already Subscribed (drdroid.io)](https://drdroid.io/stack-diagnosis/supabase-realtime-channel-already-subscribed) — duplicate subscription pitfall
+- [Flutter ListView Optimization with Riverpod (Medium)](https://saqlainalishah.medium.com/flutter-listview-optimization-with-riverpod-avoiding-unnecessary-rebuilds-3bdf49a86ad3) — key-based diffing, scoped providers for list items
+- [Preventing Race Conditions with SERIALIZABLE Isolation in Supabase (GitHub Discussion #30334)](https://github.com/orgs/supabase/discussions/30334) — serializable isolation trade-offs for concurrent updates
+- [Grand Strategy Games: Simulating population growth (Roblox Dev Forum)](https://devforum.roblox.com/t/grand-strategy-games-simulating-population-growth-workforce-etc/4041693) — fractional growth accumulation pattern for integer population display
+- [Web Race Conditions: PortSwigger Research](https://portswigger.net/research/smashing-the-state-machine) — concurrent request exploitation patterns applicable to order book and pillage
 
 ---
-*Pitfalls research for: Ikariam-style browser multiplayer strategy game*
-*Stack: Flutter + Flame (web), Supabase, pg_cron, Riverpod*
-*Researched: 2026-03-11*
+*Pitfalls research for: Ikariam-style browser strategy game — v1.1 Economy & Combat Depth (adding happiness, marketplace, pillage, battle visualization to existing Supabase system)*
+*Stack: Flutter web + Supabase + pg_cron + Riverpod (manual providers)*
+*Researched: 2026-03-13*

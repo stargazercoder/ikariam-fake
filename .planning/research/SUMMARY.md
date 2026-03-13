@@ -1,17 +1,17 @@
 # Project Research Summary
 
-**Project:** Ikariam Clone — Browser-based Multiplayer Strategy Game
-**Domain:** Ancient Greek island city-building MMO strategy (browser-first, Flutter web)
-**Researched:** 2026-03-11
+**Project:** Ikariam Clone — v1.1 Economy & Combat Depth
+**Domain:** Browser-based multiplayer strategy game (Flutter Web + Supabase)
+**Researched:** 2026-03-13
 **Confidence:** HIGH
 
 ## Executive Summary
 
-This project is an Ikariam-style multiplayer browser strategy game built on Flutter Web + Flame for rendering, Supabase for the backend (PostgreSQL, Auth, Realtime, Edge Functions, pg_cron), and Riverpod for reactive state management. The stack is well-supported by official packages with verified version compatibility; Flutter 3.29/Dart 3.7 + Flame 1.36 + supabase_flutter 2.12 + flutter_riverpod 3.3.1 + flame_riverpod 5.5.3 form a coherent, WASM-forward, production-capable combination. The architecture follows a strict dumb-client / authoritative-server model where all game-state mutations flow through Supabase Edge Functions or pg_cron SQL, never from the Flutter client directly — this is both the security foundation and the anti-cheat backbone of the entire system.
+v1.1 adds eight tightly interconnected economy and combat features to a validated Flutter + Supabase architecture. The existing codebase already provides the structural backbone — server-authority model, Supabase Realtime, pg_cron resource ticks, Edge Functions with atomic SQL patterns — and every new feature is an extension of these established patterns, not a new paradigm. The only new Dart dependency is `fl_chart 1.1.1` for battle report visualization; all other features are implementable with the existing stack. The research confirms this milestone is achievable with high confidence: the patterns are proven, the data already exists, and the eight features decompose cleanly into schema migrations, backend extensions, and Flutter UI work.
 
-The recommended approach is feature-first project structure organized around 6 development phases: Auth/Foundation, Core Economy (city + resources), World Map + Research, Military + Battle System, Social + Trade, and Meta (ranking + diplomacy). The 5-minute turn-based combat system is the primary gameplay differentiator versus all existing competitors (Ikariam, Grepolis, Travian all resolve combat instantly). Island-cooperative shared buildings are a secondary differentiator that should land in v1.x. The MVP is substantial — 18 P1 features — but the dependency chain is clear and the architecture is designed for incremental addition of features without rewrites.
+The recommended build approach is a strict three-wave sequence: schema migrations first (unblock parallel backend work), then SQL function modifications and Edge Functions, then Flutter UI. This order is non-negotiable because several SQL functions (`process_resource_tick`, `resolve_battles`, `process_arrivals`) are shared infrastructure that multiple feature clusters depend on. Building UI before backend functions are extended is the most common source of integration rework. The happiness/population system must be built first — it is a dependency of the tax system and is the highest-risk item for subtle tick-ordering bugs.
 
-The two most consequential risks are both architectural and must be resolved before any feature is built on top of them: (1) accidentally placing resource/building calculations on the client side instead of the server, and (2) creating pg_cron jobs via the Supabase dashboard UI which silently applies a 5000ms HTTP timeout that will break resource ticks under player load. Both are easy to prevent with correct patterns from day one but catastrophically expensive to fix retroactively. RLS must be enabled on every table at migration time, and all transaction-level resource deductions must use atomic SQL patterns to prevent double-spend race conditions.
+The primary risks are concurrency-related, not architectural. Five of the nine critical pitfalls share the same root cause: treating shared PostgreSQL rows (city resources, island levels, marketplace orders) without proper row-level locking. Every one has a clear prevention: use `SELECT ... FOR UPDATE` inside `SECURITY DEFINER` PostgreSQL functions rather than sequential TypeScript calls from Edge Functions. A secondary risk is the `cities` table Realtime fan-out — enabling Realtime on `cities` (required for happiness/population push) will broadcast a city row UPDATE every 5 minutes to every subscriber. The mitigation is well-defined in the research and must be addressed at design time, not as a post-ship optimization.
 
 ---
 
@@ -19,233 +19,188 @@ The two most consequential risks are both architectural and must be resolved bef
 
 ### Recommended Stack
 
-The entire stack is built within the Dart/Flutter ecosystem, keeping a single codebase that compiles to web today and mobile later without significant rework. Flame provides the 2D game loop and component system; flame_riverpod bridges Riverpod state into Flame components which are not Flutter widgets. Supabase provides the full backend surface needed for a multiplayer game (Auth, Postgres with RLS, Realtime WebSockets, Edge Functions, pg_cron) without requiring a custom server. The stack compiles to CanvasKit for v1 (broadest browser support) with a WASM migration path available once all transitive dependencies confirm WASM support.
+The existing stack (Flutter 3.29, Supabase 2.12.0, Riverpod 3.3.1, Flame 1.35.1, go_router 17.1.0) handles all eight new features without changes. One new package is justified: `fl_chart 1.1.1` (MIT, 6,200+ GitHub stars, min Flutter SDK 3.27.4) for stacked bar charts in battle reports. Its `BarChartRodStackItem` API maps directly onto the per-turn, per-unit-type casualty data already stored in `battle_turns`.
 
 See full details: `.planning/research/STACK.md`
 
-**Core technologies:**
-- **Flutter 3.29 / Dart 3.7** — web build target (CanvasKit), single codebase for future mobile; WASM-ready
-- **Flame 1.36.0** — 2D game engine (FlameGame, Component tree, Camera2D, flame_tiled integration); only mature 2D engine in Flutter ecosystem
-- **flame_riverpod 5.5.3** — bridges Riverpod providers into Flame component tree; required for reactive state in Flame components
-- **supabase_flutter 2.12.0** — unified client for Auth, PostgREST, Realtime, Edge Functions; WASM-compatible (uses dart:js_interop)
-- **flutter_riverpod 3.3.1** — context-free reactive state; works outside widget tree; critical for Flame/Flutter hybrid
-- **freezed 3.2.5 + json_serializable 6.13.0** — immutable Dart model classes with JSON serialization for all game data types
-- **go_router 17.1.0** — URL-based navigation; required for Supabase Auth deep-link callbacks on web
-- **pg_cron (Postgres extension)** — server-side resource production ticks every 5 minutes; no client trust required
+**Core technologies for v1.1:**
+- `fl_chart 1.1.1` — battle report turn-by-turn unit loss visualization; only Flutter chart library with native stacked bar support at MIT license
+- `PostgreSQL SECURITY DEFINER functions` — atomic order matching, pillage calculation, island upgrades; prevents race conditions that TypeScript Edge Function chains cannot guarantee
+- `Supabase Realtime Postgres Changes` — live marketplace order book and resource shipment tracking; reuses established WebSocket connection, no new infrastructure
+- `pg_cron (extended existing jobs)` — happiness + population + tax gold added into `process_resource_tick()`; new `deliver-resources` job for cargo shipments
+- `flutter_riverpod (manual providers)` — new `StreamProvider` for marketplace orders and resource shipments; new derived `Provider` for hourly production rates; no code generation (riverpod_generator blocked by Dart analyzer conflict per PROJECT.md)
 
-**Critical version constraints:**
-- flame_riverpod 5.x requires flutter_riverpod 3.x — do not mix versions
-- supabase_flutter 2.x only (v1.x is not WASM-compatible)
-- riverpod_generator, riverpod_annotation, flutter_riverpod must all be updated together (same author, pinned versions)
+**Critical constraint:** Do NOT introduce `riverpod_generator` or `freezed` for v1.1 models. The Dart 3.10.1 analyzer conflict is still active per PROJECT.md. All new models follow the existing handwritten `fromJson`/`==`/`hashCode` pattern.
 
 ### Expected Features
 
-Research cross-referenced against original Ikariam, Grepolis, Travian, and Tribal Wars. Feature set is well-understood and genre-standardized. The MVP is 18 P1 features; the full feature dependency chain is mapped.
+All features in scope are P1 for v1.1 launch. All are table stakes or clear differentiators with no viable deferral.
 
 See full details: `.planning/research/FEATURES.md`
 
-**Must have for launch (P1 — table stakes):**
-- Authentication (email/password) + persistent player profile — identity foundation
-- 5 resource types (Wood, Marble, Crystal, Sulfur, Gold) with server-side production (pg_cron) — core idle loop
-- Warehouse capacity limits — resource scarcity and trade pressure
-- 10 core building types (Town Hall, Barracks, Academy, Shipyard, Trading Post, Palace, Embassy, Warehouse, Tavern, Hideout) + single-slot upgrade queue
-- Research tree (4 branches: Seafaring, Economy, Science, Military; 20+ techs with prerequisites) — progression system
-- World map (2D grid, island-based) — spatial context and target-finding
-- Island view + city view navigation
-- 6 land unit types + 3 naval unit types
-- Turn-based combat (5-minute turns) with battle reports and pillage mechanic
-- Player-to-player messaging
-- Alliance system (create/join, roles: Leader, General, Diplomat, Member)
-- Resource trading via cargo ships (distance-based travel time)
-- Ranking leaderboard (total score)
-- Beginner protection (no attacks until Town Hall level 4)
-- Colony expansion (Palace + Seafaring research + Colony Ship)
-- Basic tutorial / onboarding
+**Must have (table stakes) — users expect these in any Ikariam-like game:**
+- Happiness system (tavern + wine consumption) — without it, the Tavern building serves no purpose
+- Population growth driven by happiness — closes the core city progression loop
+- Population-based tax income — gold must scale with city growth; static gold feels broken
+- Configurable wine spending rate slider — genre-standard; players can't manage wine scarcity without it
+- Island resource building upgrades — shared island cooperation mechanic; its absence removes the social dynamic
+- Resource production rate visible in UI (+X/hr) — players cannot plan without hourly rates
+- Pillage resources on battle victory — winning a battle needs tangible economic reward
+- Battle report showing unit losses per turn — flat win/loss summary is inadequate post-combat UX
 
-**Should have after validation (P2 — v1.x):**
-- Barbarian villages (PvE combat practice) — once PvP is stable
-- Daily tasks / favor system — daily re-engagement
-- Marketplace order book — once enough players trading
-- Spy / espionage system — intelligence layer over PvP
-- Occupation / city takeover — ultimate PvP goal
-- Vacation mode — quality-of-life for small community
-- Island shared buildings (Sawmill, luxury resource, miracle building) — cooperative differentiator
-- War declarations + NAP between alliances — political meta-game
+**Should have (differentiators above the original Ikariam):**
+- Marketplace order book (global async buy/sell orders) — original Ikariam's radius-limited search is a known weakness; a global order book creates a real economy
+- Direct player-to-player resource transfer — faster than marketplace for allied trades; prerequisite for the marketplace cargo ship mechanic
+- Color-coded turn-by-turn battle chart (fl_chart) — materially above original Ikariam's text-based reports
 
-**Defer to v2+:**
-- Isometric/3D map rendering — purely visual, massive scope
-- Drag-and-drop building placement — no strategic value
-- Automated trade routes — reduces player agency
-- Museum + artifact system — marginal value
-- Premium cosmetics — only if monetization needed; never pay-to-win
+**Defer to v1.2+:**
+- Corruption mechanic (gold penalty at high city count) — only relevant with 3+ cities
+- Auto wine-send standing orders — quality-of-life after wine management is validated
+- Museum building for happiness — high complexity, low immediate value
+- Population decay from extreme unhappiness — only if players request punishing mechanics
 
-**Anti-features to permanently reject:**
-- Pay-to-win monetization (kills small communities)
-- Real-time instant-resolve combat (destroys strategic depth)
-- Server seasonal wipes (destroys player investment)
+**Anti-features to explicitly reject:**
+- Negative happiness causing population loss — death spiral for new players
+- Gold-for-gold marketplace trades — original Ikariam prohibits this; enables exploit vectors
+- Per-city island resource ownership — removes the island cooperation social dynamic
+- Instant pillage without cargo ship travel — breaks balance; travel delay is intentional counterplay
+- Real-time happiness ticker (WebSocket every second) — battery drain; happiness changes once per 5-min tick
 
 ### Architecture Approach
 
-The architecture is a strict 3-layer client-server model: Flutter/Flame client (rendering + UI), Supabase backend (PostgreSQL as single source of truth), and a server-logic layer (Edge Functions for mutations, pg_cron for time-based progression). The client is deliberately "dumb" — it sends intents, never computed results. All game arithmetic (build costs, resource production, battle outcomes) happens server-side. Realtime WebSocket push (Supabase Realtime) replaces all polling: DB Changes for persistent events, Broadcast for ephemeral battle turn updates. Riverpod AsyncNotifiers per domain cache server state and subscribe to Realtime streams.
+v1.1 extends the v0.1.0 server-authority architecture through targeted additions: two new tables (`resource_shipments`, `marketplace_orders`), four new columns on `cities`, one new nullable column on `unit_movements` (cargo jsonb), eight new Edge Functions, one new pg_cron job (`deliver-resources`), and modifications to three existing SQL functions. The Flutter client gains two new feature modules (`features/trade/`, `features/marketplace/`), one new screen (`TavernScreen`), and one new provider (`resource_rates_provider`). The core architectural contract is unchanged: all game-state mutations happen server-side; the client is a read-only consumer of Supabase Realtime and PostgREST.
 
 See full details: `.planning/research/ARCHITECTURE.md`
 
-**Major components:**
-1. **Flutter UI Layer** — screens, dialogs, menus, HUD overlays via Flutter widgets; uses `GameWidget.overlayBuilderMap` to sit on top of Flame canvas
-2. **Flame World Layer** — separate FlameGame subclass per view (WorldMapGame, CityGame); never one global FlameGame
-3. **Riverpod Providers** — one AsyncNotifier per game domain (city, resources, research, battle, trade, alliance); each loads from Supabase and subscribes to Realtime
-4. **Service Layer** — thin Dart wrappers over Supabase SDK; no game logic; calls Edge Functions for all mutations
-5. **Supabase Edge Functions (Deno/TypeScript)** — authoritative server logic: build queue, battle resolution, trade route validation, construction completion; invoked by client JWT or pg_cron
-6. **pg_cron** — scheduled SQL jobs: resource production tick every 5 min, daily score recalculation; stores target timestamps, not timers
-7. **PostgreSQL + RLS** — single source of truth; RLS on every table; all player data isolated by `auth.uid()`; atomic SQL patterns for resource deductions
+**Major components added:**
+1. **Economy tick extension** (`process_resource_tick`) — happiness/wine consumption, population growth, tax gold, island level multiplier bundled into the single existing 5-minute pg_cron job to prevent ordering ambiguity
+2. **Escrow-on-dispatch pattern** — resource shipments and marketplace orders deduct resources at creation time, not delivery; prevents double-spend from concurrent operations
+3. **Resource shipments subsystem** — `resource_shipments` table + `deliver-resources` pg_cron job handles both P2P trades and marketplace fulfillment via the same cargo ship delivery mechanism
+4. **Marketplace order book** — `marketplace_orders` table with Realtime; order matching via PostgreSQL stored procedure with `FOR UPDATE` row locks; escrow deducted at order placement
+5. **Pillage integration** — extends `resolve_battles()` attacker_won branch; loot travels home via `unit_movements.cargo` jsonb; delivered by `process_arrivals()` extended with a cargo delivery branch
+6. **Battle report visualization** — pure Flutter; `UnitCasualtyBar` widget + `unit_visual_constants.dart` constants; no backend changes needed (all turn data already in `battle_turns`)
 
-**Key architectural rules:**
-- Client NEVER writes directly to game-state tables (no INSERT/UPDATE from Flutter)
-- All timestamps are server-side (`NOW()`) — client calculates display-only countdowns from server UTC timestamps
-- Separate FlameGame instances per screen view (not one monolithic game)
-- Realtime DB Changes for persistent events; Broadcast for ephemeral battle updates
+**Key patterns to follow:**
+- Columnar extension over new tables: happiness/population/tax/wine-rate are columns on `cities`, not separate tables — one Realtime event covers all city economy changes
+- Bundled SQL function extension: new tick behaviors co-located with related existing behaviors to avoid ordering ambiguity
+- Client-side rate derivation: hourly production rate is NOT stored in DB; derived in `resourceRatesProvider` from existing streams; the Dart formula must stay in sync with the SQL tick formula
 
 ### Critical Pitfalls
 
 See full details: `.planning/research/PITFALLS.md`
 
-1. **Client-side resource/game calculations** — Any `.update()` call on game state tables from Flutter is exploitable. Prevention: 100% of mutations go through Edge Functions with server-side validation. Establish this pattern before Phase 1 ends and enforce via code review.
+1. **Happiness/wine tick ordering** — Separate pg_cron job for happiness races with the resource tick on the same wine row (double deduction). Prevention: extend `process_resource_tick()` with happiness sub-steps in fixed order: produce → deduct wine → compute happiness → grow population. Never add a separate cron job for happiness.
 
-2. **pg_cron 5-second HTTP timeout** — Creating cron jobs via the Supabase dashboard UI silently caps HTTP timeout at 5000ms, causing resource ticks to fail silently above ~100 players. Prevention: always create cron jobs via raw SQL with `timeout_milliseconds := 30000`; never use the dashboard UI for game-critical jobs.
+2. **Pillage race with production tick** — `resolve_battles()` and `process_resource_tick()` can run concurrently; without row-level locking the pillage reads a stale defender balance. Prevention: `SELECT ... FOR UPDATE` on defender resource rows inside `resolve_battles()` before the pillage UPDATE.
 
-3. **Race condition double-spend** — Two simultaneous "upgrade building" requests both read sufficient balance and both deduct cost, resulting in negative resources or duplicate queue entries. Prevention: atomic SQL `UPDATE resources SET wood = wood - $cost WHERE wood >= $cost RETURNING wood` pattern + `CHECK (wood >= 0)` constraints on all resource columns.
+3. **Marketplace partial fill orphans** — Concurrent match + cancel on the same partially-filled order leaves inconsistent state. Prevention: entire order matching logic must be a single PostgreSQL stored procedure with `SELECT ... FOR UPDATE` on matched rows; never write match logic as sequential TypeScript calls.
 
-4. **RLS disabled by default on new tables** — Every new Supabase table has RLS off by default. One forgotten table leaks all players' private data (army composition, messages, resources). Prevention: enable RLS in the same migration that creates every table; add a CI assertion that no public table has `rowsecurity = false`.
+4. **Island upgrade concurrent over-increment** — Two players on the same island clicking "Upgrade" within milliseconds both pass the level-cap check before either commits. Prevention: `SELECT ... FOR UPDATE` on the `islands` row inside a `SECURITY DEFINER` function; `CHECK (wood_level BETWEEN 1 AND 10)` constraint as DB-level backstop.
 
-5. **Battle state desynchronization** — If a pg_cron battle tick is delayed, client countdown reaches 0 but no new state arrives. Prevention: store `last_processed_at` server-side; client shows "Waiting for server..." if `last_processed_at` is more than `turn_duration + 30s` behind `NOW()`; battle tick Edge Function must be idempotent.
+5. **Population as INTEGER — fractional growth silently truncated** — At 5-minute tick intervals, population delta is fractional (~0.12 citizens/tick at happiness=50). `INTEGER` means `FLOOR(0.12) = 0` every tick; the city never grows. Prevention: store as `NUMERIC` or use a `population_growth_accum NUMERIC` accumulator column. Must be decided at schema creation — changing column type later requires a locking migration.
 
-6. **Ghost cities exhausting island slots** — Inactive players permanently occupy island slots, making the map feel dead. Prevention: design abandonment policy in schema from day one (`last_login_at` column, pg_cron inactivity check removing cities after 30 days).
+6. **Marketplace orders without expiry** — Stale orders accumulate indefinitely; query times grow linearly; order book fills with offers from inactive players. Prevention: `expires_at TIMESTAMPTZ NOT NULL` in the initial migration; partial index filtering on `status = 'open' AND expires_at > NOW()`; weekly pg_cron expiry job returning escrowed resources.
 
-7. **Flutter Web CanvasKit cold-load penalty** — 3-10 MB WASM binary download blocks first paint for 5-15 seconds on slow connections. Prevention: self-host CanvasKit on CDN, add static HTML/CSS splash screen, enable PWA service worker caching before launch.
+7. **Gold double-production (Town Hall + tax)** — Town Hall already generates gold in `process_resource_tick()`. Adding population-tax gold without auditing the existing formula creates two simultaneous gold income streams. Prevention: audit `process_resource_tick()` before Phase 1 implementation; decide which formula replaces or supplements which.
+
+8. **Realtime fan-out on `cities` updates** — Enabling Realtime on `cities` means every pg_cron tick broadcasts a city UPDATE to all subscribers (every 5 minutes). At 50+ concurrent players this creates unnecessary widget rebuilds. Prevention: use Riverpod `select:` to expose only the fields a specific widget needs; consider population updates on an hourly rather than 5-minute cadence.
+
+9. **Trade cargo not branched in `process_arrivals()`** — Adding a `'trade'` movement type without branching `process_arrivals()` causes cargo movements to attempt to start battles. Prevention: update `movement_type` CHECK constraint and add an explicit branch in `process_arrivals()` for trade arrivals before writing the trade Edge Function.
 
 ---
 
 ## Implications for Roadmap
 
-Based on the combined dependency chain from FEATURES.md, the build order from ARCHITECTURE.md, and the phase-mapped pitfalls from PITFALLS.md, the following 6-phase structure is recommended. This ordering is not arbitrary — each phase is a prerequisite for the next.
+Based on the feature dependencies, architecture build order, and pitfall-to-phase mapping from research, a five-phase structure is recommended.
 
-### Phase 1: Foundation (Auth + Schema + Server Authority)
+### Phase 1: Economy Foundation — Happiness, Population, Tax
 
-**Rationale:** Auth must exist before any table has a `player_id` foreign key. RLS must be enabled on every table from day one. The server-authority contract (no client-side game mutations) must be established before any feature is built on top of it — retrofitting this is a full rewrite.
+**Rationale:** Happiness is the root dependency for population, which is the root dependency for tax. All three share the `cities` table schema and the `process_resource_tick()` extension. Building these together in one phase means one schema migration, one SQL function replacement, and two Edge Functions (`configure-tavern`, `set-tax-rate`). The `cities` Realtime publication is also enabled here, which is a prerequisite for Phase 3 (trading notifications) and Phase 4 (marketplace). This is the highest-risk phase — the tick ordering pitfall and population INTEGER truncation pitfall both live here and must be solved at schema design time.
 
-**Delivers:** Working registration/login, player profile auto-creation, base DB schema with RLS enabled on all tables, migration conventions, Supabase local dev environment, first Edge Function scaffold.
+**Delivers:** Working happiness/population/tax loop. Tavern building becomes functional. Gold scales with city size. Configurable wine spending rate UI in new `TavernScreen`. Tax rate slider with estimated gold-per-hour display.
 
-**Addresses features:** Authentication, player profile, beginner protection (schema-level).
+**Addresses (from FEATURES.md):** Happiness system, population growth, tax income, configurable wine spending rate — all table stakes.
 
-**Avoids pitfalls:** RLS disabled on tables, client-side calculation pattern, race condition (add CHECK constraints now), service role key exposure.
+**Avoids (from PITFALLS.md):** Pitfall 1 (tick ordering — happiness integrated into existing tick), Pitfall 5 (population INTEGER truncation — use NUMERIC from schema creation), Pitfall 7 (gold double-production — audit Town Hall formula before adding tax).
 
-**Research flag:** Standard patterns — Supabase Auth + RLS is well-documented. Skip phase research.
-
----
-
-### Phase 2: Core Economy (Resources + City + Buildings)
-
-**Rationale:** Resources are the foundation of all other systems — building upgrades cost resources, military training costs resources, research costs resources. The pg_cron tick must be validated under load before any other feature depends on it. The building upgrade queue is the first real game loop.
-
-**Delivers:** 5 resource types with server-side pg_cron production ticks (every 5 min), warehouse capacity caps, city view with building slots, single-slot building upgrade queue via Edge Function, resource display with client-side estimated counter (reconciled on Realtime tick).
-
-**Addresses features:** Resource production, warehouse limits, building upgrade queue, core building types (Town Hall, Warehouse, Barracks, Academy, Shipyard, Trading Post, Palace, Embassy, Tavern, Hideout).
-
-**Uses stack:** pg_cron (resource tick), Edge Functions (upgrade-building), Supabase Realtime DB Changes (resource updates), Flame CityGame, Riverpod CityNotifier + ResourceNotifier.
-
-**Avoids pitfalls:** pg_cron 5s timeout (create via SQL, test with 100 rows), double-spend race condition (atomic SQL deduction, CHECK constraints), client-side calculations.
-
-**Research flag:** pg_cron timeout issue is a known gotcha — validate during implementation with load test. Otherwise standard patterns.
+**Research flag:** Standard patterns (pg_cron extension, columnar schema). Skip `/gsd:research-phase`.
 
 ---
 
-### Phase 3: World Map + Research + Colony
+### Phase 2: Island Upgrades + Resource Rate UI
 
-**Rationale:** Players need the world map to find each other before social/combat systems matter. Research tree requires the Academy (built in Phase 2) and gates mid-game progression. Colony expansion gates the late-game; it belongs here because it requires Palace (Phase 2) and Seafaring research.
+**Rationale:** Island resource upgrade modifies `process_resource_tick()` to apply the island level multiplier. The resource rate UI (`+X/hr` display) reads from the island level via `resourceRatesProvider`. Both depend on the Phase 1 tick extension being deployed first — the island multiplier formula must be live in the SQL before the client derives rates from it. These two features share no dependencies with the trading or marketplace systems, making this a clean standalone phase with well-bounded scope.
 
-**Delivers:** 2D grid world map (Flame WorldMapGame + flame_tiled), island view with city slots, player city placement on first login, research tree UI (4 branches, 20+ techs, prerequisites), colony expansion (Palace + research + Colony Ship unit), ghost city abandonment schema.
+**Delivers:** Island sawmill/luxury building upgrades (shared, all island cities benefit). Hourly production rates visible in resource bar and building upgrade sheet. Upgrade cost formula: `base_cost * 1.5^current_level`.
 
-**Addresses features:** World map, island view, city view navigation, research system, colony expansion, basic tutorial/onboarding.
+**Addresses (from FEATURES.md):** Island resource upgrades, resource production rate UI — both table stakes.
 
-**Uses stack:** flame_tiled for world map grid, Tiled Map Editor for .tmx map assets, Riverpod WorldMapNotifier + ResearchNotifier, Supabase Realtime Presence (online players on map).
+**Avoids (from PITFALLS.md):** Pitfall 4 (concurrent island over-upgrade — `FOR UPDATE` lock in `SECURITY DEFINER` function; `CHECK` constraint on wood_level from the start). Client-side rate derivation formula must be documented as synced with the SQL formula.
 
-**Avoids pitfalls:** Ghost city island exhaustion (add `last_login_at` column and inactivity pg_cron job now), countdown timer client-side (server timestamps only).
-
-**Research flag:** Tiled map editor integration + flame_tiled setup may need phase-level research if not previously used. Colony expansion logic (multi-city ownership) has complexity worth a planning deep-dive.
+**Research flag:** Standard patterns. Skip `/gsd:research-phase`.
 
 ---
 
-### Phase 4: Military + Battle System
+### Phase 3: Trading via Cargo Ships
 
-**Rationale:** Military units require the Barracks and Shipyard (Phase 2) and unit tables seeded with stats. The 5-minute turn-based battle engine is the project's primary differentiator and the most architecturally complex feature — it requires idempotent pg_cron tick processing, battle-state server authority, Realtime Broadcast for live turn updates, and careful balance. This deserves its own isolated phase.
+**Rationale:** Direct P2P resource transfer is a prerequisite for marketplace fulfillment (`fulfill-order` triggers a `resource_shipment`). Building the trade infrastructure first means the marketplace reuses the `resource_shipments` table and `deliver-resources` pg_cron job without reimplementing them. The `movement_type` discriminator and `process_arrivals()` cargo branch must be added here — before the marketplace creates shipments that use the same delivery path. This ordering also validates the cargo delivery mechanic under real conditions before the marketplace depends on it.
 
-**Delivers:** 6 land unit types + 3 naval unit types (seeded data), unit training queue, turn-based combat engine (5-min turns via pg_cron + Edge Function), battle report system, pillage mechanic (resource transfer), beginner protection enforcement (no attacks below Town Hall level 4).
+**Delivers:** Players can send resources to other cities via cargo ships. `TradeScreen` with target city selection, resource/amount picker, arrival countdown. Incoming/outgoing shipment tracking in `ResourceShipmentsProvider` via Realtime.
 
-**Addresses features:** Military units, naval units, turn-based combat, battle reports, pillage.
+**Addresses (from FEATURES.md):** Direct player-to-player resource transfer (differentiator).
 
-**Uses stack:** Edge Function `battle-turn` (authoritative calculation), pg_cron to invoke it every 5 min during active battles, Supabase Realtime Broadcast for live turn-by-turn updates to both players, Riverpod BattleNotifier.
+**Avoids (from PITFALLS.md):** Pitfall 5 (wine escrow — resources deducted at dispatch, not arrival), Pitfall 9 (cargo collision with military arrival — `process_arrivals()` branched on `movement_type`; interception explicitly deferred to v1.2 with code comment).
 
-**Avoids pitfalls:** Battle state desynchronization (idempotent tick function, `last_processed_at` column, "Waiting for server" client UI), client-side battle outcome calculation, Realtime subscription to high-churn tables (push summary events not raw rows).
-
-**Research flag:** Turn-based battle networking over WebSocket is a niche pattern with sparse documentation. Phase-level research recommended for battle tick architecture and idempotency implementation.
+**Research flag:** Standard patterns. Skip `/gsd:research-phase`.
 
 ---
 
-### Phase 5: Social + Trade + Alliance
+### Phase 4: Marketplace Order Book
 
-**Rationale:** Social features require established players with cities and resources — there is nothing to trade or ally around until Phases 2-4 are live. Messaging, alliance system, and resource trading form a coherent social layer that must arrive together to be functional (alliances without messaging are unusable; trading without the marketplace requires manual coordination via messaging).
+**Rationale:** Depends on Phase 3 cargo ship infrastructure (`fulfill-order` triggers a `resource_shipment` for delivery). Marketplace is the highest-complexity feature — four Edge Functions, atomic SQL matching, Realtime order book, escrow for both buy and sell orders, expiry handling. Deserves its own isolated phase. Building after trading means the `resource_shipments` delivery path is already tested and trusted.
 
-**Delivers:** Player-to-player messaging (Supabase Realtime Broadcast), alliance system (create/join, roles, Embassy building gate), resource trading via cargo ships (distance-based travel time, escrowed resources at departure), ranking leaderboard (server-side score calculation via pg_cron).
+**Delivers:** Global buy/sell order book. Players post orders, browse by resource type (sorted by price), fulfill orders. Resources travel via cargo ships on fulfillment. Orders expire after 48 hours with automatic escrow return. `MarketplaceScreen` with filterable order list, "Post Order" form, and "My Orders" tab.
 
-**Addresses features:** Player messaging, alliance system, resource trading, ranking leaderboard.
+**Addresses (from FEATURES.md):** Marketplace order book (primary differentiator).
 
-**Uses stack:** Supabase Realtime Broadcast (chat), Realtime DB Changes (trade arrival notifications), Edge Function `trade-route` (cargo ship dispatch with travel time enforcement), Riverpod AllianceNotifier + MessageNotifier + TradeNotifier.
+**Avoids (from PITFALLS.md):** Pitfall 3 (partial fill orphans — single stored procedure with `FOR UPDATE`), Pitfall 6 (unbounded order growth — `expires_at` in initial migration), anti-pattern of client-side match logic.
 
-**Avoids pitfalls:** Alliance role checked only client-side (every privileged action re-checks role in Edge Function), trade resource not escrowed at departure (resources deducted immediately on dispatch, not arrival), message content readable by other players (RLS on messages table).
-
-**Research flag:** Cargo ship travel time + resource escrow mechanics have subtle implementation complexity. Standard alliance CRUD is well-documented; skip research for that portion.
+**Research flag:** Needs `/gsd:research-phase`. Specifically: confirm that a Supabase Edge Function calling a PostgreSQL stored procedure via RPC receives full ACID rollback semantics if the stored procedure raises. This must be verified before writing the match function — the entire correctness of order matching depends on it.
 
 ---
 
-### Phase 6: Polish + Deployment + Hardening
+### Phase 5: Combat Depth — Pillage + Battle Report Visualization
 
-**Rationale:** All core systems are functional after Phase 5. This phase closes security holes, optimizes cold-load performance, adds indexes for production query performance, and ships the game to a real hosting environment.
+**Rationale:** Pillage modifies `resolve_battles()` and `process_arrivals()`. `process_arrivals()` was also modified in Phase 3 (cargo branch). Building pillage last avoids modifying `process_arrivals()` twice across different phases, which risks merge conflicts and regression. Battle report visualization is pure Flutter (no backend changes), making it safe to build in parallel with or immediately after pillage. Combat features are grouped together because they share the battles domain and the `unit_movements.cargo` schema addition.
 
-**Delivers:** Flutter web deployment (self-hosted CDN for CanvasKit WASM, HTML/CSS splash screen, PWA service worker), database index audit (all `player_id`, `island_id`, `alliance_id`, `status`, `created_at` columns indexed), security audit (RLS CI assertion, rate limiting on Edge Functions, CORS restriction), pg_cron job monitoring (`cron_job_log` table with alerting), inactivity cleanup job (ghost city removal after 30 days), first-load performance validation (throttled 3G test, target < 10 seconds time-to-interactive).
+**Delivers:** Attackers steal resources on battle victory (transported home via cargo in the return movement). Hideout building protects resources (100 units per hideout level). Turn-by-turn unit loss visualization with color-coded unit types in `BattleTurnCard`. New `UnitCasualtyBar` widget and `unit_visual_constants.dart` constant map.
 
-**Addresses features:** Production deployment, performance, security hardening, onboarding polish.
+**Addresses (from FEATURES.md):** Pillage mechanic, battle report visualization — both table stakes.
 
-**Uses stack:** Flutter build web --release (CanvasKit), PWA manifest, Supabase dashboard for monitoring, pg_cron for inactivity job.
+**Avoids (from PITFALLS.md):** Pitfall 2 (pillage race — `FOR UPDATE` on defender resource rows inside `resolve_battles()`), Pitfall 6 (battle turns Realtime flood — `ListView.builder` with `ValueKey` per turn card, `.on('INSERT')` append pattern instead of `.stream()` full-list re-emit).
 
-**Avoids pitfalls:** Flutter WASM cold-load penalty, missing indexes, open CORS, rate limiting gaps, pg_cron silent failures.
-
-**Research flag:** PWA and CDN configuration for Flutter web is well-documented. Standard patterns — skip phase research.
+**Research flag:** Standard patterns. Skip `/gsd:research-phase` for battle report visualization. Before implementing pillage SQL, read the existing `resolve_battles()` function in full to understand the `attacker_won` branch before modifying it.
 
 ---
 
 ### Phase Ordering Rationale
 
-- **Auth before all:** Every table's RLS policies reference `auth.uid()` — no schema is meaningful without auth
-- **Resources before buildings:** Building cost validation requires a functional resource system to check against
-- **pg_cron tick before city view is shipped:** Displaying resource production numbers to users requires the tick to actually be running and validated
-- **Buildings before research:** Research requires Academy; unit training requires Barracks/Shipyard
-- **Units before battle:** Battle formulas reference unit stats tables which must be seeded
-- **Players established before social:** You cannot trade or ally with no neighbors — social features require density first
-- **Realtime added incrementally:** Each phase can start with polling-fallback and replace with Realtime subscriptions feature by feature; this reduces Phase 1 complexity
-
----
+- **Economy foundation first:** Population and tax depend on happiness as the root. No other phase can be built in isolation from this tick extension.
+- **Island upgrades before trading:** The `resourceRatesProvider` client derivation needs the island multiplier live in the SQL tick to display accurate rates; traders will immediately notice if +X/hr labels don't reflect the island level.
+- **Trading before marketplace:** `fulfill-order` in the marketplace triggers a `resource_shipment`; the `resource_shipments` table, RLS, and delivery pg_cron job must exist and be tested before marketplace goes live.
+- **Marketplace before pillage:** Pillage modifies `process_arrivals()` which was also modified in Phase 3. Sequencing pillage last avoids a multi-phase migration conflict on the same function. It also means Phase 5 can be an entirely combat-domain phase with no cross-cutting schema risk.
+- **Battle visualization in the same phase as pillage:** Both touch the combat domain; `unit_movements.cargo` is needed for pillage; visualization is pure Flutter with no backend risk. Grouping them keeps combat domain changes isolated to one phase and reduces the total phase count.
 
 ### Research Flags
 
-**Phases needing deeper research during planning:**
-- **Phase 3 (World Map):** flame_tiled integration, Tiled map editor workflow, multi-city ownership schema for colonies
-- **Phase 4 (Battle System):** Turn-based battle networking patterns, idempotent pg_cron tick design, Realtime Broadcast for live battle updates — sparse documentation, high complexity
+Phases needing deeper research during planning:
+- **Phase 4 (Marketplace):** Confirm Supabase Edge Function → PostgreSQL stored procedure RPC transaction semantics before writing the match function. The entire correctness guarantee of order matching depends on this.
 
-**Phases with standard well-documented patterns (skip phase research):**
-- **Phase 1 (Foundation):** Supabase Auth + RLS patterns are extensively documented
-- **Phase 2 (Economy):** pg_cron + Edge Function resource tick pattern is documented in official Supabase blog; known gotcha (5s timeout) is documented with fix
-- **Phase 5 (Social/Trade):** Supabase Realtime Broadcast for chat and DB Changes for notifications are standard; alliance CRUD is straightforward Postgres
-- **Phase 6 (Deployment):** Flutter web deployment + CDN configuration is well-covered
+Phases with standard patterns (skip `/gsd:research-phase`):
+- **Phase 1 (Economy Foundation):** pg_cron extension, columnar schema, Edge Functions as column setters — all established patterns in the codebase.
+- **Phase 2 (Island Upgrades + Rate UI):** `SECURITY DEFINER` + `FOR UPDATE` is already used in `deduct_resource()`; client-side rate derivation is a pure Riverpod `Provider` combination.
+- **Phase 3 (Trading):** `resource_shipments` mirrors existing `unit_movements`; `deliver-resources` mirrors existing `construction-tick` and `training-tick` patterns.
+- **Phase 5 (Combat Depth):** `resolve_battles()` pattern is understood from existing codebase; battle visualization is documented fl_chart usage with an established API.
 
 ---
 
@@ -253,20 +208,24 @@ Based on the combined dependency chain from FEATURES.md, the build order from AR
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All package versions verified via pub.dev official pages on research date; version compatibility matrix validated |
-| Features | HIGH | Cross-referenced against Ikariam wiki, Grepolis, Travian, Tribal Wars; genre conventions are stable and well-documented |
-| Architecture | HIGH | Pattern verified via official Supabase architecture docs, Flame docs, and Gabriel Gambetta's authoritative client-server architecture reference |
-| Pitfalls | HIGH (technical) / MEDIUM (balance) | Technical pitfalls verified via GitHub issues and official docs; game balance pitfalls from community sources |
+| Stack | HIGH | Only one new package (fl_chart 1.1.1); all other capabilities verified in the existing codebase; version compatibility confirmed via pub.dev |
+| Features | HIGH | Cross-referenced against Ikariam Fandom wiki, community guides, original game mechanics; all nine features have clear scope boundaries and implementation notes |
+| Architecture | HIGH | Research read the actual codebase (22 migration files, existing Edge Functions, existing Flutter features); findings are grounded in real code, not theory |
+| Pitfalls | HIGH (technical) / MEDIUM (game design) | PostgreSQL locking pitfalls verified against official docs and GitHub issues; game balance constants (happiness formula, pillage rates) are from Ikariam wiki and subject to playtesting adjustment |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Game balance formulas:** Exponential cost formula `base * 1.5^level` is referenced but specific balance values (base costs per building, production rates per worker, unit stats) are not validated against playtesting. These will need iteration post-launch.
-- **Exact RLS policy patterns for public game data vs. private player data:** Some game data is intentionally public (world map city locations, leaderboard scores, alliance names) while some is private (army composition, resource counts, messages). The exact boundary needs explicit policy design during Phase 1.
-- **WASM production readiness:** All identified packages claim WASM compatibility but transitive dependency WASM support was not exhaustively verified. Validate before switching from CanvasKit to WASM build.
-- **pg_cron performance ceiling:** The resource tick batching strategy is described but the exact batch size thresholds (LIMIT 500 per invocation) need real measurement at player counts above 100.
-- **Combat balance:** Turn-based combat with 5-minute turns is the key differentiator but specific unit stats, terrain bonuses, and research multipliers were not researched. This requires dedicated balance design work before Phase 4.
+- **Gold production formula audit (Phase 1 blocker):** Before Phase 1 implementation, read `process_resource_tick()` in full to confirm the existing Town Hall gold production formula. Adding population-tax gold without auditing will create two simultaneous income streams for the same city. The research flags this but does not resolve which formula survives — this is an implementation decision that must happen before the Phase 1 migration is written.
+
+- **Happiness formula balance values (post-Phase 1 tuning):** The Ikariam wiki formula constants adapted for a 5-minute tick interval are estimates, not production-validated values. Specifically: `population * 0.01 * (happiness/100)` growth rate per tick and `happiness = LEAST(100, happiness + 2)` on successful wine consumption are design estimates. Expect to tune these values in playtesting after Phase 1 ships.
+
+- **Cargo ship availability model (Phase 3 pre-implementation check):** The research assumes `city_units.unit_type = 'cargo_ship'` exists as garrison stock that can be reserved by trade dispatch. Before Phase 3, verify the actual unit model — if cargo ships are only tracked as active movements in `unit_movements` rather than as garrison stock in `city_units`, the reservation logic will differ from the research design.
+
+- **Marketplace partial fills (Phase 4 scope decision):** STACK.md and FEATURES.md both describe partial fills. The ARCHITECTURE.md describes orders as 'open' → 'filled' only. Align on whether v1.1 supports partial fills or only full-quantity matches before Phase 4 planning. Partial fills add significant complexity to the match stored procedure and the order book UI.
+
+- **`cities` Realtime performance at scale (Phase 1 monitoring item):** Enabling `REPLICA IDENTITY FULL` + Realtime publication on `cities` broadcasts a city UPDATE to all subscribers every 5-minute tick. At 50+ concurrent players watching the city screen simultaneously, this may become a bottleneck. Monitor Supabase Realtime message volume after Phase 1 ships; the mitigation (separate population table not in Realtime, hourly population updates) is documented in PITFALLS.md Performance Traps.
 
 ---
 
@@ -274,35 +233,31 @@ Based on the combined dependency chain from FEATURES.md, the build order from AR
 
 ### Primary (HIGH confidence)
 
-- pub.dev official package pages (Flame 1.36.0, supabase_flutter 2.12.0, flutter_riverpod 3.3.1, flame_riverpod 5.5.3, all supporting packages)
-- docs.flutter.dev/platform-integration/web/renderers — CanvasKit vs WASM renderer comparison
-- supabase.com/docs/guides/realtime — Broadcast, Presence, Postgres Changes
-- supabase.com/docs/guides/database/extensions/pg_cron — pg_cron scheduling
-- supabase.com/docs/guides/troubleshooting/rls-performance-and-best-practices — RLS indexing
-- supabase.com/blog/flutter-real-time-multiplayer-game — official Flutter + Flame + Supabase tutorial
-- supabase.com/docs/guides/getting-started/architecture — Supabase system architecture
-- docs.flame-engine.org — Flame component system, flame_riverpod bridge
-- gabrielgambetta.com/client-server-game-architecture.html — authoritative multiplayer architecture reference
-- supabase/supabase GitHub Issue #37629 — pg_cron 5s HTTP timeout confirmed bug
-- supabase.com/docs/guides/troubleshooting/pgcron-debugging-guide — pg_cron debugging
+- Existing codebase (read directly): `supabase/migrations/` (all 22 files), `supabase/functions/upgrade-building/index.ts`, `lib/features/city/`, `lib/features/battles/`, `lib/features/military/`, `lib/features/map/` — architecture and pattern verification
+- [pub.dev/packages/fl_chart](https://pub.dev/packages/fl_chart) — Version 1.1.1, MIT license, min Flutter SDK 3.27.4, `BarChartRodStackItem` API confirmed
+- [supabase.com/docs/guides/realtime/realtime-listening-flutter](https://supabase.com/docs/guides/realtime/realtime-listening-flutter) — Realtime Postgres Changes subscription patterns
+- [marmelab.com/blog/2025/12/08/supabase-edge-function-transaction-rls.html](https://marmelab.com/blog/2025/12/08/supabase-edge-function-transaction-rls.html) — SECURITY DEFINER pattern and Edge Function transaction semantics
+- [supaexplorer.com — FOR UPDATE SKIP LOCKED](https://supaexplorer.com/best-practices/supabase-postgres/lock-skip-locked/) — atomic operations in Supabase PostgreSQL
+- [postgresql.org/docs/current/explicit-locking.html](https://www.postgresql.org/docs/current/explicit-locking.html) — row-level lock semantics; `FOR UPDATE` vs `SKIP LOCKED`
 
 ### Secondary (MEDIUM confidence)
 
-- ikariam.fandom.com/wiki — detailed Ikariam mechanics (espionage, colonization, daily tasks, barbarian villages, trading, vacation mode)
-- en.wikipedia.org/wiki/Ikariam — feature overview
-- heroiclabs.com/docs — authoritative multiplayer architecture patterns
-- aleksandra.codes/supabase-game — Supabase Realtime game implementation
-- longwelwind.net/blog/networking-turn-based-game — turn-based networking patterns
-- gamedesignskills.com/game-design/player-retention — retention mechanics
-- gamedeveloper.com — game economy design handbook
-- push.cx/game-influence-ikariam — design analysis (island cooperation as key mechanic)
+- [ikariam.fandom.com/wiki/Happiness](https://ikariam.fandom.com/wiki/Happiness) — happiness formula: base 196, tavern +12/level, wine +60/load, population penalty
+- [ikariam.fandom.com/wiki/Pillaging](https://ikariam.fandom.com/wiki/Pillaging) — warehouse protection, cargo ship loot capacity
+- [ikariam.fandom.com/wiki/Saw_mill](https://ikariam.fandom.com/wiki/Saw_mill) — island resource buildings as shared cooperative upgrades
+- [ikariam.fandom.com/wiki/Citizen](https://ikariam.fandom.com/wiki/Citizen) — gold income per idle citizen (3 gold/hr)
+- [ikariam.fandom.com/wiki/Trading](https://ikariam.fandom.com/wiki/Trading) — trading post mechanics; cargo ship capacity 500 units
+- [github.com/anders94/order-matching-engine](https://github.com/anders94/order-matching-engine) — PostgreSQL atomic order matching reference implementation
+- [devforum.roblox.com — Grand Strategy population simulation](https://devforum.roblox.com/t/grand-strategy-games-simulating-population-growth-workforce-etc/4041693) — fractional growth accumulation pattern for integer population display
+- [scalablearchitect.com — PostgreSQL row-level locks guide](https://scalablearchitect.com/postgresql-row-level-locks-a-complete-guide-to-for-update-for-share-skip-locked-and-nowait/) — join locking pitfalls and same-row contention
 
-### Tertiary (LOW confidence — needs validation during implementation)
+### Tertiary (LOW confidence — needs playtesting validation)
 
-- Game balance formula values (base costs, production rates, unit stats) — inferred from Ikariam wiki; must be validated through playtesting
-- pg_cron batch size thresholds — estimated from Supabase performance docs; must be measured empirically
+- Happiness formula constants adapted for 5-minute tick interval — design estimates derived from Ikariam wiki values, not production-validated
+- Population growth rate per tick (`population * 0.01 * happiness/100`) — design estimate, subject to balance tuning
+- Pillage rate (30% of unprotected resources per battle win) — design estimate based on Ikariam community guides
 
 ---
 
-*Research completed: 2026-03-11*
+*Research completed: 2026-03-13*
 *Ready for roadmap: yes*

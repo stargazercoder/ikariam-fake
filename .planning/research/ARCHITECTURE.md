@@ -1,577 +1,1018 @@
 # Architecture Research
 
-**Domain:** Browser-based multiplayer strategy game (Ikariam-style)
-**Researched:** 2026-03-11
-**Confidence:** HIGH (Supabase + Flutter + Flame official docs verified; game architecture patterns from authoritative sources)
+**Domain:** Ikariam Clone — v1.1 Economy & Combat Depth Integration
+**Researched:** 2026-03-13
+**Confidence:** HIGH
 
-## Standard Architecture
-
-### System Overview
-
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                         CLIENT LAYER (Flutter Web)                    │
-├──────────────────────────────────────────────────────────────────────┤
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐               │
-│  │ Flutter UI   │  │  Flame World │  │  Riverpod    │               │
-│  │ (Screens,    │  │  (Map, City  │  │  Providers   │               │
-│  │  Overlays,   │  │   Views,     │  │  (Game State │               │
-│  │  Dialogs)    │  │   Battle HUD)│  │   Cache)     │               │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘               │
-│         │                 │                 │                        │
-│         └─────────────────┴─────────────────┘                        │
-│                           │                                          │
-│                  ┌────────┴────────┐                                 │
-│                  │  Service Layer  │                                 │
-│                  │ (Supabase SDK)  │                                 │
-│                  └────────┬────────┘                                 │
-└───────────────────────────┼──────────────────────────────────────────┘
-                            │  HTTPS / WebSockets
-┌───────────────────────────┼──────────────────────────────────────────┐
-│                     SUPABASE BACKEND                                  │
-│  ┌──────────────┐         │        ┌──────────────┐                  │
-│  │ Kong API     ├─────────┘        │  GoTrue Auth │                  │
-│  │ Gateway      │                  │  (JWT tokens)│                  │
-│  └──────┬───────┘                  └──────┬───────┘                  │
-│         │                                 │                          │
-│  ┌──────┴──────────────────────────────────┴──────────────────────┐  │
-│  │                     PostgreSQL Database                         │  │
-│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌──────────┐  │  │
-│  │  │  Players   │  │  Cities /  │  │  Battles / │  │ Alliances│  │  │
-│  │  │  Profiles  │  │  Buildings │  │  Reports   │  │  Trades  │  │  │
-│  │  └────────────┘  └────────────┘  └────────────┘  └──────────┘  │  │
-│  └─────────────────────────────────────────────────────────────────┘  │
-│         │                    │                    │                   │
-│  ┌──────┴───────┐   ┌────────┴────────┐  ┌───────┴──────┐           │
-│  │  PostgREST   │   │   Realtime      │  │  Edge        │           │
-│  │  (REST API   │   │   (WebSockets:  │  │  Functions   │           │
-│  │   via RLS)   │   │   Broadcast +  │  │  (Deno/TS:   │           │
-│  │              │   │   DB Changes)  │  │  game logic) │           │
-│  └──────────────┘   └─────────────────┘  └──────┬───────┘           │
-│                                                  │                   │
-│                                         ┌────────┴────────┐          │
-│                                         │   pg_cron       │          │
-│                                         │ (Tick Scheduler)│          │
-│                                         │ Every 5 minutes │          │
-│                                         └─────────────────┘          │
-└──────────────────────────────────────────────────────────────────────┘
-```
-
-### Component Responsibilities
-
-| Component | Responsibility | Implementation |
-|-----------|---------------|----------------|
-| Flutter UI Layer | Screens, dialogs, menus, HUD overlays | Flutter widgets, Navigator, MaterialApp |
-| Flame World Layer | 2D rendering of map grid, city grid, battle animations | FlameGame + World + Camera2D |
-| Riverpod Providers | Reactive game state cache, optimistic updates | AsyncNotifier, StreamProvider |
-| Service Layer | API calls, WebSocket subscriptions, auth tokens | Supabase Dart SDK |
-| Kong Gateway | Request routing, rate limiting, auth header verification | Managed by Supabase |
-| GoTrue Auth | User registration, login, JWT issuance | Supabase Auth |
-| PostgreSQL | Single source of truth for all game state | Tables + RLS + triggers |
-| PostgREST | Auto-generated REST API honoring RLS | Managed by Supabase |
-| Supabase Realtime | Push battle events, chat, trade updates to clients | WebSocket channels (Broadcast + DB Changes) |
-| Edge Functions | Authoritative game calculations (battle, construction) | Deno TypeScript |
-| pg_cron | Server-side tick scheduler (resource production) | pg_cron extension |
+> This document supersedes the v0.1.0 architecture research for the purposes of
+> v1.1 planning. It focuses exclusively on how the eight new features integrate
+> with the existing Supabase + Flutter architecture. Existing patterns (dumb
+> client, server authority, Realtime subscriptions, pg_cron ticks) are
+> established and not re-researched here — only additions and modifications are
+> detailed.
 
 ---
 
-## Recommended Project Structure
+## Existing Architecture Baseline
+
+The v0.1.0 system uses a strict server-authority model:
 
 ```
-ikariam/
-├── lib/
-│   ├── main.dart                    # App entry point, ProviderScope
-│   ├── app.dart                     # MaterialApp + router setup
-│   │
-│   ├── core/
-│   │   ├── supabase_client.dart     # Supabase singleton init
-│   │   ├── router.dart              # go_router or auto_route config
-│   │   └── constants.dart           # Game constants (tick interval, etc.)
-│   │
-│   ├── features/
-│   │   ├── auth/
-│   │   │   ├── auth_provider.dart   # Riverpod: auth state
-│   │   │   ├── auth_service.dart    # Supabase Auth wrapper
-│   │   │   └── screens/            # Login, register screens
-│   │   │
-│   │   ├── world_map/
-│   │   │   ├── world_map_game.dart  # FlameGame subclass for world map
-│   │   │   ├── components/         # IslandTile, FleetMarker components
-│   │   │   ├── world_map_provider.dart
-│   │   │   └── screens/            # WorldMapScreen (wraps GameWidget)
-│   │   │
-│   │   ├── city/
-│   │   │   ├── city_game.dart       # FlameGame subclass for city view
-│   │   │   ├── components/         # BuildingSlot, ResourceBar components
-│   │   │   ├── city_provider.dart   # Riverpod: city state, buildings
-│   │   │   ├── services/
-│   │   │   │   ├── building_service.dart
-│   │   │   │   └── construction_service.dart
-│   │   │   └── screens/            # CityScreen
-│   │   │
-│   │   ├── resources/
-│   │   │   ├── resource_provider.dart  # Riverpod: resource counts
-│   │   │   └── resource_service.dart   # Supabase reads (resources table)
-│   │   │
-│   │   ├── research/
-│   │   │   ├── research_provider.dart
-│   │   │   ├── research_service.dart
-│   │   │   └── screens/            # ResearchScreen (tech tree UI)
-│   │   │
-│   │   ├── military/
-│   │   │   ├── army_provider.dart
-│   │   │   ├── unit_service.dart
-│   │   │   └── screens/            # BarracksScreen, NavyScreen
-│   │   │
-│   │   ├── battle/
-│   │   │   ├── battle_provider.dart  # Riverpod: active battle state
-│   │   │   ├── battle_service.dart   # Edge Function caller
-│   │   │   ├── battle_realtime.dart  # Supabase Realtime subscription
-│   │   │   └── screens/             # BattleReportScreen
-│   │   │
-│   │   ├── trade/
-│   │   │   ├── trade_provider.dart
-│   │   │   ├── marketplace_service.dart
-│   │   │   └── screens/             # MarketplaceScreen
-│   │   │
-│   │   ├── alliance/
-│   │   │   ├── alliance_provider.dart
-│   │   │   ├── alliance_service.dart
-│   │   │   └── screens/             # AllianceScreen, DiplomacyScreen
-│   │   │
-│   │   └── messaging/
-│   │       ├── chat_provider.dart    # Riverpod: alliance chat
-│   │       ├── message_realtime.dart # Supabase Realtime broadcast
-│   │       └── screens/             # ChatScreen, InboxScreen
-│   │
-│   └── shared/
-│       ├── widgets/                  # Reusable UI (ResourceBar, etc.)
-│       ├── models/                   # Dart data classes (City, Building, etc.)
-│       └── extensions/               # Dart extensions
-│
-├── supabase/
-│   ├── migrations/                   # SQL schema files
-│   ├── functions/
-│   │   ├── battle-turn/              # Battle calculation Edge Function
-│   │   ├── start-battle/             # Battle initiation Edge Function
-│   │   ├── upgrade-building/         # Construction queue Edge Function
-│   │   ├── complete-research/        # Research tick Edge Function
-│   │   ├── trade-route/              # Cargo ship dispatch Edge Function
-│   │   └── _shared/                  # Shared logic (formulas, validators)
-│   └── seed.sql                      # Initial game data (units, buildings)
-│
-└── pubspec.yaml
+┌────────────────────────────────────────────────────────────────────────┐
+│  Flutter Web Client (read-only game-state consumer)                    │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐              │
+│  │  Screen  │  │  Screen  │  │  Screen  │  │  Screen  │              │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘              │
+│  ┌────┴──────────────┴──────────────┴──────────────┴────────────────┐  │
+│  │          Riverpod Providers (StreamProvider / AsyncNotifier)      │  │
+│  │     city · resources · buildings · military · battles · map      │  │
+│  └────────────────────────────┬──────────────────────────────────────┘  │
+│                               │ Supabase SDK                           │
+└───────────────────────────────┼────────────────────────────────────────┘
+                                │
+              ┌─────────────────┼────────────────────────┐
+              │         Supabase Platform                 │
+              │   ┌─────────────┴─────────────────────┐  │
+              │   │  Edge Functions (Deno/TypeScript)  │  │
+              │   │  upgrade-building                  │  │
+              │   │  dispatch-units · train-units      │  │
+              │   └─────────────┬─────────────────────┘  │
+              │                 │ service role (bypasses RLS)
+              │   ┌─────────────┴─────────────────────┐  │
+              │   │  PostgreSQL (single source of truth)│  │
+              │   │  + RLS on every table               │  │
+              │   │  + REPLICA IDENTITY FULL            │  │
+              │   │    (Realtime push on UPDATE)        │  │
+              │   └─────────────┬─────────────────────┘  │
+              │   ┌─────────────┴─────────────────────┐  │
+              │   │  pg_cron jobs (every 1 / 5 min)    │  │
+              │   │  resource-tick · construction-tick  │  │
+              │   │  training-tick · movement-tick      │  │
+              │   │  battle-tick                        │  │
+              │   └─────────────────────────────────────┘  │
+              └───────────────────────────────────────────┘
 ```
 
-### Structure Rationale
+### Existing Tables
 
-- **features/:** Feature-first organization. Each feature owns its Flame game (if needed), Riverpod providers, services, and screens. Prevents cross-feature coupling.
-- **features/[x]/services/:** Thin wrappers over Supabase SDK calls. No game logic here — logic lives in Edge Functions or pg_cron.
-- **supabase/functions/:** One Edge Function per game action. Each function is a security boundary — the client can call it with JWT, the function validates, mutates DB, and returns result.
-- **shared/models/:** Plain Dart classes. No UI, no Supabase dependencies. Easy to test.
+| Table | Key Columns | Realtime |
+|-------|-------------|----------|
+| `islands` | `id, grid_x, grid_y, wood_level, luxury_type, luxury_level` | No |
+| `cities` | `id, owner_id, island_id, slot_number, name` | No (v0.1.0) |
+| `city_resources` | `city_id, resource_type, amount` | Yes — FULL |
+| `city_buildings` | `city_id, building_type, level, assigned_workers` | Yes — FULL |
+| `construction_queue` | `city_id, building_type, target_level, finish_at` | No |
+| `city_units` | `city_id, unit_type, quantity` | No |
+| `unit_movements` | `owner_id, origin_city_id, destination_city_id, units (jsonb), arrive_at, movement_type` | Yes — FULL |
+| `battles` | `defender_city_id, attacker_city_id, attacker_units (jsonb), defender_units (jsonb), status, turn_number, next_turn_at` | Yes — FULL |
+| `battle_turns` | `battle_id, turn_number, naval/land casualties (jsonb), survivors (jsonb)` | No |
+| `profiles` | `id, display_name, avatar_id` | No |
+
+### Existing pg_cron Schedule
+
+| Job Name | Schedule | Function |
+|----------|----------|----------|
+| `resource-tick` | `*/5 * * * *` | `process_resource_tick()` |
+| `construction-tick` | `* * * * *` | `complete_building_upgrades()` |
+| `training-tick` | `* * * * *` | `complete_training()` |
+| `movement-tick` | `* * * * *` | `process_arrivals()` |
+| `battle-tick` | `* * * * *` | `resolve_battles()` |
+
+### Existing Edge Functions
+
+| Function | Purpose |
+|----------|---------|
+| `upgrade-building` | Validate ownership, deduct resources, queue construction |
+| `train-units` | Validate, deduct resources, queue training |
+| `dispatch-units` | Validate, deduct from garrison, create unit_movement |
+
+---
+
+## New Feature Integration Map
+
+### Feature 1: Happiness System
+
+**What it adds:** Tavern building consumes the island's luxury resource every tick.
+Net consumption rate sets `happiness` (0–100) on the city. Happiness affects
+population growth rate.
+
+**Schema changes — MODIFY `cities`:**
+
+```sql
+ALTER TABLE public.cities ADD COLUMN population        integer NOT NULL DEFAULT 50;
+ALTER TABLE public.cities ADD COLUMN happiness         integer NOT NULL DEFAULT 50
+  CHECK (happiness BETWEEN 0 AND 100);
+ALTER TABLE public.cities ADD COLUMN tavern_wine_rate  integer NOT NULL DEFAULT 0;
+  -- units consumed per hour from the island's luxury resource; 0 = tavern off
+```
+
+`cities` needs Realtime enabled (currently absent):
+
+```sql
+ALTER TABLE public.cities REPLICA IDENTITY FULL;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.cities;
+```
+
+**No new table.** Tavern configuration is a column on `cities`.
+
+**MODIFY `process_resource_tick()` — add happiness sub-loop:**
+
+After the existing production loop, for each city with `tavern_wine_rate > 0`:
+1. `wine_per_tick = tavern_wine_rate / 12.0` (12 five-minute ticks per hour)
+2. Attempt deduction from `city_resources` WHERE `resource_type = island.luxury_type`
+3. If deduction succeeds: `happiness = LEAST(100, happiness + 2)`
+4. If insufficient wine: `happiness = GREATEST(0, happiness - 5)`
+5. `population = population + FLOOR(population * 0.01 * (happiness / 100.0))`
+
+The happiness and population update is a single `UPDATE cities SET happiness = ..., population = ... WHERE id = ...` appended inside the existing loop. No new pg_cron job.
+
+**New Edge Function — `configure-tavern`:**
+
+```
+POST /functions/v1/configure-tavern
+Body: { city_id, wine_rate }   // wine_rate in units/hour; 0 = tavern off
+```
+
+Validates: city ownership, tavern building level >= 1, wine_rate non-negative.
+Writes: `UPDATE cities SET tavern_wine_rate = $wine_rate WHERE id = $city_id`.
+
+**Flutter integration:**
+
+- `cityProvider` already streams `cities` via PostgREST. Add `population`,
+  `happiness`, `tavernWineRate` to the select fields.
+- New `City` model fields. New `TavernScreen` with wine-rate slider and live
+  happiness display.
+- Realtime: `cities` is now in the publication — `cityProvider` stream fires on
+  city row UPDATE (population, happiness changes from pg_cron tick).
+
+---
+
+### Feature 2: Population-Based Tax Income
+
+**What it adds:** Gold production each tick equals `population * tax_rate / 12`.
+High tax depresses happiness.
+
+**Schema changes — MODIFY `cities`:**
+
+```sql
+ALTER TABLE public.cities ADD COLUMN tax_rate numeric NOT NULL DEFAULT 0.10
+  CHECK (tax_rate BETWEEN 0 AND 1);
+```
+
+**MODIFY `process_resource_tick()` — add tax gold sub-loop:**
+
+After the happiness/population update for each city:
+```sql
+gold_per_tick = FLOOR(population * tax_rate / 12.0)
+-- ADD to city_resources WHERE resource_type = 'gold', LEAST-capped by warehouse
+-- happiness_penalty: if tax_rate > 0.30, happiness -= FLOOR((tax_rate - 0.30) * 20)
+```
+
+Bundled into the same function modification as happiness — one migration file
+replaces `process_resource_tick()`.
+
+**New Edge Function — `set-tax-rate`:**
+
+```
+POST /functions/v1/set-tax-rate
+Body: { city_id, tax_rate }   // 0.0 to 1.0 inclusive
+```
+
+**Flutter integration:**
+
+- `TavernScreen` (or a new `GovernorScreen`) adds a tax slider beneath the wine
+  slider. Shows estimated gold-per-hour as a derived display value:
+  `(population * tax_rate).floor()` gold/hour. Display only; actual production
+  is server-authoritative.
+
+---
+
+### Feature 3: Island Resource Upgrades
+
+**What it adds:** Players on an island can upgrade `islands.wood_level` or
+`islands.luxury_level`. All cities on the island multiply their matching
+resource production by the island level.
+
+**Existing schema handles storage:** `islands.wood_level` and `islands.luxury_level`
+already exist. Only the upgrade path and the production multiplier are new.
+
+**MODIFY `process_resource_tick()` — island multiplier:**
+
+The current production formula is:
+```
+workers * prod_level * 1.0
+```
+Replace with:
+```
+workers * prod_level * island_resource_level
+```
+
+This requires joining `islands` in the resource tick loop:
+
+```sql
+LEFT JOIN public.islands isl
+  ON isl.id = (SELECT island_id FROM public.cities WHERE id = cr.city_id)
+```
+
+Then multiply by `COALESCE(isl.wood_level, 1)` for wood, and
+`COALESCE(isl.luxury_level, 1)` for the island's luxury type. Gold production
+(town_hall) is unaffected by island levels.
+
+**New Edge Function — `upgrade-island-resource`:**
+
+```
+POST /functions/v1/upgrade-island-resource
+Body: { island_id, resource_type }  // 'wood' | 'luxury'
+```
+
+Logic:
+1. Verify `EXISTS (SELECT 1 FROM cities WHERE island_id = $island_id AND owner_id = $user_id)`.
+2. Cost formula: `base_cost * 1.5^current_level` in wood + gold.
+3. `deduct_resource(caller_city_id, ...)` using the existing atomic SQL function.
+4. `UPDATE islands SET wood_level = wood_level + 1` (or luxury_level).
+
+RLS: `islands` has SELECT-all policy. The Edge Function uses service role for
+the UPDATE — no RLS change needed.
+
+**Flutter integration:**
+
+- `IslandScreen` adds an "Upgrade Resources" section showing current wood/luxury
+  level, upgrade cost, and an upgrade button.
+- No new provider: `islandDetailProvider` already streams island data. The
+  button calls the new Edge Function and the stream reflects the change.
+
+---
+
+### Feature 4: Resource UI — Hourly Production Rate Display
+
+**What it adds:** The resource bar and building screens show `+N/hour` alongside
+the current resource amount. Pure client-side derivation from existing streams.
+
+**Backend changes:** None.
+
+**New Riverpod provider — `resourceRatesProvider`:**
+
+```dart
+// Combines resourcesStreamProvider + buildingsStreamProvider + islandProvider
+// Returns Map<ResourceType, double> of gross hourly production rates.
+// Formula: workers * building_level * island_level * 12 ticks_per_hour
+final resourceRatesProvider = Provider.autoDispose.family<Map<ResourceType, double>, String>(
+  (ref, cityId) {
+    final buildings = ref.watch(buildingsStreamProvider(cityId)).valueOrNull ?? [];
+    final island = ref.watch(islandDetailProvider(cityId)).valueOrNull;
+    // ... derive per-resource rate
+  },
+);
+```
+
+For gold, rate also includes tax: `population * tax_rate` per hour (from `cityProvider`).
+
+The formula on the client **must stay in sync** with the server formula in
+`process_resource_tick()`. Document the sync requirement with a comment in both
+files. Any formula change requires updating both.
+
+**Flutter integration:**
+
+- `_ResourceChip` in `city_screen.dart` gains a subtitle `+N/h` in green.
+- `BuildingUpgradeSheet` shows current vs. post-upgrade production rate.
+- Keep to gross rate display for v1.1; net rate (minus training costs) is
+  deferred to avoid complexity.
+
+---
+
+### Feature 5: Player-to-Player Resource Trading via Cargo Ships
+
+**What it adds:** A player selects a target city, picks resource type and
+quantity, dispatches a cargo ship. Resources are deducted immediately
+(escrowed). On arrival, the recipient's city gains the resources.
+
+**New table — `resource_shipments`:**
+
+```sql
+CREATE TABLE public.resource_shipments (
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  sender_id           uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  origin_city_id      uuid NOT NULL REFERENCES public.cities(id),
+  destination_city_id uuid NOT NULL REFERENCES public.cities(id),
+  resource_type       text NOT NULL,
+  amount              numeric NOT NULL CHECK (amount > 0),
+  arrive_at           timestamptz NOT NULL,
+  status              text NOT NULL DEFAULT 'in_transit'
+                      CHECK (status IN ('in_transit', 'delivered', 'returned')),
+  created_at          timestamptz NOT NULL DEFAULT NOW(),
+  CHECK (origin_city_id <> destination_city_id)
+);
+
+ALTER TABLE public.resource_shipments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.resource_shipments REPLICA IDENTITY FULL;
+
+CREATE POLICY "resource_shipments_select"
+  ON public.resource_shipments FOR SELECT TO authenticated
+  USING (
+    sender_id = auth.uid()
+    OR destination_city_id IN (SELECT id FROM public.cities WHERE owner_id = auth.uid())
+  );
+
+ALTER PUBLICATION supabase_realtime ADD TABLE public.resource_shipments;
+```
+
+**New Edge Function — `send-resources`:**
+
+```
+POST /functions/v1/send-resources
+Body: { origin_city_id, destination_city_id, resource_type, amount }
+```
+
+Logic:
+1. Verify caller owns `origin_city_id`.
+2. Verify `trading_port` building level >= 1 at origin.
+3. Calculate travel time: `max(1, ceil(sqrt(dx² + dy²) * 2))` minutes — same
+   formula used in `dispatch-units`.
+4. `deduct_resource(origin_city_id, resource_type, amount)` — atomic; rolls back
+   on INSERT failure.
+5. INSERT into `resource_shipments`.
+
+**New pg_cron job — `deliver-resources`:**
+
+```sql
+SELECT cron.schedule('deliver-resources', '* * * * *',
+  'SELECT public.deliver_resource_shipments()');
+```
+
+New SQL function `deliver_resource_shipments()`:
+
+```sql
+-- FOR each resource_shipment WHERE arrive_at <= NOW() AND status = 'in_transit'
+-- FOR UPDATE SKIP LOCKED:
+--   warehouse_cap = 500 * POWER(1.5, warehouse_level)
+--   UPDATE city_resources SET amount = LEAST(amount + shipment.amount, warehouse_cap)
+--     WHERE city_id = destination_city_id AND resource_type = shipment.resource_type
+--   UPDATE resource_shipments SET status = 'delivered'
+```
+
+**Flutter integration:**
+
+- New `TradeScreen`: select target city from a list/map, pick resource + amount,
+  confirm send.
+- New `ResourceShipmentsProvider` (StreamProvider.family on city_id): streams
+  `resource_shipments` for outgoing and incoming shipments.
+- Arrival countdown uses existing `CountdownTimerWidget`.
+
+---
+
+### Feature 6: Marketplace with Buy/Sell Order Book
+
+**What it adds:** Global order book where players post buy or sell offers for
+resources. Fulfillment is a player-triggered action.
+
+**New table — `marketplace_orders`:**
+
+```sql
+CREATE TABLE public.marketplace_orders (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  player_id       uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  city_id         uuid NOT NULL REFERENCES public.cities(id),
+  order_type      text NOT NULL CHECK (order_type IN ('buy', 'sell')),
+  resource_type   text NOT NULL,
+  quantity        numeric NOT NULL CHECK (quantity > 0),
+  price_gold      numeric NOT NULL CHECK (price_gold > 0),
+  status          text NOT NULL DEFAULT 'open'
+                  CHECK (status IN ('open', 'filled', 'cancelled')),
+  created_at      timestamptz NOT NULL DEFAULT NOW(),
+  updated_at      timestamptz NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.marketplace_orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.marketplace_orders REPLICA IDENTITY FULL;
+
+-- All players can read open orders (public order book)
+CREATE POLICY "marketplace_orders_select"
+  ON public.marketplace_orders FOR SELECT TO authenticated USING (true);
+
+-- Partial index for efficient order book queries
+CREATE INDEX ON public.marketplace_orders (resource_type, price_gold)
+  WHERE status = 'open';
+
+ALTER PUBLICATION supabase_realtime ADD TABLE public.marketplace_orders;
+```
+
+**New Edge Functions:**
+
+`post-sell-order`:
+1. Verify city ownership + `trading_port` level >= 1.
+2. `deduct_resource(city_id, resource_type, quantity)` — escrows resources.
+3. INSERT order `order_type = 'sell'`.
+
+`post-buy-order`:
+1. Verify city ownership + `trading_port` level >= 1.
+2. `deduct_resource(city_id, 'gold', quantity * price_gold)` — escrows gold.
+3. INSERT order `order_type = 'buy'`.
+
+`fulfill-order`:
+1. Verify caller's city owns the other side of the trade.
+2. Return escrowed gold to seller's `city_resources`.
+3. INSERT into `resource_shipments` for the resource delivery to buyer (same
+   travel time calculation as `send-resources`).
+4. `UPDATE marketplace_orders SET status = 'filled'` for both matched orders.
+
+`cancel-order`:
+1. Verify caller owns the order.
+2. Return escrowed resource or gold to `city_resources` atomically.
+3. `UPDATE marketplace_orders SET status = 'cancelled'`.
+
+**No pg_cron job needed** for the marketplace — fulfillment is event-driven.
+
+**Flutter integration:**
+
+- New `MarketplaceScreen`: order book table (filterable by resource, sortable by
+  price), "Post Order" form, "My Orders" tab.
+- `MarketplaceOrdersProvider` (global StreamProvider, no city_id): streams
+  `marketplace_orders WHERE status = 'open'`.
+- Fulfillment triggers a `resource_shipment`, which the existing
+  `ResourceShipmentsProvider` picks up automatically.
+
+---
+
+### Feature 7: Pillage (Steal Resources on Battle Victory)
+
+**What it adds:** When `resolve_battles()` resolves an `attacker_won` outcome,
+a fraction of the defender's unprotected resources is transferred to the
+attacker via the return movement's cargo.
+
+**Schema changes — MODIFY `unit_movements`:**
+
+```sql
+ALTER TABLE public.unit_movements ADD COLUMN cargo jsonb;
+-- {"wood": 120, "gold": 50} — resources carried by returning army
+-- NULL for non-pillage movements
+```
+
+**MODIFY `resolve_battles()` — add pillage in the `attacker_won` branch:**
+
+```sql
+-- Before INSERT of the return unit_movement:
+DECLARE
+  v_hideout_level  integer;
+  v_protected      numeric;
+  v_stealable      numeric;
+  v_stolen         numeric;
+  v_cargo          jsonb := '{}';
+  v_res_type       text;
+  v_def_amount     numeric;
+BEGIN
+  SELECT COALESCE(level, 0) INTO v_hideout_level
+  FROM city_buildings WHERE city_id = b.defender_city_id AND building_type = 'hideout';
+
+  v_protected := 100 * v_hideout_level;  -- resources immune to pillage per hideout level
+
+  FOREACH v_res_type IN ARRAY ARRAY['wood','marble','crystal','sulfur','gold'] LOOP
+    SELECT amount INTO v_def_amount
+    FROM city_resources
+    WHERE city_id = b.defender_city_id AND resource_type = v_res_type;
+
+    v_stealable := GREATEST(0, v_def_amount - v_protected);
+    v_stolen    := FLOOR(v_stealable * 0.30);  -- 30% pillage rate
+
+    IF v_stolen > 0 THEN
+      UPDATE city_resources SET amount = amount - v_stolen
+      WHERE city_id = b.defender_city_id AND resource_type = v_res_type;
+      v_cargo := v_cargo || jsonb_build_object(v_res_type, v_stolen);
+    END IF;
+  END LOOP;
+END;
+
+-- Then INSERT return movement WITH cargo:
+INSERT INTO unit_movements (..., cargo) VALUES (...,
+  CASE WHEN v_cargo = '{}' THEN NULL ELSE v_cargo END);
+```
+
+**MODIFY `process_arrivals()` — cargo delivery on return movements:**
+
+```sql
+-- After existing unit return-to-garrison logic:
+IF v_movement.movement_type = 'return' AND v_movement.cargo IS NOT NULL THEN
+  FOR v_kv IN SELECT key, value FROM jsonb_each_text(v_movement.cargo) LOOP
+    UPDATE city_resources
+    SET amount = LEAST(amount + v_kv.value::numeric, warehouse_cap)
+    WHERE city_id = v_movement.destination_city_id
+      AND resource_type = v_kv.key;
+  END LOOP;
+END IF;
+```
+
+**Flutter integration:**
+
+- `UnitMovement` Dart model gains `cargo` field (`Map<String, double>?`).
+- Movement list widget shows "Returning with pillage: 120 wood, 50 gold" when
+  `cargo != null`.
+- Battle detail screen final turn card shows pillage summary.
+
+---
+
+### Feature 8: Battle Report — Turn-by-Turn Unit Loss Visualization
+
+**What it adds:** Replaces the existing text-based casualty list in
+`BattleTurnCard` with a color-coded visual: unit type icons with loss badges and
+survivor counts, color-coded by unit class.
+
+**Backend changes:** None. All required data is already in `battle_turns`
+(JSONB casualty maps + survivor maps). The data model is complete.
+
+**Pure Flutter changes:**
+
+New widget — `lib/features/battles/screens/widgets/unit_casualty_bar.dart`:
+
+```dart
+// Renders a row of UnitChip widgets.
+// Each chip shows:
+//   - Unit type display name or icon
+//   - Red "-N" badge for losses
+//   - Green "N left" subtitle
+// Color coding:
+//   Naval units: Colors.blue.shade400 accent border
+//   Land units:  Colors.green.shade600 accent border
+//   Support (medic, cook): Colors.grey accent border
+```
+
+New file — `lib/core/constants/unit_visual_constants.dart`:
+
+```dart
+// Maps DB unit type string → (Color category, display label)
+// Keeps BattleTurnCard free of switch statements
+const Map<String, UnitVisualCategory> kUnitVisuals = {
+  'hoplite': UnitVisualCategory.land,
+  'phalanx': UnitVisualCategory.land,
+  // ...
+  'cargo_ship': UnitVisualCategory.naval,
+  // ...
+  'medic': UnitVisualCategory.support,
+  'cook': UnitVisualCategory.support,
+};
+```
+
+**Modified `BattleTurnCard`:**
+
+- Naval Phase section (blue header): attacker + defender `UnitCasualtyBar`
+- Land Phase section (green header): attacker + defender `UnitCasualtyBar`
+- "Skipped" / "Blocked" phases show a gray muted label
+- No changes to providers, repositories, or SQL
+
+---
+
+## Complete v1.1 Component Summary
+
+### New Tables
+
+| Table | Purpose | Realtime |
+|-------|---------|----------|
+| `resource_shipments` | In-transit resource transfers | Yes — FULL |
+| `marketplace_orders` | Buy/sell order book | Yes — FULL |
+
+### Modified Tables
+
+| Table | Change |
+|-------|--------|
+| `cities` | + `population`, `happiness`, `tavern_wine_rate`, `tax_rate`; + Realtime FULL |
+| `unit_movements` | + `cargo jsonb` (nullable) |
+
+### New pg_cron Jobs
+
+| Job Name | Schedule | Function |
+|----------|----------|----------|
+| `deliver-resources` | `* * * * *` | `deliver_resource_shipments()` |
+
+### Modified SQL Functions
+
+| Function | Change |
+|----------|--------|
+| `process_resource_tick()` | + happiness tick, + population growth, + tax gold, + island level multiplier |
+| `resolve_battles()` | + pillage calculation in `attacker_won` branch; return movement gets `cargo` |
+| `process_arrivals()` | + cargo delivery when `movement_type = 'return' AND cargo IS NOT NULL` |
+
+### New Edge Functions
+
+| Function | Body Params | Purpose |
+|----------|-------------|---------|
+| `configure-tavern` | `city_id, wine_rate` | Set tavern wine consumption rate |
+| `set-tax-rate` | `city_id, tax_rate` | Set city tax rate |
+| `upgrade-island-resource` | `island_id, resource_type` | Upgrade island resource level |
+| `send-resources` | `origin_city_id, destination_city_id, resource_type, amount` | Dispatch resource cargo ship |
+| `post-sell-order` | `city_id, resource_type, quantity, price_gold` | Escrow + open sell order |
+| `post-buy-order` | `city_id, resource_type, quantity, price_gold` | Escrow gold + open buy order |
+| `fulfill-order` | `order_id, fulfiller_city_id` | Match orders, trigger shipment |
+| `cancel-order` | `order_id` | Return escrow, close order |
+
+### New Flutter Features
+
+| Module | Files | Purpose |
+|--------|-------|---------|
+| `features/city/screens/tavern_screen.dart` | NEW | Wine rate + tax rate sliders |
+| `features/city/providers/resource_rates_provider.dart` | NEW | Derived hourly production rates |
+| `features/trade/` | NEW module | TradeScreen, ResourceShipmentsProvider, resource_shipment model |
+| `features/marketplace/` | NEW module | MarketplaceScreen, MarketplaceOrdersProvider, order model |
+| `features/battles/screens/widgets/unit_casualty_bar.dart` | NEW | Color-coded unit loss visualization |
+| `core/constants/unit_visual_constants.dart` | NEW | Unit-to-color/category mapping |
+| `features/battles/screens/widgets/battle_turn_card.dart` | MODIFIED | Uses UnitCasualtyBar |
+| `features/city/screens/city_screen.dart` | MODIFIED | Resource panel adds hourly rate |
+| `features/map/screens/island_screen.dart` | MODIFIED | Island upgrade UI |
+| `features/military/models/unit_movement.dart` | MODIFIED | + `cargo` field |
+| `features/city/models/city.dart` | MODIFIED | + `population`, `happiness`, `taxRate`, `tavernWineRate` |
+
+---
+
+## Data Flow Diagrams
+
+### Happiness / Population / Tax Tick
+
+```
+pg_cron resource-tick (every 5 min):
+  process_resource_tick()
+    ├── [EXISTING] Production buildings → city_resources (wood/marble/crystal/sulfur)
+    ├── [NEW] Tavern wine consumption:
+    │         city_resources (luxury) -= wine_per_tick
+    │         cities.happiness ↑ if sufficient wine, ↓ if not
+    │         cities.population += floor(population * 0.01 * happiness/100)
+    ├── [NEW] Tax income:
+    │         city_resources (gold) += floor(population * tax_rate / 12)
+    │         cities.happiness -= penalty if tax_rate > 0.30
+    └── Realtime push:
+          cities row UPDATE → cityProvider stream → TavernScreen + GovernorScreen rebuild
+          city_resources row UPDATE → resourcesStreamProvider → resource panel rebuild
+```
+
+### Island Upgrade
+
+```
+Player taps "Upgrade Sawmill Level":
+  upgrade-island-resource Edge Function
+    ├── Check city-on-island ownership
+    ├── deduct_resource(caller_city_id, 'wood', cost)
+    │   deduct_resource(caller_city_id, 'gold', cost)
+    └── UPDATE islands SET wood_level = wood_level + 1
+          → islandDetailProvider refresh (PostgREST SELECT, no Realtime on islands)
+
+pg_cron resource-tick (next tick):
+  process_resource_tick()
+    └── wood production = workers * sawmill_level * islands.wood_level
+          all cities on island produce more wood from now on
+```
+
+### Resource Trading
+
+```
+Player sends resources:
+  send-resources Edge Function
+    ├── deduct_resource(origin, type, amount)   [escrow — immediate]
+    └── INSERT resource_shipments (status = 'in_transit', arrive_at = now + travel)
+          → ResourceShipmentsProvider receives Realtime INSERT
+          → UI shows outgoing shipment with countdown
+
+pg_cron deliver-resources (every minute):
+  deliver_resource_shipments()
+    └── For arrived shipments (arrive_at <= NOW()):
+          UPDATE city_resources (destination) += amount (warehouse capped)
+          UPDATE resource_shipments SET status = 'delivered'
+            → ResourceShipmentsProvider Realtime UPDATE
+            → resourcesStreamProvider Realtime UPDATE (recipient's resources)
+```
+
+### Marketplace
+
+```
+Seller posts:
+  post-sell-order
+    ├── deduct_resource(city, resource, qty)    [escrow]
+    └── INSERT marketplace_orders (status = 'open')
+          → MarketplaceOrdersProvider Realtime INSERT → order appears in book
+
+Buyer fulfills:
+  fulfill-order
+    ├── credit seller: city_resources (gold) += qty * price
+    ├── INSERT resource_shipments (buyer receives resources via travel)
+    └── UPDATE both orders SET status = 'filled'
+          → MarketplaceOrdersProvider Realtime UPDATE → order removed from book
+          → ResourceShipmentsProvider Realtime INSERT → buyer sees incoming shipment
+```
+
+### Pillage
+
+```
+resolve_battles() (pg_cron battle-tick) — attacker_won branch:
+  ├── [EXISTING] Clear defender city_units
+  ├── [NEW] Calculate pillage:
+  │         hideout_protection = 100 * hideout_level
+  │         for each resource: stolen = floor((amount - protection) * 0.30)
+  │         UPDATE defender city_resources -= stolen
+  │         cargo = {wood: N, gold: M, ...}
+  └── INSERT unit_movements (movement_type='return', cargo=cargo_jsonb)
+        → unitMovementsProvider Realtime INSERT
+        → attacker sees "returning with pillage" in movement list
+
+process_arrivals() (movement-tick) — return with cargo:
+  └── UPDATE attacker city_resources += cargo amounts (warehouse capped)
+        → resourcesStreamProvider Realtime UPDATE → attacker's resources increase
+```
+
+---
+
+## Recommended Project Structure Additions
+
+```
+lib/
+├── features/
+│   ├── city/
+│   │   ├── screens/
+│   │   │   ├── city_screen.dart              [MODIFIED — hourly rates in resource panel]
+│   │   │   └── tavern_screen.dart            [NEW]
+│   │   └── providers/
+│   │       └── resource_rates_provider.dart  [NEW]
+│   ├── trade/                                [NEW feature module]
+│   │   ├── data/trade_repository.dart
+│   │   ├── models/resource_shipment.dart
+│   │   ├── providers/resource_shipments_provider.dart
+│   │   └── screens/trade_screen.dart
+│   ├── marketplace/                          [NEW feature module]
+│   │   ├── data/marketplace_repository.dart
+│   │   ├── models/marketplace_order.dart
+│   │   ├── providers/marketplace_orders_provider.dart
+│   │   └── screens/marketplace_screen.dart
+│   ├── battles/
+│   │   └── screens/widgets/
+│   │       ├── battle_turn_card.dart         [MODIFIED — uses UnitCasualtyBar]
+│   │       └── unit_casualty_bar.dart        [NEW]
+│   └── map/
+│       └── screens/island_screen.dart        [MODIFIED — island upgrade UI]
+├── core/constants/
+│   └── unit_visual_constants.dart            [NEW]
+supabase/
+├── functions/
+│   ├── configure-tavern/index.ts             [NEW]
+│   ├── set-tax-rate/index.ts                 [NEW]
+│   ├── upgrade-island-resource/index.ts      [NEW]
+│   ├── send-resources/index.ts               [NEW]
+│   ├── post-sell-order/index.ts              [NEW]
+│   ├── post-buy-order/index.ts               [NEW]
+│   ├── fulfill-order/index.ts                [NEW]
+│   └── cancel-order/index.ts                 [NEW]
+└── migrations/
+    ├── 2026XXXX_add_city_economy_columns.sql   [cities: population/happiness/rates]
+    ├── 2026XXXX_add_unit_movements_cargo.sql   [unit_movements: cargo jsonb]
+    ├── 2026XXXX_create_resource_shipments.sql
+    ├── 2026XXXX_create_marketplace_orders.sql
+    ├── 2026XXXX_modify_process_resource_tick.sql  [replaces existing function]
+    ├── 2026XXXX_modify_resolve_battles.sql        [replaces existing function]
+    ├── 2026XXXX_modify_process_arrivals.sql       [replaces existing function]
+    └── 2026XXXX_deliver_resources_cron.sql        [new cron job]
+```
 
 ---
 
 ## Architectural Patterns
 
-### Pattern 1: Dumb Client — Authoritative Server
+### Pattern 1: Escrow-on-Dispatch
 
-**What:** Client sends intent (action request), server validates and calculates, server writes state, server pushes result back.
+**What:** Any feature where resources are "in flight" (trading, marketplace sell,
+marketplace buy) deducts the resources from the sender atomically at dispatch
+time. The `resource_shipments` or `marketplace_orders` row represents the
+escrowed value.
 
-**When to use:** All game-affecting actions — building upgrades, troop movements, battle resolutions, resource production. This is the core anti-cheat mechanism.
+**When to use:** All multi-city resource transfers without exception. Prevents
+a double-send race condition where a player opens two tabs and sends the same
+resources to two destinations.
 
-**Trade-offs:** Slightly higher latency per action (network round trip to Edge Function). For a slow-paced strategy game, this is acceptable and preferred over client-side trust.
+**Trade-offs:** Player sees resources decrease immediately, which can feel
+jarring. Mitigate with a clear "in transit: +120 wood arriving in 4 min"
+display. The alternative — deducting on arrival — would allow oversending and
+create debt.
 
-**Example:**
-```dart
-// Client: send intent only, never compute outcomes
-Future<void> upgradeBuilding(String buildingId) async {
-  // Calls Edge Function — no local calculation
-  final result = await supabase.functions.invoke(
-    'upgrade-building',
-    body: {'building_id': buildingId},
-  );
-  // State comes back via Realtime subscription or function response
-}
-```
+**Implementation pattern:** Call `deduct_resource()` inside the Edge Function
+before the INSERT. If the INSERT fails for any reason, Supabase auto-rolls back
+the function's implicit transaction, returning the resources.
 
-```typescript
-// Edge Function: validate + calculate + write
-Deno.serve(async (req) => {
-  const { building_id } = await req.json();
-  const user = await getUser(req); // JWT verification
+### Pattern 2: Columnar Extension Over New Tables
 
-  // Server validates preconditions
-  const building = await getBuilding(building_id, user.id);
-  if (!canAfford(building, user.resources)) {
-    return error('Insufficient resources');
-  }
+**What:** Happiness, population, tax rate, and tavern wine rate are added as
+columns to `cities` rather than in separate `city_happiness` or `city_economy`
+tables.
 
-  // Server calculates cost and time
-  const cost = baseCost * Math.pow(1.5, building.level);
-  const duration = baseTime * Math.pow(1.2, building.level);
+**When to use:** When data has a strict 1:1 relationship with an existing entity
+and is always queried together with it.
 
-  // Server writes atomically
-  await db.transaction([
-    deductResources(user.id, cost),
-    queueConstruction(building_id, duration),
-  ]);
+**Trade-offs:** The `cities` row grows wider. Postgres handles this efficiently
+up to hundreds of columns. The benefit is that one Realtime event covers all
+city economy changes — no additional subscriptions.
 
-  return success({ queued_until: completionTime });
-});
-```
+**Exception:** `marketplace_orders` and `resource_shipments` are separate tables
+because they are 1:many with cities and require independent Realtime subscriptions
+from any client (not just the city owner).
 
-### Pattern 2: pg_cron Tick System for Passive Production
+### Pattern 3: Bundled SQL Function Extension
 
-**What:** Scheduled PostgreSQL jobs run every 5 minutes to advance game state — resource production, construction completion, battle turns, fleet arrivals.
+**What:** New tick behaviors (happiness, population, tax, pillage, cargo
+delivery) are added as new sections inside existing SQL functions rather than
+as new pg_cron jobs.
 
-**When to use:** Any time-based passive progression. This pattern ensures state advances correctly even when no players are online and prevents client-side time manipulation.
+**When to use:** When the new behavior is tightly coupled to the existing tick's
+timing and must operate on data already loaded in the same loop. Happiness and
+tax run at the same 5-minute interval as resource production — co-locating them
+avoids ordering ambiguity and reduces cron job count.
 
-**Trade-offs:** 5-minute resolution is the minimum tick granularity. Intermediate states (e.g., "building 3 minutes from completion") are stored as target timestamps, not countdown timers. The client calculates display-only countdowns from server timestamps.
+**Trade-offs:** Functions grow larger. Mitigate with clear `-- SECTION` comment
+blocks inside the function body.
 
-**Example:**
-```sql
--- pg_cron job: runs every 5 minutes
-SELECT cron.schedule(
-  'resource-production-tick',
-  '*/5 * * * *',
-  $$
-    UPDATE city_resources cr
-    SET amount = LEAST(
-      cr.amount + (
-        SELECT workers * building_level * research_bonus
-        FROM production_buildings pb
-        WHERE pb.city_id = cr.city_id AND pb.resource_type = cr.resource_type
-      ),
-      warehouse_capacity
-    )
-    FROM cities c
-    WHERE cr.city_id = c.id;
-  $$
-);
-```
+**Exception:** `deliver_resource_shipments` is a separate new job because it
+operates on a new independent table (`resource_shipments`) with no logical
+coupling to the resource production loop.
 
-### Pattern 3: Supabase Realtime for Push Notifications
+### Pattern 4: Client-Side Rate Derivation
 
-**What:** Use Realtime DB Changes (WAL streaming) for persistent game events (battle reports, trade arrivals, messages) and Broadcast for ephemeral real-time events (active battle turn updates).
+**What:** Hourly production rate is not stored in the database. It is derived
+client-side from existing Riverpod streams (building levels, workers, island
+level) using a combined `Provider`.
 
-**When to use:**
-- DB Changes: battle report inserts, construction completions, resource deliveries — anything that needs to persist and be received even on reconnect
-- Broadcast: active battle turn-by-turn updates, typing indicators in chat — ephemeral and low-latency
+**When to use:** Display-only data that changes only when the underlying inputs
+change (which already trigger Realtime updates), and where the formula is
+simple enough to maintain in sync.
 
-**Trade-offs:** DB Changes have higher latency (WAL → Realtime → client) but guarantee delivery. Broadcast is faster but ephemeral — if client disconnects, it misses the message.
-
-**Example:**
-```dart
-// DB Changes: battle reports (persistent)
-supabase
-  .from('battle_reports')
-  .stream(primaryKey: ['id'])
-  .eq('defender_id', userId)
-  .listen((reports) {
-    ref.read(battleProvider.notifier).updateReports(reports);
-  });
-
-// Broadcast: active battle turns (ephemeral)
-final channel = supabase.channel('battle:${battleId}');
-channel.onBroadcast(
-  event: 'turn_result',
-  callback: (payload) {
-    ref.read(activeBattleProvider.notifier).applyTurnResult(payload);
-  },
-).subscribe();
-```
-
-### Pattern 4: Riverpod Provider Per Game Domain
-
-**What:** One Riverpod `AsyncNotifier` per major game domain (city, resources, research, battle). Providers load from Supabase on first access, subscribe to Realtime for updates, and expose optimistic update methods.
-
-**When to use:** All game state that needs to be reactively displayed in UI and kept in sync with the server.
-
-**Trade-offs:** More boilerplate than a single global store, but provides clean isolation between domains. Individual features can be developed and tested independently.
-
-**Example:**
-```dart
-@riverpod
-class CityNotifier extends _$CityNotifier {
-  @override
-  Future<City> build(String cityId) async {
-    // Initial load from Supabase
-    final data = await supabase
-      .from('cities')
-      .select('*, buildings(*), construction_queue(*)')
-      .eq('id', cityId)
-      .single();
-
-    // Subscribe to Realtime updates
-    ref.onDispose(() => _subscription?.cancel());
-    _subscription = supabase
-      .from('cities')
-      .stream(primaryKey: ['id'])
-      .eq('id', cityId)
-      .listen((data) => state = AsyncData(City.fromJson(data.first)));
-
-    return City.fromJson(data);
-  }
-}
-```
-
----
-
-## Data Flow
-
-### Player Action Flow (e.g., queue building upgrade)
-
-```
-[Player taps "Upgrade"]
-        |
-[Flutter UI] --> dispatch action to CityNotifier
-        |
-[CityNotifier] --> optimistic update (optional: show "pending")
-        |
-[BuildingService] --> POST to Edge Function /upgrade-building
-        |
-[Edge Function] --> validate JWT + check preconditions + calculate
-        |
-[PostgreSQL] --> atomic transaction: deduct resources + insert queue entry
-        |
-[Realtime WAL] --> detects INSERT into construction_queue
-        |
-[Realtime WebSocket] --> pushes DB change event to subscribed client
-        |
-[CityNotifier.stream] --> receives update --> state = AsyncData(updatedCity)
-        |
-[Flutter UI] --> rebuilds with new construction queue entry
-```
-
-### Passive Tick Flow (resource production)
-
-```
-[pg_cron] -- every 5 minutes -->
-        |
-[SQL UPDATE] --> city_resources += production_rate (bounded by warehouse)
-        |
-[PostgreSQL WAL] --> change detected
-        |
-[Realtime] --> DB Changes event sent to all subscribed players
-        |
-[ResourceNotifier] --> receives stream update --> updates resource counts
-        |
-[UI] --> resource numbers update
-```
-
-### Battle Turn Flow
-
-```
-[pg_cron] -- every 5 minutes during active battle -->
-        |
-[pg_cron invokes] --> Edge Function /battle-turn
-        |
-[Edge Function] --> load battle state from DB
-        |
-[Edge Function] --> calculate combat (unit stats, terrain, research bonuses)
-        |
-[Edge Function] --> write turn result + survivors to DB
-        |
-[Edge Function] --> broadcast turn result via Realtime channel 'battle:{id}'
-        |
-[Both players' clients] --> receive Broadcast event --> update battle HUD
-        |
-[Edge Function] --> if battle_over: insert battle_report record
-        |
-[Realtime DB Changes] --> both players receive battle_report notification
-```
-
-### State Management Flow
-
-```
-[Supabase DB]
-    | stream (Realtime subscription)
-    v
-[Riverpod AsyncNotifier]  <-->  [Edge Function calls (mutations)]
-    | watch/read
-    v
-[Flutter widgets / Flame components]
-    | rebuild on state change
-    v
-[UI renders current game state]
-```
-
-### Key Data Flows Summary
-
-1. **Read path:** Client reads via PostgREST (REST) or Supabase Realtime stream — RLS enforces what each player can see
-2. **Write path:** Client calls Edge Function with JWT — Edge Function validates, writes to DB — Realtime pushes change back to subscribed clients
-3. **Tick path:** pg_cron runs SQL directly on DB — Realtime detects WAL changes — pushes to clients
-4. **Battle path:** pg_cron triggers battle-turn Edge Function every 5 min — Edge Function computes result, writes it — Broadcast pushes turn update to both players immediately
-
----
-
-## Component Boundaries
-
-### What Talks to What
-
-| From | To | Channel | Direction |
-|------|----|---------|-----------|
-| Flutter UI | Riverpod Providers | read/watch | UI reads state |
-| Riverpod Providers | Service Layer | Dart calls | Providers call services |
-| Service Layer | Supabase SDK | Dart SDK | Services use Supabase client |
-| Supabase SDK | Edge Functions | HTTPS POST | Client triggers server action |
-| Supabase SDK | PostgREST | HTTPS GET | Client reads data |
-| Supabase SDK | Realtime WebSocket | WS subscribe | Client receives push events |
-| Edge Functions | PostgreSQL | Direct SQL | Server writes game state |
-| pg_cron | PostgreSQL | Direct SQL | Scheduler updates state |
-| pg_cron | Edge Functions | HTTP invoke | Scheduler triggers complex logic |
-| PostgreSQL WAL | Realtime | Internal | DB changes propagate to clients |
-| Flame Components | Riverpod Providers | RiverpodComponentMixin | Game components read/react to state |
-
-### Rules
-
-- Client NEVER writes game state directly to the DB (no direct INSERT/UPDATE from client code)
-- Client only: reads via SELECT (PostgREST + RLS) and triggers Edge Functions
-- All calculations (battle damage, resource production, build costs) happen in Edge Functions or pg_cron SQL — never in Dart client code
-- RLS policies ensure players only read their own cities, private messages, etc.
-
----
-
-## Build Order (Phase Dependencies)
-
-The component dependency graph determines build order:
-
-```
-Phase 1: Foundation
-  Auth system → Player profile → DB schema (base tables)
-       ↓
-Phase 2: Core Game Loop
-  Resource system (pg_cron ticks) → City view → Building system
-  (Resources are needed before buildings make sense)
-       ↓
-Phase 3: World & Expansion
-  World map (islands/cities) → Research system
-  (Need a world before players interact with it)
-       ↓
-Phase 4: Military
-  Military units → Battle system (turn engine)
-  (Need units before battles)
-       ↓
-Phase 5: Social & Economy
-  Trade / Marketplace → Alliance system → Messaging
-  (Need players established before social features matter)
-       ↓
-Phase 6: Meta
-  Ranking system → Diplomacy (war declarations, NAP)
-```
-
-### Dependency Rationale
-
-- **Auth before everything:** Every DB table has `player_id` foreign keys — auth must exist first
-- **Resources before buildings:** Building upgrade costs require the resource system to be functional and testable
-- **pg_cron tick before city view:** Resource display in the city view needs the tick system to be meaningful
-- **Buildings before research:** Research requires the Academy building to generate research points
-- **Units before battles:** Battle calculations reference unit stats — unit tables and seeded data must exist
-- **Realtime can be added incrementally:** Polling works initially; Realtime subscriptions can replace polling feature by feature
+**Critical constraint:** The Dart formula in `resourceRatesProvider` must match
+the PostgreSQL formula in `process_resource_tick()` exactly. Add a comment in
+both files cross-referencing the other. Any formula change in the SQL migration
+must also update the Dart provider.
 
 ---
 
 ## Scaling Considerations
 
-| Scale | Architecture Adjustments |
-|-------|--------------------------|
-| 0-500 players | Supabase free/pro tier. Single DB, pg_cron every 5 min, no optimization needed. |
-| 500-5,000 players | Monitor pg_cron job duration. If resource tick takes >30s, batch cities into chunks. Add DB indexes on `city_id`, `player_id`, `battle_id`. |
-| 5,000-50,000 players | Supabase Pro or Enterprise. Consider partitioning battle_reports table by date. Realtime connection count may require Supabase plan upgrade. |
-| 50,000+ players | This stack's ceiling. Would need custom game server (Elixir/Go) to replace Edge Functions for battle calculations. Supabase remains viable for persistence. |
-
-### Scaling Priorities
-
-1. **First bottleneck:** pg_cron resource tick touching all cities simultaneously. Fix: process cities in batches, or shard by island.
-2. **Second bottleneck:** Realtime connection count. Fix: Supabase plan upgrade; group players into fewer channels per island/region.
-3. **Third bottleneck:** Edge Function cold starts during battle spikes. Fix: pg_cron invokes battle functions — warm invocations are faster; acceptable for 5-min turns.
+| Scale | Concern | Approach |
+|-------|---------|---------|
+| Current (< 50 players) | `process_resource_tick()` growing — happiness + tax + island join added | Fine: single-pass loop; island join adds one subquery per resource row, acceptable |
+| 100–500 players | Marketplace Realtime fan-out — all players subscribe to all open orders | Filter channel to `WHERE status = 'open'`; Supabase handles ~1000 concurrent connections |
+| 100–500 players | `process_resource_tick()` includes happiness + population + tax per city | Monitor job duration; still single function, should complete in < 5s for 500 cities |
+| 500+ players | `resolve_battles()` + `process_resource_tick()` may exceed 1-min window | Add `LIMIT 200 FOR UPDATE SKIP LOCKED` batch processing |
+| 500+ players | `resource_shipments` table grows unbounded | Add cleanup: `DELETE FROM resource_shipments WHERE status = 'delivered' AND created_at < NOW() - INTERVAL '7 days'` |
+| 500+ players | `marketplace_orders` query performance | Partial index on `(resource_type, price_gold) WHERE status = 'open'` — already included in migration above |
 
 ---
 
 ## Anti-Patterns
 
-### Anti-Pattern 1: Client-Side Game Calculations
+### Anti-Pattern 1: Client-Side Escrow Calculation
 
-**What people do:** Calculate battle outcomes, resource production, or building costs in Dart and send the result to the server.
+**What people do:** Show the resource cost in the Flutter UI and display the
+post-deduction balance before calling the Edge Function.
 
-**Why it's wrong:** Any calculation on the client is cheatable. Players can modify Flutter web code or intercept network calls to send fraudulent results (e.g., "I won the battle with 0 losses").
+**Why it's wrong:** The displayed balance and the server's actual balance can
+diverge between render and Edge Function call (another tab, a pg_cron tick, a
+concurrent order). The UI shows "sufficient" but the server rejects with
+"insufficient resources".
 
-**Do this instead:** Client sends intent only (`{ action: 'attack', target_city_id: '...' }`). Edge Function receives, validates, calculates, writes result. Client receives outcome via Realtime.
+**Do this instead:** Call the Edge Function immediately on player confirm.
+Handle `insufficient_resources` error responses in the UI with an informative
+snackbar and refresh the resource provider. Never compute affordability on the
+client as authoritative.
 
-### Anti-Pattern 2: Polling Instead of Realtime Subscriptions
+### Anti-Pattern 2: Cancellation Without Escrow Return
 
-**What people do:** `setInterval(() => fetchResources(), 5000)` to keep UI fresh.
+**What people do:** `UPDATE marketplace_orders SET status = 'cancelled'` without
+also returning the escrowed resource or gold to the city.
 
-**Why it's wrong:** Creates N × interval HTTP requests per player. At 100 players polling every 5s, that is 20 requests/second just for resource reads. Wastes Supabase request quota and adds server load.
+**Why it's wrong:** Player permanently loses the escrowed resources. Happens
+easily if cancellation logic is written as two separate statements without a
+transaction.
 
-**Do this instead:** Subscribe to Supabase Realtime DB Changes on the `city_resources` table. The client receives a push only when the pg_cron tick runs, not continuously.
+**Do this instead:** The `cancel-order` Edge Function issues both mutations
+(resource return + status update) via the service role client. The Supabase
+Deno client wraps them in the same HTTP request to PostgREST which handles
+implicit rollback — or call a SECURITY DEFINER SQL function that wraps both
+in a `BEGIN/COMMIT` block.
 
-### Anti-Pattern 3: Direct DB Writes from Client
+### Anti-Pattern 3: Storing Happiness on `city_buildings.tavern`
 
-**What people do:** Use the Supabase JS/Dart client directly to INSERT into `buildings` or UPDATE `resources`.
+**What people do:** Add a `happiness` or `wine_consumed` column to the tavern
+row in `city_buildings`.
 
-**Why it's wrong:** Even with RLS, this bypasses game logic validation. A player could INSERT a level-20 building without paying costs, or set resources to max.
+**Why it's wrong:** Happiness is a city-wide property. Storing it on a building
+row means the `city_buildings` Realtime subscription would fire on every building
+change (not just tavern), causing unnecessary UI rebuilds in `BuildingsGrid` and
+`BuildingUpgradeSheet`.
 
-**Do this instead:** All writes go through Edge Functions that validate preconditions, check costs, and apply formulas before writing. PostgREST is read-only from the client.
+**Do this instead:** `happiness`, `population`, `tax_rate`, `tavern_wine_rate`
+live on `cities`. One Realtime subscription covers all city-level economy data.
+Building-level data stays in `city_buildings`.
 
-### Anti-Pattern 4: One Flame Game for Everything
+### Anti-Pattern 4: Island Upgrade Without City-Membership Check
 
-**What people do:** Create a single `FlameGame` instance with all components — world map, city buildings, battle HUD — all loaded simultaneously.
+**What people do:** Allow any authenticated player to call
+`upgrade-island-resource` on any island by passing an `island_id`.
 
-**Why it's wrong:** Flame components for the world map (hundreds of island tiles) and city view (building grid) should not be in memory at the same time. This causes unnecessary memory use and rendering overhead in a web context.
+**Why it's wrong:** A player with no city on the island could upgrade that
+island's resources at the cost of their own city's resources, benefiting
+strangers.
 
-**Do this instead:** Create separate `FlameGame` subclasses per view (`WorldMapGame`, `CityGame`). Mount the correct `GameWidget` for the active screen. Use Flutter Navigator to switch between screens, letting Flame games unmount with the screen.
+**Do this instead:** In `upgrade-island-resource`, before any deduction, assert:
 
-### Anti-Pattern 5: Storing Countdown Timers Client-Side
+```sql
+EXISTS (
+  SELECT 1 FROM cities
+  WHERE island_id = $island_id AND owner_id = $auth_uid
+)
+```
 
-**What people do:** On receiving a "construction queued" response, store `remainingSeconds = 3600` in local state and decrement it with a timer.
-
-**Why it's wrong:** Client timers drift, can be paused/manipulated, and are lost on refresh. The server and client disagree on completion time.
-
-**Do this instead:** Store `completes_at: DateTime` (server UTC timestamp) in the database. Client calculates `remainingSeconds = completesAt.difference(DateTime.now().toUtc()).inSeconds` for display only. Server pg_cron checks `completes_at < NOW()` to finalize.
+Fail with 403 if the check fails.
 
 ---
 
 ## Integration Points
 
-### External Services
+### Modified Existing Boundaries
 
-| Service | Integration Pattern | Notes |
-|---------|---------------------|-------|
-| Supabase Auth | Dart SDK `supabase.auth.signInWithPassword()` | JWT stored in SDK session; auto-refreshed |
-| PostgREST | Dart SDK `.from('table').select()` — RLS enforced | Read-only from client; all writes via Edge Functions |
-| Edge Functions | Dart SDK `supabase.functions.invoke('fn-name', body: {...})` | Authenticated with user JWT automatically |
-| Realtime | Dart SDK `.channel().onPostgresChanges().subscribe()` | DB Changes + Broadcast channels |
-| pg_cron | Defined in SQL migrations; no client integration | Server-only scheduler |
+| Boundary | Change | Notes |
+|----------|--------|-------|
+| `process_resource_tick()` | Add happiness, population, tax, island multiplier sections | One migration replaces the full function; test under load before deploying |
+| `resolve_battles()` | Add pillage block in `attacker_won` branch | Hideout level lookup added; `cargo` JSONB built across resource types |
+| `process_arrivals()` | Add cargo delivery for return movements | Null-check on `cargo` before processing; warehouse cap applied |
+| `unit_movements` table | + `cargo jsonb` nullable column | Existing rows unaffected (NULL default) |
+| `cities` table | + 4 economy columns; Realtime enabled | Requires schema migration + Realtime publication update |
+| `UnitMovement` Dart model | + `cargo` field | `Map<String, double>?` — nullable |
+| `CityModel` / `cityProvider` | + `population`, `happiness`, `taxRate`, `tavernWineRate` | From updated `cities` SELECT fields |
+| `BattleTurnCard` widget | Casualty display replaced with `UnitCasualtyBar` | No provider or API changes |
 
-### Internal Boundaries
+### New Internal Boundaries
 
 | Boundary | Communication | Notes |
 |----------|---------------|-------|
-| Flutter UI ↔ Flame | Flutter Overlays API | UI dialogs sit on top of Flame canvas via `overlays.add()` |
-| Flame components ↔ Riverpod | `RiverpodComponentMixin` | Components call `ref.read()` inside `onMount()` |
-| Feature providers ↔ Services | Direct Dart function calls | No global event bus needed at this scale |
-| Edge Functions ↔ DB | Supabase Deno client with `service_role` key | Bypasses RLS — functions have full write access |
-| pg_cron ↔ Edge Functions | `net.http_post()` via pg_net extension | Cron invokes functions over HTTP internally |
+| `TavernScreen` → `configure-tavern` | HTTP POST + JWT | Optimistic display ok (UI only) |
+| `TavernScreen` → `set-tax-rate` | HTTP POST + JWT | Optimistic display ok (UI only) |
+| `IslandScreen` → `upgrade-island-resource` | HTTP POST + JWT | Response includes new island level for immediate display |
+| `TradeScreen` → `send-resources` | HTTP POST + JWT | Response includes `arrive_at` for countdown |
+| `MarketplaceScreen` → `post-/fulfill-/cancel-order` | HTTP POST + JWT | fulfill triggers resource_shipment — both parties notified via Realtime |
+| `deliver_resource_shipments()` → `city_resources` | SQL pg_cron | No client involvement; Realtime pushes changes to subscribers automatically |
+
+---
+
+## Suggested Build Order (Dependency-Aware)
+
+Features have internal dependencies. Build in three waves to avoid blocked work:
+
+**Wave 1 — Schema migrations (no Flutter work blocked):**
+
+1. Migration: `cities` economy columns + Realtime enabled
+   - Unblocks: happiness system, tax system, `TavernScreen`
+2. Migration: `unit_movements.cargo`
+   - Unblocks: pillage modification in `resolve_battles()`
+3. Migration: `resource_shipments` table + `deliver-resources` cron
+   - Unblocks: `send-resources` Edge Function, marketplace `fulfill-order`
+4. Migration: `marketplace_orders` table
+   - Unblocks: all marketplace Edge Functions
+
+**Wave 2 — Backend (Edge Functions + SQL function modifications):**
+
+5. MODIFY `process_resource_tick()` — happiness + population + tax + island multiplier
+   - Depends on: Wave 1 cities columns
+   - Unblocks: `TavernScreen` rates are now server-computed
+6. MODIFY `resolve_battles()` — pillage block
+   - Depends on: `unit_movements.cargo` column
+7. MODIFY `process_arrivals()` — cargo delivery
+   - Depends on: `unit_movements.cargo` column
+8. `configure-tavern` + `set-tax-rate` Edge Functions — simple column setters
+9. `upgrade-island-resource` Edge Function
+   - Depends on: `process_resource_tick()` updated with island multiplier
+10. `send-resources` Edge Function
+    - Depends on: `resource_shipments` table
+11. `post-sell-order`, `post-buy-order`, `fulfill-order`, `cancel-order`
+    - `fulfill-order` depends on `send-resources` pattern (triggers shipment)
+
+**Wave 3 — Flutter (can start once corresponding backend is in Wave 2):**
+
+12. `resource_rates_provider.dart` + hourly rate UI in resource panel
+    - Depends on: `process_resource_tick()` updated (island multiplier must match)
+13. `TavernScreen` — wine rate + tax sliders
+    - Depends on: `configure-tavern` + `set-tax-rate`
+14. `IslandScreen` upgrade UI
+    - Depends on: `upgrade-island-resource`
+15. `TradeScreen` + `ResourceShipmentsProvider`
+    - Depends on: `send-resources`
+16. `MarketplaceScreen` + `MarketplaceOrdersProvider`
+    - Depends on: all marketplace Edge Functions
+17. `UnitCasualtyBar` + `BattleTurnCard` update
+    - Pure Flutter; no backend dependency (all data already in `battle_turns`)
+    - Can be built in parallel with any Wave 2/3 work
 
 ---
 
 ## Sources
 
-- [Supabase Architecture Docs](https://supabase.com/docs/guides/getting-started/architecture) — HIGH confidence
-- [Supabase Realtime Architecture](https://supabase.com/docs/guides/realtime/architecture) — HIGH confidence
-- [Supabase Edge Functions Architecture](https://supabase.com/docs/guides/functions/architecture) — HIGH confidence
-- [Flame Component System Docs](https://docs.flame-engine.org/latest/flame/components.html) — HIGH confidence
-- [flame_riverpod Bridge Package](https://docs.flame-engine.org/latest/bridge_packages/flame_riverpod/riverpod.html) — HIGH confidence
-- [Gabriel Gambetta: Client-Server Game Architecture](https://www.gabrielgambetta.com/client-server-game-architecture.html) — HIGH confidence
-- [Heroic Labs: Authoritative Multiplayer Architecture](https://heroiclabs.com/docs/nakama/concepts/multiplayer/authoritative/) — MEDIUM confidence
-- [Aleksandra Codes: Supabase Realtime Game](https://www.aleksandra.codes/supabase-game) — MEDIUM confidence
-- [Red Gate: MMO Game Database Design](https://www.red-gate.com/blog/mmo-games-and-database-design) — MEDIUM confidence
-- [Supabase Cron Docs](https://supabase.com/docs/guides/cron) — HIGH confidence
+- Existing codebase read directly:
+  `supabase/migrations/` (all 22 migration files),
+  `supabase/functions/upgrade-building/index.ts`,
+  `lib/features/city/`, `lib/features/battles/`, `lib/features/military/`,
+  `lib/features/map/` — HIGH confidence
+- Supabase Realtime: `REPLICA IDENTITY FULL` requirement for UPDATE events — HIGH confidence (official docs)
+- Supabase Edge Function transaction semantics (implicit rollback on exception) — HIGH confidence (existing `deduct_resource` pattern in codebase)
+- pg_cron `FOR UPDATE SKIP LOCKED` batching pattern — HIGH confidence (existing `resolve_battles()` in codebase)
+- Ikariam game mechanics (hideout protection, happiness system, pillage rates): ikariam.fandom.com/wiki — MEDIUM confidence (use as design intent; balance values subject to playtesting)
 
 ---
 
-*Architecture research for: Ikariam-style browser multiplayer strategy game*
-*Stack: Flutter + Flame + Supabase (PostgreSQL + Edge Functions + Realtime + pg_cron) + Riverpod*
-*Researched: 2026-03-11*
+*Architecture research for: Ikariam Clone v1.1 Economy & Combat Depth*
+*Researched: 2026-03-13*

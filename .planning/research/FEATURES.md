@@ -1,8 +1,12 @@
 # Feature Research
 
-**Domain:** Ikariam-style browser-based multiplayer strategy game (ancient Greek island setting)
-**Researched:** 2026-03-11
-**Confidence:** HIGH (cross-referenced: original Ikariam wiki, Grepolis, Travian, Tribal Wars, browser MMO design literature)
+**Domain:** Ikariam-style browser strategy game — v1.1 Economy & Combat Depth features
+**Researched:** 2026-03-13
+**Confidence:** HIGH (Ikariam Fandom wiki, community guides, original game mechanics cross-referenced)
+
+> **Scope note:** This document focuses on the 9 new features targeted for v1.1. The v0.1.0
+> feature landscape was documented in the prior research pass. All existing systems (auth,
+> buildings, combat, map) are treated as stable dependencies here.
 
 ---
 
@@ -10,208 +14,142 @@
 
 ### Table Stakes (Users Expect These)
 
-Features users assume exist. Missing these = product feels incomplete or broken.
+Features users assume exist in any Ikariam-like game. Missing these = product feels incomplete.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Account registration + login | Every game has accounts; players need persistent identity | LOW | Email/password sufficient for v1; Supabase Auth handles this |
-| Persistent player profile (name, display) | Players need to be identifiable to others on map and in messages | LOW | Avatar optional for v1 |
-| City building with upgradeable buildings | This IS the game's core loop; without it there's nothing to do | HIGH | 15+ building types; exponential cost formula (base x 1.5^level) |
-| Multiple resource types (Wood, Marble, Crystal, Sulfur, Gold) | Genre standard; single resource would feel trivial | MEDIUM | 5 types per PROJECT.md; production tied to workers + building level |
-| Automatic resource production over time | Players expect to log back in and have accumulated resources | MEDIUM | Server-side pg_cron ticks every 5 min; no client-side idle trust |
-| Warehouse / storage capacity limits | Creates meaningful tension and trade decisions | LOW | Caps enforce trading necessity; without caps economy trivializes |
-| Construction queue (build one thing at a time) | Players expect to queue construction and log off | LOW | Single queue per city; project already specifies this |
-| Research / technology tree | Core genre expectation; progression and power growth | HIGH | 4 branches: Seafaring, Economy, Science, Military; tree with prerequisites |
-| World map showing all players/islands | Players must be able to find each other, scout threats, plan expansions | HIGH | 2D grid for v1; island-based; must show city count per island |
-| PvP military combat | Core fantasy of the genre: build army, attack enemies | HIGH | Turn-based 5-min turns is the project's chosen model |
-| Land military units (at least 4-6 types) | Diverse units create strategic choice; all-same units feels broken | MEDIUM | 8 types defined in PROJECT.md (Hoplite, Phalanx, Archer, etc.) |
-| Naval units for sea warfare and transport | Island-based setting demands ships; missing = thematically broken | MEDIUM | 5 types defined in PROJECT.md |
-| Battle reports sent after combat | Players must know what happened and why they won/lost | LOW | Supabase Realtime push to both combatants |
-| Pillage (steal resources after winning) | Standard genre mechanic; winning combat must have tangible reward | LOW | Already in PROJECT.md requirements |
-| Alliance system (create/join guilds) | Social backbone; solo play only = players leave quickly | MEDIUM | Requires Embassy building; roles: Leader, General, Diplomat, Member |
-| Player-to-player messaging | Basic social expectation; needed for trade and diplomacy | LOW | Supabase Realtime channels |
-| Ranking / leaderboard | Players need to compare progress; without it the game lacks prestige goals | LOW | Score from buildings + research + military + gold |
-| Resource trading between players | Island resource scarcity forces trade; without it players self-isolate | MEDIUM | Cargo ships, travel time based on distance |
-| Beginner protection (new players can't be attacked immediately) | Without this, new players get wiped day 1 and quit | LOW | Lock attacks until Town Hall level 4; genre standard |
-| Colony / city expansion (found new cities) | Mid-game progression; without it top players stagnate | HIGH | Palace upgrade to support up to 11 colonies + capital; research Expansion first |
+| Happiness system (tavern + wine → mood) | Every Ikariam player knows this mechanic; without it the Tavern building serves no purpose | MEDIUM | Tavern gives +12 happiness/level; wine loads give +60/load; pg_cron distributes wine every 20 min; happiness formula = 196 + tavern + wine - population - corruption |
+| Population growth driven by happiness | Core Ikariam loop: happiness → population → workers → production; missing this breaks the city progression curve | MEDIUM | happiness score > population = growth; 1 point of "total satisfaction" above current pop = 1 citizen/period; natural cap forms as city grows |
+| Tax / gold income from population | Players expect gold to scale with city size; if gold only comes from idle citizens at a flat rate the economy feels static | LOW | In original: each idle citizen = +3 gold/hr; each worker = 0 gold (they work, not tax); a tax-rate slider (0–33%) is the standard UI control for this |
+| Configurable wine spending rate | Tavern slider to control happiness-vs-wine tradeoff is genre standard; without it players can't manage wine scarcity | LOW | Slider sets % of hourly wine supply fed to tavern; at 0% no wine is served (happiness drops); at 100% maximum happiness boost; stored as city setting |
+| Island resource buildings upgradeable | All Ikariam players expect to click on the sawmill and donate wood to upgrade it for the whole island; skipping this breaks the island cooperation loop | MEDIUM | Shared building level, stored per island (not per city); all cities on island benefit; donations proportional to upgrade cost (wood only for tier 1); upgrade gates more workers |
+| Resource production rate visible in UI | Players cannot plan without knowing their hourly rates; the resource bar without a rate label is a major UX gap | LOW | Show +X/hr next to each resource in top bar; tooltip or detail screen shows worker breakdown: base rate x island level x research bonus |
+| Pillage resources on battle victory | Winning a battle must have a tangible economic reward; without pillage, aggressive play has no incentive | MEDIUM | Cargo ships required to carry loot; warehouse protects a fixed floor (e.g. 100 + 480/warehouse level); stolen proportional to resource ratios in target warehouse; 15 goods/ship/minute loading rate |
+| Battle report shows unit losses per turn | After a 5-minute turn-based battle players need to see what died when; flat win/loss summary feels inadequate | MEDIUM | Turn-by-turn table: attacker losses vs defender losses per unit type; color-code unit types; naval phase then land phase per turn; already have raw data in battle_turns or equivalent |
 
 ### Differentiators (Competitive Advantage)
 
-Features that set the product apart. Not required by genre standards, but meaningfully valued.
+Features not strictly required by genre expectations but that meaningfully elevate this game above the original Ikariam's UX.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Real-time turn-based combat (5-min turns with reinforcement window) | Strategic depth over instant-resolve; players can react mid-battle | HIGH | The key differentiator vs Ikariam itself (which resolves faster); creates genuine tension and tactical decisions |
-| Island-cooperative shared resource buildings | Forces positive-sum cooperation between rivals on same island; unique social dynamic | MEDIUM | Sawmill / luxury resource upgrades benefit all island residents; leeching creates natural conflict |
-| Island community forum (Agora) | In-game communication for island diplomacy without needing external tools | LOW | Messages visible to all city owners on the same island |
-| Island shared miracle building | Bonus resource production (e.g. +10% for all) when island community contributes | LOW | Helios Tower equivalent; encourages cooperation with tangible reward |
-| Barbarian villages (PvE targets per player) | Safe tutorial for combat system without attacking real players; daily engagement hook | MEDIUM | 50 levels per player; resets slowly when ignored; first PvE activity for beginners |
-| Daily tasks / favor system | Consistent daily re-engagement without forcing PvP; gives passive players a reason to log in | LOW | Tasks tied to palace; rewards favor points usable for mild bonuses |
-| Spy / espionage system | Intelligence gathering before attacking; adds information asymmetry layer to combat | MEDIUM | Hideout building; spy missions: scout resources, garrison, research; counter-espionage via defending spies |
-| Occupation / city takeover mechanic | Ultimate PvP goal beyond pillage; raises strategic stakes of warfare significantly | HIGH | City takeover under specific conditions (project requirement); must be balanced to prevent griefing |
-| War declarations + NAP (non-aggression pact) between alliances | Structured diplomacy adds political meta-game layer above individual combat | MEDIUM | Formal state changes that players can track; gives alliances clear purpose beyond casual grouping |
-| Marketplace order book (buy/sell limit orders) | Real player-driven economy; more engaging than direct trades only | HIGH | Players post buy/sell orders; cargo ship travel mechanic adds geographic pricing reality |
-| Vacation mode | Quality-of-life for small community; players who can't log in don't get wiped | LOW | Must block resource production AND attacks; 48-hour minimum; prevent abuse during active battle |
-| Score breakdown by category | Lets players optimize a specific area (military vs economic vs research) | LOW | Already in PROJECT.md: buildings + research + military + gold sub-scores |
+| Marketplace order book (buy/sell offers posted globally) | Original Ikariam trading is radius-limited search; a global order book with async fill creates a real economy and more player interaction | HIGH | Players post: resource type, amount, price-per-unit in gold; buyer accepts offer → cargo ships depart; order remains open until accepted or cancelled; requires Trading Port building; no gold-for-gold trades (original Ikariam rule) |
+| Direct player-to-player resource transfer | Faster than marketplace for allied trades or targeted help; simpler UX for informal economy | LOW | Both players need Trading Port; sender selects city, target city, resource type, amount; cargo ships carry 500 units each; travel time = distance / ship speed; already have dispatch infrastructure |
+| Battle report visualization with color-coded unit chart | Showing a stacked bar or table of unit losses per turn (each unit type in its own color) is far above original Ikariam's text-based reports | MEDIUM | fl_chart (bar chart) per turn; attacker side blue, defender red; each unit type a color segment; click turn to expand detail; no external lib needed beyond fl_chart (already pub.dev standard) |
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
-Features that seem good but create serious problems for a small community or indie scope.
-
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| Premium / pay-to-win monetization | Sustainable revenue | Destroys fairness perception; kills small communities faster than anything else; Ikariam's Ambrosia system is widely hated | Keep game free, no monetization in v1; optional cosmetics only if needed later |
-| Real-time (instant-resolve) combat | Feels snappier, immediate feedback | Removes all strategic depth; rewards who's online 24/7 not who plans better; exhausting for small team to balance | Stick with 5-minute turn system; schedule-friendly combat |
-| Drag-and-drop building placement | More city customization freedom | Significant UI complexity for Flutter web; little strategic value for Ikariam-style game where layout doesn't affect gameplay | Fixed grid slots with visual variety; deferred per PROJECT.md |
-| Isometric / 3D map rendering | Looks more impressive | Massive scope increase; weeks of extra work with no gameplay impact; can add later | 2D grid for v1; already deferred per PROJECT.md |
-| OAuth (Google/Apple login) | Easier signup | Extra integration work; email/password sufficient for small community | Email/password via Supabase Auth; add OAuth after v1 if conversion is poor |
-| Multi-language (i18n) support | Broader audience | Doubles content maintenance burden; translation inconsistency is worse than no translation | English only for v1 per PROJECT.md |
-| Automated trade routes | Passive economy automation appeal | Removes player decision-making from resource acquisition; reduces need to interact with other players; kills marketplace activity | Manual trading with ship queues; automation deferred |
-| Server wipe / seasonal resets | Competitive seasons keep game fresh | Destroys player investment; small communities won't rebuild after wipe; designed for 10k+ player games | Single persistent world; world resets only if community explicitly votes for it |
-| Alliance cities (shared alliance territory) | Collective ownership appeal | Extremely complex to implement (shared ownership, permissions, funding); governance disputes ruin alliances | Alliance bonuses via coordinated individual cities; share the mechanic through war/NAP system |
-| Mobile native app (iOS/Android) | Wider reach | Flutter web already works on mobile browser; native app = app store approval, separate build pipeline, maintenance burden | Flutter web is mobile-responsive; add PWA manifest for "add to home screen" feel |
-| PvP ranking seasons with prizes | Competitive motivation | Hard to maintain fairly; prize management is a legal/administrative burden for indie dev | Simple all-time leaderboard; community recognition is sufficient |
-| Museum building (happiness from artifacts) | More building variety | Marginal happiness impact; complex artifact-collection mechanic; already deferred per PROJECT.md | Tavern + Agora for happiness; museum deferred post-v1 |
+| Automatic wine restocking / trade routes | Players don't want to manually send wine to cities | Removes resource scarcity tension; wine management IS the happiness gameplay loop | Manual wine transport via cargo ships; optional: configurable auto-send if player sets standing transfer |
+| Instant pillage (no cargo ship travel) | Simpler implementation | Breaks balance — attackers would farm resources instantly with no risk window; the cargo loading delay is intentional counterplay | Keep 15-goods/ship/minute loading rate; defenders can surrender or reinforce before loading completes |
+| Negative happiness → population loss | Seems realistic | Catastrophic death spiral if a new player runs out of wine; extremely punishing for beginners | Cap minimum growth at 0 (no shrink); happiness just controls growth rate, not population decay |
+| Gold-for-gold marketplace trades | Financial speculation appeal | Original Ikariam explicitly prohibits gold trades; enables gold laundering / real-money trade workarounds | Resources only in marketplace; gold is the pricing unit, not a tradeable commodity |
+| Per-city island resource ownership (only your city benefits from upgrade) | Simpler DB model | Removes island cooperation social dynamic — the key differentiator; players would never donate for others | Shared island-level building; all cities benefit equally regardless of who donated |
+| Real-time happiness ticker (WebSocket every second) | More responsive UI | Battery drain on mobile web; happiness changes slowly (once/20 min tick); overkill for the mechanic | Refresh on pg_cron tick (5 min) + manual pull-to-refresh; Realtime only for battle events |
+| Complex tax rate formula with diminishing returns and corruption | Depth appeal | Harder to communicate to players; original Ikariam's corruption mechanic is widely disliked for being opaque | Simple: idle citizens x gold_rate x tax_pct; corruption only at high city count (defer to v1.2+) |
 
 ---
 
 ## Feature Dependencies
 
 ```
-[Authentication / Account]
-    └──requires──> [Player Profile]
-                       └──requires──> [City Placement on World Map]
-                                          └──requires──> [World Map]
+[Happiness System]
+    └──requires──> [Tavern Building] (already built v0.1.0)
+    └──requires──> [Wine resource supply] (already built v0.1.0)
+    └──requires──> [pg_cron wine distribution tick] (new tick handler)
+    └──enables──>  [Population Growth Rate] (calculated from happiness surplus)
 
-[City Building]
-    └──requires──> [Resource Production]
-                       └──requires──> [Workers / Population System]
-                                          └──requires──> [Happiness System]
-                                                             └──requires──> [Tavern Building]
+[Population Growth Rate]
+    └──requires──> [Happiness System]
+    └──enables──>  [Tax Income] (more citizens = more gold)
+    └──enables──>  [More Workers] (larger pool to assign)
 
-[Research Tree]
-    └──requires──> [Academy Building]
-                       └──requires──> [City Building]
+[Tax Income]
+    └──requires──> [Population system] (citizen count)
+    └──requires──> [Tax rate setting] (configurable per city)
+    └──enhances──> [Gold resource] (additional income stream)
 
-[Military Training]
-    └──requires──> [Barracks Building]
-                       └──requires──> [City Building]
+[Tavern Happiness Config]
+    └──requires──> [Tavern Building] (already built v0.1.0)
+    └──requires──> [Happiness System]
+    └──enables──>  [Player control over wine burn rate]
 
-[Naval Units]
-    └──requires──> [Shipyard Building]
-                       └──requires──> [City Building]
+[Island Resource Upgrade]
+    └──requires──> [Island model with resource_building_level] (schema change)
+    └──requires──> [Wood donation mechanism] (Edge Function)
+    └──enables──>  [Higher worker capacity at island resource]
+    └──enables──>  [Higher production rate for all island cities]
 
-[PvP Combat]
-    └──requires──> [Military Units]
-    └──requires──> [Naval Units] (for island attacks)
-    └──requires──> [World Map] (to find targets)
+[Resource Rate UI]
+    └──requires──> [Production formula already implemented] (v0.1.0)
+    └──requires──> [Island building level exposed to client] (island resource upgrade)
+    └──no new backend needed──> [Pure frontend enhancement]
 
-[Resource Trading]
-    └──requires──> [Trading Post Building]
-    └──requires──> [Cargo Ships] (transport mechanic)
-    └──requires──> [World Map] (distance calculation)
+[Player-to-Player Trading]
+    └──requires──> [Trading Port Building] (already built v0.1.0)
+    └──requires──> [Cargo Ship unit] (already built v0.1.0 as naval unit? verify)
+    └──requires──> [Dispatch infrastructure] (already built v0.1.0 for military)
+    └──enhances──> [Island resource cooperation] (wine transport between islands)
 
-[Marketplace / Order Book]
-    └──requires──> [Resource Trading]
-    └──enhances──> [Resource Trading]
+[Marketplace Order Book]
+    └──requires──> [Player-to-Player Trading] (cargo ship transport mechanic)
+    └──requires──> [marketplace_orders table] (new schema)
+    └──requires──> [Trading Port Building] (already built)
+    └──enhances──> [Player-to-Player Trading]
 
-[Alliance System]
-    └──requires──> [Embassy Building]
-    └──requires──> [Player Messaging]
+[Pillage Mechanic]
+    └──requires──> [Battle system] (already built v0.1.0)
+    └──requires──> [Battle victory detection] (already built)
+    └──requires──> [Cargo ships present in attacking fleet] (new check)
+    └──requires──> [Warehouse protection formula] (new calculation)
+    └──modifies──> [Resource balances of both players] (via Edge Function)
 
-[War Declaration / NAP]
-    └──requires──> [Alliance System]
-
-[Colony Expansion]
-    └──requires──> [Palace Building]
-    └──requires──> [Research: Expansion (Seafaring branch)]
-    └──requires──> [Colony Ship unit]
-
-[Espionage / Spy System]
-    └──requires──> [Hideout Building]
-    └──requires──> [Research: Espionage]
-
-[Barbarian Villages (PvE)]
-    └──requires──> [Military Units]
-    └──enhances──> [Combat Tutorial / Onboarding]
-
-[Daily Tasks]
-    └──requires──> [Palace Building]
-    └──enhances──> [Barbarian Villages]
-
-[Vacation Mode]
-    └──requires──> [Authentication]
-    └──conflicts──> [Active Battle] (cannot activate mid-combat)
-
-[Island Shared Buildings (Sawmill, Luxury, Miracle)]
-    └──requires──> [World Map / Island System]
-    └──enhances──> [Resource Production for all island residents]
-
-[Occupation / City Takeover]
-    └──requires──> [PvP Combat]
-    └──requires──> [Specific Conditions Logic]
+[Battle Report Visualization]
+    └──requires──> [Battle turn data] (already stored server-side v0.1.0)
+    └──requires──> [fl_chart Flutter package] (frontend only)
+    └──enhances──> [Battle reports] (already sent via Realtime v0.1.0)
+    └──no new backend needed──> [Pure frontend enhancement]
 ```
 
 ### Dependency Notes
 
-- **Colony Expansion requires Palace + Research**: Players must invest significantly before expanding; this gates mid-game progression correctly.
-- **Alliance System requires Embassy Building**: Physical building gate means players can't join alliances on day 1; natural progression.
-- **Marketplace enhances Resource Trading**: Order book is additive; direct player-to-player trading can work without it; add marketplace in phase 2+ once trading is validated.
-- **Espionage conflicts with Beginner Protection**: New players (under Town Hall level 4) should not be spied on either; protection covers both attack and espionage.
-- **Vacation Mode conflicts with Active Battle**: Standard Ikariam rule; must enforce server-side.
-- **Island Shared Buildings enhance Resource Production**: All island residents benefit from upgrades regardless of who donated; creates natural cooperation incentive.
+- **Island Resource Upgrade requires schema change**: `islands` table needs `resource_building_level` (int) and `resource_building_donated_wood` (int) columns. All cities on island read from this shared row.
+- **Pillage depends on cargo ships in fleet**: Attacking fleet must include at least one Cargo Ship to loot; if none sent, battle can still happen but no resources are taken. This is original Ikariam's design — intentional choice.
+- **Battle Report Visualization is pure frontend**: All turn data already exists server-side from v0.1.0. This is a UI-only phase; no new Edge Functions needed.
+- **Resource Rate UI is pure frontend**: Production formula (workers x island_level x research_bonus) is already server-side. Frontend just needs to display the rate it can calculate from known values.
+- **Tax Income integrates into existing pg_cron tick**: The 5-minute resource tick already runs; gold from tax is added to the same calculation (idle_citizens x gold_rate x tax_pct_decimal).
+- **Happiness System needs new pg_cron handler**: Every 20 minutes (or every 5-min tick), wine is deducted from city storage and happiness is updated. Population growth applies once per tick based on surplus happiness.
+- **Marketplace Order Book is independent of direct trading**: Both can exist simultaneously. Marketplace is async (post offer, wait for match); direct trading is synchronous (both players agree out-of-game, then transfer).
 
 ---
 
 ## MVP Definition
 
-### Launch With (v1)
+### Launch With (v1.1 — this milestone)
 
-Minimum viable product — what's needed to validate the core loop: build, expand, conquer.
-
-- [ ] Authentication (email/password) — players need accounts before anything else
-- [ ] Player profile + auto city placement on first login — immediate sense of ownership
-- [ ] 5 resource types with server-side production (pg_cron) — core idle loop
-- [ ] Warehouse capacity limits — creates resource scarcity and trade pressure
-- [ ] 10 core building types (Town Hall, Barracks, Academy, Shipyard, Trading Post, Palace, Embassy, Warehouse, Tavern, Hideout) — minimum set for all major systems
-- [ ] Building upgrade queue (single slot) — fundamental city management
-- [ ] Research tree (4 branches, 20+ techs) with prerequisites — progression system
-- [ ] World map with island grid (2D) — spatial context, find targets
-- [ ] Island view + city view — navigate game world
-- [ ] 6 land unit types + 3 naval unit types — sufficient unit diversity for strategic combat
-- [ ] Turn-based combat (5-min turns) with battle reports — the differentiating combat system
-- [ ] Pillage mechanic — reward for winning combat
-- [ ] Player-to-player messaging — minimum social layer
-- [ ] Alliance system (create/join, basic roles) — social retention anchor
-- [ ] Resource trading via cargo ships — inter-player economy
-- [ ] Ranking leaderboard (total score) — prestige goal
-- [ ] Beginner protection (no attack until Town Hall level 4) — protect new players
-- [ ] Basic tutorial / help text — onboarding for new players
+- [x] Happiness system: pg_cron distributes wine to tavern, calculates happiness score, updates population growth rate — closes the tavern building's purpose
+- [x] Tavern happiness configuration: wine spending rate slider (0–100%), stored per city
+- [x] Population-based tax income: idle_citizens x 3 gold/hr included in 5-min resource tick
+- [x] Island resource building upgrade: donation screen, shared level per island, all cities benefit
+- [x] Resource rate UI: +X/hr suffix in top resource bar; detail breakdown in building screen
+- [x] Player-to-player resource transfer: send resources via cargo ships (direct, no order book)
+- [x] Marketplace order book: post buy/sell offers, accept offers, cargo ships fulfill
+- [x] Pillage mechanic: cargo ships load resources after battle win; warehouse protection floor
+- [x] Battle report visualization: turn-by-turn unit loss table with color-coded unit types
 
 ### Add After Validation (v1.x)
 
-Features to add once core loop is confirmed working and players are engaged.
-
-- [ ] Barbarian villages (PvE) — once PvP combat is stable; add safe combat practice
-- [ ] Daily tasks / favor system — once players need additional daily engagement hooks
-- [ ] Marketplace order book — once enough players are trading to generate liquidity
-- [ ] Spy / espionage system — once PvP is active; adds intelligence layer
-- [ ] Occupation / city takeover — once combat system is battle-tested; high-risk feature requiring careful balance
-- [ ] Vacation mode — once players are invested enough to fear losing cities
-- [ ] Island shared buildings (collaborative upgrades) — once enough players share islands
-- [ ] War declaration + NAP between alliances — once alliances are active enough for political meta-game
-- [ ] Extended ranking breakdowns (military, alliance, island sub-rankings) — once leaderboard is being watched
+- [ ] Corruption mechanic (gold penalty at high city count) — only relevant once players have 3+ cities; defer to v1.2
+- [ ] Marketplace trade treaties (priority access for allied cities) — requires alliance system maturity
+- [ ] Auto wine-send standing orders — quality-of-life once wine management is validated as engaging
+- [ ] Population decay from extreme unhappiness — only if players request more punishing mechanics post-launch
 
 ### Future Consideration (v2+)
 
-Features to defer until product-market fit is established.
-
-- [ ] Isometric map rendering — massive effort, purely visual; defer until core is validated
-- [ ] Drag-and-drop building placement — UX complexity without strategic value change
-- [ ] Automated trade routes — reduces player agency; only add if player demand is clear
-- [ ] Museum building + artifact system — complexity without proportional value for small community
-- [ ] Premium cosmetics (if monetization needed) — cosmetics-only to avoid pay-to-win
-- [ ] PWA / "add to homescreen" for mobile — quick win for mobile engagement after v1
+- [ ] Museum building for happiness (culture goods) — high complexity, low immediate value
+- [ ] Barbarian village wine supply (PvE wine source) — requires barbarian villages first
+- [ ] Dynamic pricing in marketplace (supply/demand curves) — requires enough player volume
 
 ---
 
@@ -219,75 +157,116 @@ Features to defer until product-market fit is established.
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Authentication + profiles | HIGH | LOW | P1 |
-| Resource production (pg_cron) | HIGH | MEDIUM | P1 |
-| City building + upgrades | HIGH | HIGH | P1 |
-| Research tree | HIGH | HIGH | P1 |
-| World map (2D grid) | HIGH | HIGH | P1 |
-| Military units + turn-based combat | HIGH | HIGH | P1 |
-| Battle reports | HIGH | LOW | P1 |
-| Alliance system | HIGH | MEDIUM | P1 |
-| Player messaging | HIGH | LOW | P1 |
-| Ranking / leaderboard | MEDIUM | LOW | P1 |
-| Resource trading (cargo ships) | HIGH | MEDIUM | P1 |
-| Beginner protection | HIGH | LOW | P1 |
-| Colony expansion | HIGH | MEDIUM | P1 |
-| Marketplace order book | MEDIUM | HIGH | P2 |
-| Espionage / spy system | MEDIUM | MEDIUM | P2 |
-| Occupation / city takeover | HIGH | HIGH | P2 |
-| Vacation mode | MEDIUM | LOW | P2 |
-| Barbarian villages (PvE) | MEDIUM | MEDIUM | P2 |
-| Daily tasks | MEDIUM | LOW | P2 |
-| Island shared buildings | MEDIUM | MEDIUM | P2 |
-| War declaration / NAP | MEDIUM | MEDIUM | P2 |
-| Isometric rendering | LOW | HIGH | P3 |
-| Drag-and-drop building placement | LOW | HIGH | P3 |
-| Automated trade routes | LOW | MEDIUM | P3 |
-| Museum + artifacts | LOW | HIGH | P3 |
-| Mobile native app | LOW | HIGH | P3 |
+| Resource rate UI (+X/hr display) | HIGH | LOW | P1 — pure frontend, high immediate value |
+| Tavern happiness config slider | HIGH | LOW | P1 — closes existing building's missing function |
+| Happiness system + population growth | HIGH | MEDIUM | P1 — unlocks the city progression curve |
+| Tax income from population | HIGH | LOW | P1 — piggybacks on existing resource tick |
+| Pillage mechanic | HIGH | MEDIUM | P1 — makes combat victories meaningful |
+| Battle report visualization | HIGH | MEDIUM | P1 — improves existing battle report UX significantly |
+| Island resource upgrade | MEDIUM | MEDIUM | P1 — enables island cooperation; needed for production scaling |
+| Player-to-player resource transfer | MEDIUM | LOW | P1 — prerequisite for marketplace; needed for wine trading |
+| Marketplace order book | MEDIUM | HIGH | P1 — drives player interaction and island economy |
 
 **Priority key:**
-- P1: Must have for launch
-- P2: Should have, add when possible (v1.x)
-- P3: Nice to have, future consideration (v2+)
+- P1: Must have for v1.1 launch (all features in this milestone are P1)
+- P2: Should have, add in v1.2 after validation
+- P3: Nice to have, v2+
 
 ---
 
 ## Competitor Feature Analysis
 
-| Feature | Ikariam (original) | Grepolis | Travian/Tribal Wars | Our Approach |
-|---------|-------------------|----------|---------------------|--------------|
-| Combat resolution | Near-instant per tick | Fast resolve | Instant on arrival | 5-minute turns with reinforcement window — unique differentiator |
-| Resource types | 5 (Wood + 4 luxury) | 3 (Wood, Stone, Silver) | 4 (Lumber, Clay, Iron, Crop) | 5 types matching Ikariam (Wood, Marble, Crystal, Sulfur, Gold) |
-| Colony expansion | Up to 12 cities (Palace L11) | Up to 2 cities per player | Village limit by population | Palace-based colony limit; matches Ikariam design |
-| Mythological elements | Minimal (Miracle buildings) | Strong (Gods, heroes, divine powers) | None | Minimal — Greek aesthetic without divine power mechanics (reduces scope) |
-| PvE content | Barbarian villages (50 levels) | Farming villages | None significant | Barbarian villages post-v1; PvE as onboarding tool |
-| Island cooperation | Shared resource buildings; donation-based | No island cooperation | No equivalent | Shared island buildings are a core differentiator; implement in v1.x |
-| Marketplace | Trading post order book | Trading post | Marketplace | Order book model; P2 priority |
-| Premium/monetization | Ambrosia (P2W-adjacent) | Advisor system | Premium accounts | No P2W in v1; cosmetics-only if monetization needed |
-| Turn-based combat | No (continuous) | No (instant) | No (instant arrival) | Yes — our main differentiator from all competitors |
+| Feature | Ikariam (original) | Our v1.1 Approach |
+|---------|-------------------|-------------------|
+| Happiness formula | 196 base + tavern(+12/lvl) + wine(+60/load) + museum - population - corruption | Same formula without museum (museum deferred); corruption deferred to v1.2 |
+| Wine distribution | Every 20 min in thirds (HH:00, HH:20, HH:40) | pg_cron every 5 min (simplify); deduct wine, add happiness |
+| Population growth | Happiness surplus = growth/hr; cap at Town Hall housing limit | Same; cap enforced server-side in pg_cron tick |
+| Tax / gold | 3 gold/hr per idle citizen; scientists cost 6/hr | 3 gold/hr per idle citizen; no scientists yet (research deferred) |
+| Island upgrade | All cities donate wood; all benefit equally | Same; level stored on island row; donation Edge Function |
+| Pillage | Cargo ships required; 15 goods/ship/min; warehouse protects floor | Same mechanics; floor = 100 (Town Hall) + 480 per warehouse level |
+| Trading post | Radius-limited offer search; "I offer / I am looking for" UI | Order book global (no radius limit in v1.1 for simplicity); direct transfer also available |
+| Battle reports | Text-based round summaries; morale % per round | Same data + color-coded unit loss chart (fl_chart); naval phase then land phase per turn |
+
+---
+
+## Implementation Complexity Notes
+
+### Happiness System (MEDIUM)
+
+The happiness formula is straightforward but requires a new pg_cron job or extended existing tick:
+
+1. Every tick: calculate `happiness_score = 196 + (tavern_level * 12) + (wine_loads_served * 60) - current_population`
+2. Deduct wine from city warehouse (based on slider setting)
+3. If `happiness_score > current_population`: grow population by `(happiness_score - current_population) * growth_factor`
+4. Store `happiness_score` and `population` on city row
+5. Frontend reads and displays happiness bar
+
+Key risk: wine depletion when warehouse runs dry → happiness crash → population stops growing. Handle gracefully: if wine = 0, happiness drops to base (196 + tavern only), growth slows but does not reverse.
+
+### Island Resource Upgrade (MEDIUM)
+
+Schema: add `resource_level INT DEFAULT 1` and `wood_donated INT DEFAULT 0` to `islands` table.
+
+Edge Function `donate-to-island-resource`:
+1. Validate player has a city on the island
+2. Deduct wood from player city warehouse
+3. Add to `wood_donated` on island row
+4. If `wood_donated >= upgrade_cost(resource_level)`: increment `resource_level`, reset `wood_donated = 0`
+5. All production ticks now use `island.resource_level` in formula
+
+Production formula becomes: `workers * island_resource_level * research_bonus`.
+
+### Pillage Mechanic (MEDIUM)
+
+After battle victory detection in existing Edge Function:
+1. Count cargo ships in attacking fleet
+2. Calculate `max_loot = cargo_ship_count * 500` (capacity)
+3. Calculate `unprotected = max(0, target_resource - warehouse_protection(target_warehouse_level))`
+4. Distribute loot proportionally across resource types (ratio matches target's resource ratios)
+5. Deduct from target, add to attacker — both within same DB transaction
+6. Cargo loading is instantaneous at battle end (simplify from original's 15-goods/min — too complex for turn-based model)
+
+Note: Original Ikariam's loading timer made sense for continuous battles. In our 5-minute turn model, simplifying to instant transfer at battle end is more appropriate and avoids a separate cargo-loading state machine.
+
+### Marketplace Order Book (HIGH)
+
+New table: `marketplace_orders(id, seller_city_id, resource_type, amount, price_per_unit, status, created_at)`
+
+Flow:
+1. Player posts offer → insert row, deduct resources from city (held in escrow)
+2. Buyer accepts offer → Edge Function: transfer resources via cargo ship dispatch, transfer gold, mark order filled
+3. Partial fills: split order into filled + remaining
+4. Cancel: return escrowed resources to seller
+
+Key constraint: no client writes to marketplace table directly — all via Edge Functions (existing security model).
+
+### Battle Report Visualization (MEDIUM)
+
+Frontend-only. Data already exists in battle report. Add:
+- `fl_chart` BarChart widget showing attacker vs defender losses per turn
+- Each unit type gets a fixed color (Hoplite=blue, Archer=green, etc.)
+- Naval turns shown separately from land turns
+- Click any turn bar to expand unit-by-unit breakdown in a detail card
 
 ---
 
 ## Sources
 
-- [Ikariam Wikipedia](https://en.wikipedia.org/wiki/Ikariam) — Feature overview, game mechanics
-- [Ikariam Grokipedia](https://grokipedia.com/page/Ikariam) — Detailed system breakdown
-- [Ikariam Fandom Wiki: Espionage](https://ikariam.fandom.com/wiki/Espionage) — Spy mechanics
-- [Ikariam Fandom Wiki: Happiness](https://ikariam.fandom.com/wiki/Happiness) — Citizen happiness system
-- [Ikariam Fandom Wiki: Colonization](https://ikariam.fandom.com/wiki/Colonization) — Colony expansion mechanics
-- [Ikariam Fandom Wiki: Daily Tasks](https://ikariam.fandom.com/wiki/Daily_Tasks) — Daily engagement system
-- [Ikariam Fandom Wiki: Barbarian Village](https://ikariam.fandom.com/wiki/Barbarian_Village) — PvE system
-- [Ikariam Fandom Wiki: Trading](https://ikariam.fandom.com/wiki/Trading) — Marketplace mechanics
-- [Game Influence: Ikariam (push.cx)](https://push.cx/game-influence-ikariam) — Design analysis; island cooperation as key mechanic
-- [Grepolis vs Ikariam comparison](https://www.findgameslike.com/vs/grepolis-vs-ikariam) — Competitor comparison
-- [Grepolis Ghost Towns (Innogames support)](https://support.innogames.com/kb/Grepolis/en_DK/370/What-are-Ghost-Towns-and-how-long-does-it-take-until-inactive-players-become-Ghosts) — Inactive player handling
-- [Ikariam Vacation Mode (Fandom)](https://ikariam.fandom.com/wiki/Vacation) — Vacation mechanics
-- [Pay to Win in Browser Strategy Games (mmos.com)](https://mmos.com/editorials/pay-to-win-strategy-games) — Anti-pattern analysis
-- [Scope Creep in Indie Games (Wayline)](https://www.wayline.io/blog/scope-creep-indie-games-avoiding-development-hell) — Anti-feature rationale
-- [Player Retention in Gaming (gamedesignskills.com)](https://gamedesignskills.com/game-design/player-retention/) — Retention mechanics
+- [Ikariam Fandom: Happiness](https://ikariam.fandom.com/wiki/Happiness) — Happiness formula, tavern mechanics
+- [Ikariam Fandom: Citizen](https://ikariam.fandom.com/wiki/Citizen) — Population and gold per citizen
+- [Ikariam Fandom: Gold](https://ikariam.fandom.com/wiki/Gold) — Gold income mechanics
+- [Ikariam Fandom: Pillaging](https://ikariam.fandom.com/wiki/Pillaging) — Cargo loading, warehouse protection
+- [Ikariam Fandom: Trading](https://ikariam.fandom.com/wiki/Trading) — Trading post offer mechanics
+- [Ikariam Fandom: Trading Resources](https://ikariam.fandom.com/wiki/Trading_Resources) — Resource transfer mechanics
+- [Ikariam Fandom: Cargo Ship](https://ikariam.fandom.com/wiki/Unit-ship:Cargo_Ship) — Capacity (500 units/ship)
+- [Ikariam Fandom: Saw mill](https://ikariam.fandom.com/wiki/Saw_mill) — Island resource upgrade cooperation
+- [Ikariam Forum: About warehouse protection](https://forum.ikariam.gameforge.com/forum/thread/100026-about-warehouse-protection/) — Protection floor formula
+- [Ikariam Forum: Markets and trading system](https://forum.ikariam.gameforge.com/forum/thread/69404-markets-and-trading-system/) — Order book discussion
+- [fl_chart Flutter package (pub.dev)](https://pub.dev/packages/fl_chart) — Battle visualization library
+- [Ikariam Finances and Gold Guide (GuideScroll)](https://guidescroll.com/2011/09/ikariam-finances-and-gold-guide/) — Tax/gold formula details
+- [Ikariam Forum: Happiness calculation bug (2023)](https://forum.ikariam.gameforge.com/forum/thread/96997-fixed-happiness-calculation-in-tavern-slider-does-not-account-for-corruption/) — Slider behavior confirmation
 
 ---
 
-*Feature research for: Ikariam-style browser strategy game (Flutter + Supabase)*
-*Researched: 2026-03-11*
+*Feature research for: Ikariam clone v1.1 — Economy & Combat Depth (Flutter + Supabase)*
+*Researched: 2026-03-13*
