@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Economy & Combat Depth
 status: ready_to_plan
-stopped_at: Completed 10-02-PLAN.md
-last_updated: "2026-03-13T19:49:00.845Z"
+stopped_at: Completed 10-economy-foundation/10-01-PLAN.md
+last_updated: "2026-03-13T19:49:54.644Z"
 last_activity: 2026-03-13 — Roadmap created for v1.1 milestone, all 13 requirements mapped
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 ---
@@ -66,6 +66,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 10-economy-foundation P02 | 12 | 2 tasks | 3 files |
+| Phase 10-economy-foundation P01 | 3 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,9 @@ Recent decisions affecting current work:
 - [Roadmap]: Happiness + wine consumption integrated into process_resource_tick() in fixed order — never a separate cron job (race condition on wine row)
 - [Roadmap]: Phase 12 pillage uses SELECT FOR UPDATE on defender resource rows inside resolve_battles() — prevents race with concurrent resource tick
 - [Phase 10-economy-foundation]: setWineRate in CityRepository (not new class) — wine_spending_rate is city-level setting
+- [Phase 10-economy-foundation]: Gold produced ONLY via idle citizen tax — Town Hall worker gold path removed to prevent double income
+- [Phase 10-economy-foundation]: Population stored as NUMERIC for fractional tick growth; negative happiness halts growth and applies 50% production penalty (no population loss)
+- [Phase 10-economy-foundation]: cities table added to supabase_realtime publication with REPLICA IDENTITY FULL for live population/happiness broadcasts
 
 ### Pending Todos
 
@@ -94,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T19:49:00.843Z
-Stopped at: Completed 10-02-PLAN.md
+Last session: 2026-03-13T19:49:54.643Z
+Stopped at: Completed 10-economy-foundation/10-01-PLAN.md
 Resume file: None
