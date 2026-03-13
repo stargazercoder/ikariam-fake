@@ -66,8 +66,8 @@ completed: 2026-03-13
 - **Duration:** 18 min
 - **Started:** 2026-03-13T20:00:00Z
 - **Completed:** 2026-03-13T20:18:00Z
-- **Tasks:** 3 of 4 (Task 4 is checkpoint:human-verify — awaiting player verification)
-- **Files modified:** 5
+- **Tasks:** 4 of 4 (all complete including checkpoint:human-verify approval)
+- **Files modified:** 5 (+ 1 post-checkpoint bug fix)
 
 ## Accomplishments
 
@@ -132,11 +132,20 @@ None beyond the wine enum exhaustive-switch fixes above.
 
 None — no external service configuration required.
 
+## Post-Checkpoint Bug Fix
+
+**[Rule 1 - Bug] Fixed typed access for CityBuilding.assignedWorkers (committed: dc2bde5)**
+- **Found during:** Post-checkpoint review of city_screen.dart
+- **Issue:** `_PopulationSummary` used map accessor `b['assigned_workers']` on typed `CityBuilding` objects, causing runtime type errors
+- **Fix:** Changed to `(b as CityBuilding).assignedWorkers` and added missing `city_building.dart` import
+- **Files modified:** `lib/features/city/screens/city_screen.dart`
+- **Commit:** `dc2bde5`
+
 ## Next Phase Readiness
 
-- Economy UI layer complete; Task 4 is a human-verify checkpoint for end-to-end validation
-- Player-visible loop requires a running Supabase instance with Phase 10-01 migrations applied and Phase 10-02 Edge Functions deployed
-- After Task 4 approval, Phase 10 economy foundation is fully complete and Phase 11 (military) can proceed
+- Economy UI layer complete; Task 4 checkpoint approved by player
+- Player-visible economy loop verified: wine resource, happiness indicator, population summary, and tavern wine spending slider all functional
+- Phase 10 economy foundation is fully complete; Phase 11 (military) can proceed
 
 ---
 *Phase: 10-economy-foundation*
