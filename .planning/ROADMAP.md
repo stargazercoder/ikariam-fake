@@ -29,7 +29,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 **Milestone Goal:** Deepen the economic loop with happiness/population/tax mechanics and make combat victories meaningful with pillage rewards and improved battle reports.
 
 - [x] **Phase 10: Economy Foundation** — Happiness, population growth, and tax income driven by tavern wine consumption (completed 2026-03-13)
-- [ ] **Phase 11: Island Upgrades + Resource Rate UI** — Shared island resource building levels and hourly production rate display
+- [x] **Phase 11: Island Upgrades + Resource Rate UI** — Shared island resource building levels and hourly production rate display (completed 2026-03-13)
 - [ ] **Phase 12: Combat Depth** — Pillage resources on battle victory and turn-by-turn battle report visualization
 
 ## Phase Details
@@ -59,7 +59,7 @@ Plans:
   2. After an island upgrade, all cities on that island produce more resources each tick, proportional to the new level multiplier
   3. The main resource bar shows a "+X/hr" label for each resource reflecting the current production rate
   4. Tapping a resource or opening the building screen shows a breakdown of the rate: base rate, building level bonus, island level bonus, and research bonus
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 11-01-PLAN.md — DB migration (island resource_level column + process_resource_tick() island multiplier) + donate-island-wood Edge Function
 - [ ] 11-02-PLAN.md — Flutter UI: Island model extension, production rate provider, +X/hr labels, breakdown sheet, donate wood dialog
@@ -89,5 +89,5 @@ Plans:
 | 8. Bug Fixes & Timer Guards | v0.1.0 | 2/2 | Complete | 2026-03-12 |
 | 9. Phase 2 Verification | v0.1.0 | 1/1 | Complete | 2026-03-12 |
 | 10. Economy Foundation | v1.1 | 3/3 | Complete | 2026-03-13 |
-| 11. Island Upgrades + Resource Rate UI | 1/2 | In Progress|  | - |
+| 11. Island Upgrades + Resource Rate UI | 2/2 | Complete   | 2026-03-13 | - |
 | 12. Combat Depth | v1.1 | 0/? | Not started | - |
