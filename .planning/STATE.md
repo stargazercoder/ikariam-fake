@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
-milestone: null
-milestone_name: null
-status: between_milestones
-stopped_at: "v1.1 milestone completed and archived"
+milestone: v1.2
+milestone_name: Espionage, Trading & Polish
+status: defining_requirements
+stopped_at: "Milestone v1.2 started — defining requirements"
 last_updated: "2026-03-16T00:00:00.000Z"
-last_activity: 2026-03-16 — v1.1 milestone completed, archived, and tagged
+last_activity: 2026-03-16 — Milestone v1.2 started
 progress:
   total_phases: 0
   completed_phases: 0
@@ -21,12 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-16)
 
 **Core value:** Players can build and manage cities, gather resources, and engage in real-time turn-based warfare — the core loop of build, expand, and conquer must feel satisfying and strategically meaningful.
-**Current focus:** Planning next milestone
+**Current focus:** v1.2 Espionage, Trading & Polish — defining requirements
 
 ## Current Position
 
-Between milestones — v1.1 shipped, v1.2 not yet started.
-Last milestone: v1.1 Economy & Combat Depth (3 phases, 8 plans)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-16 — Milestone v1.2 started
 
 ## Performance Metrics
 

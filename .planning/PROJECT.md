@@ -118,5 +118,17 @@ Players can build and manage cities, gather resources, and engage in real-time t
 | Pillage ratio: LEAST(0.75, total_land_units / 50.0 * 0.10) | Scales with surviving attackers, caps at 75% | ✓ Good — v1.1, needs balance tuning |
 | SELECT FOR UPDATE on defender resources during pillage | Prevents race condition with concurrent resource tick | ✓ Good — v1.1 |
 
+## Current Milestone: v1.2 Espionage, Trading & Polish
+
+**Goal:** Add espionage (spy on enemy cities), player-to-player resource trading via cargo ships, movement visibility (armies/cargo in transit), and UI polish (city view cleanup, color-coded cities/units, dev toolbar improvements).
+
+**Target features:**
+- Espionage system: spy on enemy cities to see resources, buildings, army counts
+- View other players' city screens (read-only)
+- Resource trading: send resources to other players via cargo ships
+- Movement visibility: see outgoing/returning armies and cargo in transit with carried resources
+- UI polish: remove city view title bar, color-code cities and units
+- Dev toolbar: bulk unit spawn, 5x faster training and travel times
+
 ---
-*Last updated: 2026-03-16 after v1.1 milestone completion*
+*Last updated: 2026-03-16 after v1.2 milestone start*
