@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Economy & Combat Depth
 status: ready_to_plan
-stopped_at: Checkpoint 11-02 Task 4 — awaiting human verification of island upgrade + resource rate UI
-last_updated: "2026-03-13T21:48:22.863Z"
+stopped_at: Phase 12 context gathered
+last_updated: "2026-03-15T18:30:47.247Z"
 last_activity: 2026-03-13 — Roadmap created for v1.1 milestone, all 13 requirements mapped
 progress:
   total_phases: 3
@@ -122,6 +122,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T21:48:22.844Z
-Stopped at: Checkpoint 11-02 Task 4 — awaiting human verification of island upgrade + resource rate UI
-Resume file: None
+Last session: 2026-03-15T18:30:47.243Z
+Stopped at: Phase 12 context gathered
+Resume file: .planning/phases/12-combat-depth/12-CONTEXT.md
