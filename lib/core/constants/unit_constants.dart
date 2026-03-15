@@ -5,6 +5,8 @@
 
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+
 /// Enum representing all 13 unit types in the game.
 /// 8 land units (trained from Barracks) + 5 naval units (trained from Shipyard).
 enum UnitType {
@@ -210,6 +212,49 @@ const Map<UnitType, int> unitDefenseStats = {
   UnitType.mortarShip: 15,
   UnitType.divingBoat: 25,
 };
+
+/// Fixed color for each unit type, used in battle report charts and legends.
+/// Colors are chosen for visual distinction on both light and dark themes.
+/// Land units use warm-to-cool spectrum; naval units use cooler/metallic palette.
+const Map<UnitType, Color> unitTypeColors = {
+  // Land units
+  UnitType.hoplite:      Color(0xFF4CAF50), // green
+  UnitType.phalanx:      Color(0xFF8BC34A), // light green
+  UnitType.archer:       Color(0xFF2196F3), // blue
+  UnitType.cavalry:      Color(0xFF9C27B0), // purple
+  UnitType.catapult:     Color(0xFFFF9800), // orange
+  UnitType.mortar:       Color(0xFFF44336), // red
+  UnitType.medic:        Color(0xFF00BCD4), // cyan
+  UnitType.cook:         Color(0xFFFFEB3B), // yellow
+  // Naval units
+  UnitType.cargoShip:    Color(0xFF607D8B), // blue-grey
+  UnitType.ramShip:      Color(0xFF795548), // brown
+  UnitType.catapultShip: Color(0xFFE91E63), // pink
+  UnitType.mortarShip:   Color(0xFF673AB7), // deep purple
+  UnitType.divingBoat:   Color(0xFF009688), // teal
+};
+
+/// Canonical order for land unit types in chart stack building.
+/// Always iterate in this order to ensure consistent fromY/toY in stacked bars.
+const List<UnitType> orderedLandTypes = [
+  UnitType.hoplite,
+  UnitType.phalanx,
+  UnitType.archer,
+  UnitType.cavalry,
+  UnitType.catapult,
+  UnitType.mortar,
+  UnitType.medic,
+  UnitType.cook,
+];
+
+/// Canonical order for naval unit types in chart stack building.
+const List<UnitType> orderedNavalTypes = [
+  UnitType.cargoShip,
+  UnitType.ramShip,
+  UnitType.catapultShip,
+  UnitType.mortarShip,
+  UnitType.divingBoat,
+];
 
 /// Calculates travel time in minutes between two island grid positions.
 /// Formula: max(1, ceil(sqrt(dx^2 + dy^2) * baseMinutesPerUnit))
