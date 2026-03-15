@@ -22,8 +22,8 @@
 
 ### Combat
 
-- [ ] **CMBT-01**: Winning attacker pillages resources from defender city (% of unprotected resources)
-- [ ] **CMBT-02**: Warehouse + Hideout levels protect a floor of resources from pillage
+- [x] **CMBT-01**: Winning attacker pillages resources from defender city (% of unprotected resources)
+- [x] **CMBT-02**: Warehouse + Hideout levels protect a floor of resources from pillage
 - [ ] **CMBT-03**: User can view turn-by-turn unit loss chart in battle reports (stacked bar chart)
 - [x] **CMBT-04**: Each unit type has a distinct color code in battle report visualization
 
@@ -75,8 +75,8 @@
 | RSRC-02 | Phase 11 | Complete |
 | RSRC-03 | Phase 11 | Complete |
 | RSRC-04 | Phase 11 | Complete |
-| CMBT-01 | Phase 12 | Pending |
-| CMBT-02 | Phase 12 | Pending |
+| CMBT-01 | Phase 12 | Complete |
+| CMBT-02 | Phase 12 | Complete |
 | CMBT-03 | Phase 12 | Pending |
 | CMBT-04 | Phase 12 | Complete |
 

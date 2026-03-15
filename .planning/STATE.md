@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Economy & Combat Depth
 status: ready_to_plan
-stopped_at: Completed 12-combat-depth/12-02-PLAN.md
-last_updated: "2026-03-15T19:02:21.298Z"
+stopped_at: Completed 12-combat-depth/12-01-PLAN.md
+last_updated: "2026-03-15T19:03:39.046Z"
 last_activity: 2026-03-13 — Roadmap created for v1.1 milestone, all 13 requirements mapped
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 8
-  completed_plans: 6
+  completed_plans: 7
   percent: 100
 ---
 
@@ -87,6 +87,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 10-economy-foundation P03 | 18 | 4 tasks | 6 files |
 | Phase 11-island-upgrades-resource-rate-ui P01 | 5 | 2 tasks | 2 files |
 | Phase 12-combat-depth P02 | 12 | 2 tasks | 4 files |
+| Phase 12-combat-depth P01 | 4 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,9 @@ Recent decisions affecting current work:
 - [Phase 12-combat-depth]: Color.toARGB32() used instead of deprecated Color.value for Flutter color comparisons in tests
 - [Phase 12-combat-depth]: orderedLandTypes/orderedNavalTypes as const List constants for stable stacked chart iteration order
 - [Phase 12-combat-depth]: (v as num).toInt() for JSONB parsing — Supabase JSON decoder returns num not int
+- [Phase 12-combat-depth]: hideoutProtectionFloor(null) returns 50 — base protection for cities without Hideout row (per user decision)
+- [Phase 12-combat-depth]: Pillage ratio formula: LEAST(0.75, total_land_units / 50.0 * 0.10) — scales with surviving attackers, caps at 75%
+- [Phase 12-combat-depth]: SELECT FOR UPDATE on defender city_resources during pillage prevents race with resource tick
 
 ### Pending Todos
 
@@ -126,6 +130,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T19:02:13.298Z
-Stopped at: Completed 12-combat-depth/12-02-PLAN.md
+Last session: 2026-03-15T19:03:39.044Z
+Stopped at: Completed 12-combat-depth/12-01-PLAN.md
 Resume file: None
