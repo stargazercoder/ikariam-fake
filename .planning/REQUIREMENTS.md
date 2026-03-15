@@ -1,0 +1,89 @@
+# Requirements: Ikariam Clone v1.2
+
+**Defined:** 2026-03-16
+**Core Value:** Players can build and manage cities, gather resources, and engage in real-time turn-based warfare — the core loop of build, expand, and conquer must feel satisfying and strategically meaningful.
+
+## v1.2 Requirements
+
+### Espionage
+
+- [ ] **ESPY-01**: User can send a spy to an enemy city to reveal resource amounts, building levels, and army counts
+- [ ] **ESPY-02**: User can view a read-only version of another player's city screen (buildings layout)
+
+### Trading
+
+- [ ] **TRAD-01**: User can send resources to another player's city via cargo ships (with travel time)
+
+### Movement Visibility
+
+- [ ] **MOVE-01**: User can see a list of outgoing army movements (attack, return) with destination, ETA, and unit composition
+- [ ] **MOVE-02**: User can see returning cargo ships with carried resource amounts (pillage loot and trade cargo)
+
+### UI Polish
+
+- [ ] **UIPL-01**: City view screen removes the AppBar title for cleaner layout
+- [ ] **UIPL-02**: Cities on island/world map use distinct colors to differentiate own vs enemy vs ally
+- [ ] **UIPL-03**: Unit types in military screens use subtle color coding consistent with unitTypeColors
+
+### Dev Acceleration
+
+- [ ] **DEVT-01**: Dev toolbar supports bulk unit spawning (select multiple types and quantities in one action)
+- [ ] **DEVT-02**: Unit training times reduced to 1/5 of normal in dev mode
+- [ ] **DEVT-03**: Unit travel/arrival times reduced to 1/5 of normal in dev mode
+
+## v1.3+ Requirements
+
+### Trading (Advanced)
+
+- **TRAD-02**: Marketplace with buy/sell orders (order book system)
+
+### Combat (Advanced)
+
+- **CMBT-05**: Battle outcome: occupation (city takeover)
+- **CMBT-06**: Players can send reinforcements during ongoing battles
+
+### Other Deferred
+
+- **RSCH-01**: Research system with 4 branches (Seafaring, Economy, Science, Military)
+- **RSCH-02**: Research prerequisites (tech tree with dependencies)
+- **RSCH-03**: Academy building generates research points hourly
+- **ALNC-01**: Alliance system (create/join, Embassy, roles)
+- **ALNC-02**: Alliance chat and player-to-player messaging
+- **ALNC-03**: War declarations and NAP agreements
+- **RANK-01**: Ranking system (total score, military, naval, alliance, island)
+- **RANK-02**: Score calculation (building + research + military + gold points)
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Marketplace order book | Complex economy feature; direct trading first |
+| City occupation (takeover) | Requires stable espionage + trading first |
+| Counter-espionage | Keep v1.2 simple; add defensive spy mechanics later |
+| Alliance-based trading bonuses | Alliance system not yet built |
+| Spy unit training | v1.2 espionage uses instant action (no spy unit type); unit-based spying deferred |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| ESPY-01 | — | Pending |
+| ESPY-02 | — | Pending |
+| TRAD-01 | — | Pending |
+| MOVE-01 | — | Pending |
+| MOVE-02 | — | Pending |
+| UIPL-01 | — | Pending |
+| UIPL-02 | — | Pending |
+| UIPL-03 | — | Pending |
+| DEVT-01 | — | Pending |
+| DEVT-02 | — | Pending |
+| DEVT-03 | — | Pending |
+
+**Coverage:**
+- v1.2 requirements: 11 total
+- Mapped to phases: 0
+- Unmapped: 11
+
+---
+*Requirements defined: 2026-03-16*
+*Last updated: 2026-03-16 after initial definition*
