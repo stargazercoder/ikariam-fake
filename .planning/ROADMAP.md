@@ -70,7 +70,7 @@ Plans:
 **Requirements**: CMBT-01, CMBT-02, CMBT-03, CMBT-04
 **Success Criteria** (what must be TRUE):
   1. When an attacker wins a battle, a portion of the defender's unprotected resources is transferred to the attacker (delivered home via return unit movement cargo)
-  2. Defender's Warehouse and Hideout levels protect a resource floor that cannot be pillaged
+  2. Defender's Hideout level protects a resource floor that cannot be pillaged
   3. Player can open a battle report and see a stacked bar chart showing unit losses per turn for both sides
   4. Each unit type is displayed in a distinct color code throughout the battle report visualization
 **Plans:** 3/3 plans complete
@@ -94,4 +94,4 @@ Plans:
 | 9. Phase 2 Verification | v0.1.0 | 1/1 | Complete | 2026-03-12 |
 | 10. Economy Foundation | v1.1 | 3/3 | Complete | 2026-03-13 |
 | 11. Island Upgrades + Resource Rate UI | v1.1 | 2/2 | Complete | 2026-03-13 |
-| 12. Combat Depth | 3/3 | Complete   | 2026-03-15 | - |
+| 12. Combat Depth | 3/3 | Complete    | 2026-03-15 | - |

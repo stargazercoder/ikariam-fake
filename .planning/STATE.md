@@ -4,7 +4,7 @@ milestone: v1.1
 milestone_name: Economy & Combat Depth
 status: ready_to_plan
 stopped_at: Completed 12-combat-depth/12-03-PLAN.md (all tasks done, human verification approved)
-last_updated: "2026-03-15T20:52:19.357Z"
+last_updated: "2026-03-15T20:56:59.653Z"
 last_activity: 2026-03-13 — Roadmap created for v1.1 milestone, all 13 requirements mapped
 progress:
   total_phases: 3
