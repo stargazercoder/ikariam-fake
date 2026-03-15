@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A browser-based multiplayer strategy game inspired by Ikariam. Players build cities on islands, gather resources, train armies, and wage turn-based wars against other players. Built with Flutter web frontend and Supabase backend (Auth, PostgreSQL, Edge Functions, pg_cron, Realtime), targeting a small community of players. Shipped v0.1.0 MVP with full build-expand-conquer loop.
+A browser-based multiplayer strategy game inspired by Ikariam. Players build cities on islands, gather resources, train armies, and wage turn-based wars against other players. Features a deep economic loop with happiness/wine mechanics, population-based taxation, cooperative island upgrades, and meaningful combat with pillage rewards. Built with Flutter web frontend and Supabase backend (Auth, PostgreSQL, Edge Functions, pg_cron, Realtime), targeting a small community of players.
 
 ## Core Value
 
@@ -36,26 +36,23 @@ Players can build and manage cities, gather resources, and engage in real-time t
 - ✓ Flutter web splash screen during CanvasKit load — v0.1.0
 - ✓ All game state mutations server-side (no client writes to game tables) — v0.1.0
 - ✓ RLS enabled on every database table — v0.1.0
+- ✓ Happiness system: tavern consumes wine to boost happiness, happiness affects population growth rate — v1.1
+- ✓ Population-based tax income (idle citizens x 3 gold/hour) — v1.1
+- ✓ Island resource points upgradeable (shared resource building levels) — v1.1
+- ✓ Resource UI: hourly production rate in main resource bar + detailed breakdown — v1.1
+- ✓ Battle outcome: pillage (steal resources on victory, Hideout protection floor) — v1.1
+- ✓ Battle reports: turn-by-turn unit loss visualization with color-coded unit types — v1.1
+- ✓ Tavern happiness configuration (wine spending rate adjustable) — v1.1
 
 ### Active
 
-<!-- v1.1 Economy & Combat Depth -->
-- [ ] Happiness system: tavern consumes wine to boost happiness, happiness affects population growth rate
-- [ ] Population-based tax income (population x tax rate = gold/hour)
-- [ ] Island resource points upgradeable (shared resource building levels)
-- [ ] Resource UI: hourly production rate in main resource bar + detailed breakdown in building/resource screens
 - [ ] Player-to-player resource trading via cargo ships
 - [ ] Marketplace with buy/sell orders (order book)
-- [ ] Battle outcome: pillage (steal resources on victory)
-- [ ] Battle reports: turn-by-turn unit loss visualization with color-coded unit types
-- [ ] Tavern happiness configuration (wine spending rate adjustable)
-
-<!-- Deferred to future milestones -->
 - [ ] Research system with 4 branches: Seafaring, Economy, Science, Military
 - [ ] Research prerequisites (tech tree with dependencies)
 - [ ] Academy building generates research points hourly
 - [ ] Players can send reinforcements during ongoing battles
-- [ ] Battle outcome: occupation (city takeover) — deferred to v1.2+
+- [ ] Battle outcome: occupation (city takeover)
 - [ ] Alliance system: create/join (requires Embassy), roles
 - [ ] Alliance chat and player-to-player messaging via Realtime
 - [ ] War declarations and NAP agreements
@@ -64,7 +61,7 @@ Players can build and manage cities, gather resources, and engage in real-time t
 
 ### Out of Scope
 
-- Isometric rendering — 2D grid works well for v0.1.0, upgrade later
+- Isometric rendering — 2D grid works well, upgrade later
 - OAuth login (Google/Apple) — email/password sufficient for small community
 - Mobile/Desktop native apps — web-only, Flutter enables future expansion
 - Multi-language (i18n) — English only
@@ -75,37 +72,24 @@ Players can build and manage cities, gather resources, and engage in real-time t
 - Espionage system — requires stable combat first
 - Barbarian villages (PvE) — requires combat maturity
 - WASM renderer — CanvasKit sufficient
-- City occupation (takeover) — deferred to v1.2+, pillage first
-
-## Current Milestone: v1.1 Economy & Combat Depth
-
-**Goal:** Deepen the economic loop with happiness/population/tax mechanics, add trading between players, and make combat victories meaningful with pillage rewards and improved battle reports.
-
-**Target features:**
-- Happiness system (tavern + wine → happiness → population growth)
-- Population-based gold tax income
-- Upgradeable island resource points
-- Resource production UI (hourly rates + breakdown)
-- Direct player trading + marketplace (order book)
-- Pillage mechanic (steal resources on battle victory)
-- Turn-by-turn battle report visualization (color-coded units)
-- Tavern happiness configuration
+- Negative happiness causing population loss — anti-feature for small community
 
 ## Context
 
 - Shipped v0.1.0 MVP in 2 days (2026-03-11 → 2026-03-12)
-- Codebase: ~14,500 LOC (10,400 Dart + 735 TypeScript + 3,400 SQL)
+- Shipped v1.1 Economy & Combat Depth in 3 days (2026-03-13 → 2026-03-15)
+- Codebase: ~18,000 LOC (12,700 Dart + 1,044 TypeScript + 4,219 SQL)
 - Tech stack: Flutter web + Supabase (Auth, PostgreSQL, Edge Functions, pg_cron, Realtime) + Riverpod
-- 225 files, 9 phases, 27 plans completed
+- 12 phases, 35 plans completed across 2 milestones
 - 7 test accounts with varied game states for testing
 - Dev toolbar for instant game-state manipulation (debug mode only)
-- Test automation CLI (test_all.sh / test_all.ps1)
 - Game balance formulas (costs, rates, unit stats) not yet validated — needs iteration post-launch
+- Known tech debt: cityProvider staleness after island donation, JSONB cast inconsistency, missing cargo-in-transit UI
 
 ## Constraints
 
 - **Backend**: Supabase only — all server logic via Edge Functions and pg_cron
-- **Frontend**: Flutter web — single codebase (Flame engine available but not heavily used in v0.1.0)
+- **Frontend**: Flutter web — single codebase (Flame engine available but not heavily used)
 - **State**: Riverpod for reactive state management
 - **Security**: All calculations server-side, client only triggers actions
 - **Time**: All timestamps server-side (NOW()) to prevent manipulation
@@ -126,6 +110,13 @@ Players can build and manage cities, gather resources, and engage in real-time t
 | JSONB snapshots for unit_movements | Army immutable at departure, simpler combat resolution | ✓ Good — simplified Phase 5 significantly |
 | pg_cron for game loops | Resource ticks, training, construction, battle resolution | ✓ Good — reliable server-side automation |
 | Manual Riverpod providers (no code-gen) | riverpod_generator incompatible with Dart 3.10.1 | ⚠️ Revisit — upgrade when SDK supports it |
+| Gold produced ONLY via idle citizen tax | Town Hall worker gold path removed to prevent double income | ✓ Good — v1.1 |
+| Population stored as NUMERIC | Fractional tick growth; negative happiness halts growth + 50% production penalty | ✓ Good — v1.1 |
+| Hideout-only pillage protection (no Warehouse) | Warehouse provides storage capacity only; Hideout is sole protection mechanism | ✓ Good — v1.1, simpler mental model |
+| Wine icon: Icons.wine_bar + Colors.purple.shade600 | Consistent across all UI files | ✓ Good — v1.1 |
+| Island multiplier uniform for all 4 production resources | Luxury type distinction deferred to v1.2 | ✓ Good — v1.1 |
+| Pillage ratio: LEAST(0.75, total_land_units / 50.0 * 0.10) | Scales with surviving attackers, caps at 75% | ✓ Good — v1.1, needs balance tuning |
+| SELECT FOR UPDATE on defender resources during pillage | Prevents race condition with concurrent resource tick | ✓ Good — v1.1 |
 
 ---
-*Last updated: 2026-03-13 after v1.1 milestone start*
+*Last updated: 2026-03-16 after v1.1 milestone completion*
