@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Economy & Combat Depth
 status: ready_to_plan
-stopped_at: Phase 12 context gathered
-last_updated: "2026-03-15T18:30:47.247Z"
+stopped_at: Completed 12-combat-depth/12-02-PLAN.md
+last_updated: "2026-03-15T19:02:21.298Z"
 last_activity: 2026-03-13 — Roadmap created for v1.1 milestone, all 13 requirements mapped
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 8
+  completed_plans: 6
   percent: 100
 ---
 
@@ -86,6 +86,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 10-economy-foundation P03 | 18 | 3 tasks | 5 files |
 | Phase 10-economy-foundation P03 | 18 | 4 tasks | 6 files |
 | Phase 11-island-upgrades-resource-rate-ui P01 | 5 | 2 tasks | 2 files |
+| Phase 12-combat-depth P02 | 12 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,9 @@ Recent decisions affecting current work:
 - [Phase 11-island-upgrades-resource-rate-ui]: Island multiplier applies to all 4 production resources uniformly — luxury type distinction deferred to v1.2
 - [Phase 11-island-upgrades-resource-rate-ui]: Wood donation cost uses DONATION_COSTS constant table (300 * 1.5^level) in Edge Function — no DB lookup
 - [Phase 11-island-upgrades-resource-rate-ui]: Islands NOT added to Realtime publication — island screen re-fetches on mount; level effect visible at next 5-min tick
+- [Phase 12-combat-depth]: Color.toARGB32() used instead of deprecated Color.value for Flutter color comparisons in tests
+- [Phase 12-combat-depth]: orderedLandTypes/orderedNavalTypes as const List constants for stable stacked chart iteration order
+- [Phase 12-combat-depth]: (v as num).toInt() for JSONB parsing — Supabase JSON decoder returns num not int
 
 ### Pending Todos
 
@@ -122,6 +126,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T18:30:47.243Z
-Stopped at: Phase 12 context gathered
-Resume file: .planning/phases/12-combat-depth/12-CONTEXT.md
+Last session: 2026-03-15T19:02:13.298Z
+Stopped at: Completed 12-combat-depth/12-02-PLAN.md
+Resume file: None

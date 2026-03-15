@@ -17,15 +17,15 @@
 
 - [x] **RSRC-01**: User can donate wood to upgrade island shared resource level
 - [x] **RSRC-02**: Island resource level multiplier applies to all cities on that island
-- [ ] **RSRC-03**: User can see hourly production rate per resource in main resource bar
-- [ ] **RSRC-04**: User can see detailed production breakdown per resource (base rate, building level, island bonus, research bonus)
+- [x] **RSRC-03**: User can see hourly production rate per resource in main resource bar
+- [x] **RSRC-04**: User can see detailed production breakdown per resource (base rate, building level, island bonus, research bonus)
 
 ### Combat
 
 - [ ] **CMBT-01**: Winning attacker pillages resources from defender city (% of unprotected resources)
 - [ ] **CMBT-02**: Warehouse + Hideout levels protect a floor of resources from pillage
 - [ ] **CMBT-03**: User can view turn-by-turn unit loss chart in battle reports (stacked bar chart)
-- [ ] **CMBT-04**: Each unit type has a distinct color code in battle report visualization
+- [x] **CMBT-04**: Each unit type has a distinct color code in battle report visualization
 
 ## v1.2+ Requirements
 
@@ -73,12 +73,12 @@
 | ECON-05 | Phase 10 | Complete |
 | RSRC-01 | Phase 11 | Complete |
 | RSRC-02 | Phase 11 | Complete |
-| RSRC-03 | Phase 11 | Pending |
-| RSRC-04 | Phase 11 | Pending |
+| RSRC-03 | Phase 11 | Complete |
+| RSRC-04 | Phase 11 | Complete |
 | CMBT-01 | Phase 12 | Pending |
 | CMBT-02 | Phase 12 | Pending |
 | CMBT-03 | Phase 12 | Pending |
-| CMBT-04 | Phase 12 | Pending |
+| CMBT-04 | Phase 12 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 13 total
