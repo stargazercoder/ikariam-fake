@@ -30,7 +30,7 @@ Full details: [milestones/v0.1.0-ROADMAP.md](milestones/v0.1.0-ROADMAP.md)
 
 - [x] **Phase 10: Economy Foundation** — Happiness, population growth, and tax income driven by tavern wine consumption (completed 2026-03-13)
 - [x] **Phase 11: Island Upgrades + Resource Rate UI** — Shared island resource building levels and hourly production rate display (completed 2026-03-13)
-- [ ] **Phase 12: Combat Depth** — Pillage resources on battle victory and turn-by-turn battle report visualization
+- [x] **Phase 12: Combat Depth** — Pillage resources on battle victory and turn-by-turn battle report visualization (completed 2026-03-15)
 
 ## Phase Details
 
@@ -73,7 +73,7 @@ Plans:
   2. Defender's Warehouse and Hideout levels protect a resource floor that cannot be pillaged
   3. Player can open a battle report and see a stacked bar chart showing unit losses per turn for both sides
   4. Each unit type is displayed in a distinct color code throughout the battle report visualization
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 12-01-PLAN.md — SQL migration: pillage schema (cargo + pillage_result columns), updated resolve_battles() with pillage logic, updated process_arrivals() with cargo delivery, Dart hideout helper
 - [ ] 12-02-PLAN.md — Flutter constants + models: unit type color map, Battle.pillageResult + UnitMovement.cargo model extensions
@@ -94,4 +94,4 @@ Plans:
 | 9. Phase 2 Verification | v0.1.0 | 1/1 | Complete | 2026-03-12 |
 | 10. Economy Foundation | v1.1 | 3/3 | Complete | 2026-03-13 |
 | 11. Island Upgrades + Resource Rate UI | v1.1 | 2/2 | Complete | 2026-03-13 |
-| 12. Combat Depth | 2/3 | In Progress|  | - |
+| 12. Combat Depth | 3/3 | Complete   | 2026-03-15 | - |
