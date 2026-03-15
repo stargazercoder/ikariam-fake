@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Economy & Combat Depth
 status: ready_to_plan
-stopped_at: Completed 12-combat-depth/12-03-PLAN.md (Task 3 checkpoint pending human verification)
-last_updated: "2026-03-15T19:23:54.277Z"
+stopped_at: Completed 12-combat-depth/12-03-PLAN.md (all tasks done, human verification approved)
+last_updated: "2026-03-15T20:52:19.357Z"
 last_activity: 2026-03-13 — Roadmap created for v1.1 milestone, all 13 requirements mapped
 progress:
   total_phases: 3
@@ -89,6 +89,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 12-combat-depth P02 | 12 | 2 tasks | 4 files |
 | Phase 12-combat-depth P01 | 4 | 2 tasks | 3 files |
 | Phase 12-combat-depth P03 | 15 | 3 tasks | 5 files |
+| Phase 12-combat-depth P03 | 15 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,7 @@ Recent decisions affecting current work:
 - [Phase 12-combat-depth]: Pillage ratio formula: LEAST(0.75, total_land_units / 50.0 * 0.10) — scales with surviving attackers, caps at 75%
 - [Phase 12-combat-depth]: SELECT FOR UPDATE on defender city_resources during pillage prevents race with resource tick
 - [Phase 12-combat-depth]: BattleLossChart renders both attacker and defender rods side-by-side (no isAttacker flag needed) — objective view serves all players
+- [Phase 12-combat-depth]: BattleLossChart renders both attacker and defender rods side-by-side (no isAttacker flag) — objective view; parameter simplification approved
 
 ### Pending Todos
 
@@ -132,6 +134,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T19:23:54.275Z
-Stopped at: Completed 12-combat-depth/12-03-PLAN.md (Task 3 checkpoint pending human verification)
+Last session: 2026-03-15T20:52:05.742Z
+Stopped at: Completed 12-combat-depth/12-03-PLAN.md (all tasks done, human verification approved)
 Resume file: None
