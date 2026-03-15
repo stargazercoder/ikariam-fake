@@ -10,7 +10,9 @@ import '../../../features/city/widgets/countdown_timer_widget.dart';
 import '../models/battle.dart';
 import '../providers/battles_provider.dart';
 import '../providers/battle_turns_provider.dart';
+import 'widgets/battle_loss_chart.dart';
 import 'widgets/battle_turn_card.dart';
+import 'widgets/pillage_result_card.dart';
 
 /// Detail screen for a single battle.
 ///
@@ -72,6 +74,44 @@ class BattleDetailScreen extends ConsumerWidget {
                         isAttacker: isAttacker,
                       ),
                       const SizedBox(height: 16),
+
+                      // Pillage result card (only renders if pillage occurred)
+                      if (!battle.isActive && battle.pillageResult != null) ...[
+                        PillageResultCard(
+                          pillageResult: battle.pillageResult,
+                          isAttacker: isAttacker,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+
+                      // Unit loss chart (only renders when turns are loaded)
+                      turnsAsync.when(
+                        loading: () => const SizedBox.shrink(),
+                        error: (e, st) => const SizedBox.shrink(),
+                        data: (turns) {
+                          if (turns.isEmpty) return const SizedBox.shrink();
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                'Unit Losses',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary,
+                                    ),
+                              ),
+                              const SizedBox(height: 8),
+                              BattleLossChart(turns: turns),
+                              const SizedBox(height: 16),
+                            ],
+                          );
+                        },
+                      ),
 
                       // Turn cards header
                       Text(
