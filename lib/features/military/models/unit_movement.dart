@@ -12,6 +12,7 @@ class UnitMovement {
     required this.departAt,
     required this.arriveAt,
     required this.createdAt,
+    this.cargo,
   });
 
   final String id;
@@ -30,6 +31,10 @@ class UnitMovement {
   final DateTime arriveAt;
   final DateTime createdAt;
 
+  /// Pillaged resources being transported (null for non-pillage movements).
+  /// Keys are resource types, values are amounts.
+  final Map<String, int>? cargo;
+
   /// Parses a Supabase JSON row into a [UnitMovement] instance.
   /// The 'units' JSONB field is parsed from Map<String, dynamic> to Map<String, int>.
   factory UnitMovement.fromJson(Map<String, dynamic> json) {
@@ -43,6 +48,10 @@ class UnitMovement {
       departAt: DateTime.parse(json['depart_at'] as String).toUtc(),
       arriveAt: DateTime.parse(json['arrive_at'] as String).toUtc(),
       createdAt: DateTime.parse(json['created_at'] as String).toUtc(),
+      cargo: json['cargo'] == null
+          ? null
+          : (json['cargo'] as Map<String, dynamic>)
+              .map((k, v) => MapEntry(k, (v as num).toInt())),
     );
   }
 

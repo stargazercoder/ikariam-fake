@@ -20,6 +20,7 @@ class Battle {
     required this.turnNumber,
     required this.nextTurnAt,
     required this.createdAt,
+    this.pillageResult,
   });
 
   final String id;
@@ -46,6 +47,10 @@ class Battle {
 
   final DateTime createdAt;
 
+  /// Pillaged resource amounts (null if no pillage occurred or battle not yet won).
+  /// Keys are resource types ('wood', 'marble', 'crystal', 'sulfur'), values are amounts.
+  final Map<String, int>? pillageResult;
+
   /// Returns true when the battle is still in progress.
   bool get isActive => status == 'active';
 
@@ -67,6 +72,10 @@ class Battle {
       turnNumber: json['turn_number'] as int,
       nextTurnAt: DateTime.parse(json['next_turn_at'] as String).toUtc(),
       createdAt: DateTime.parse(json['created_at'] as String).toUtc(),
+      pillageResult: json['pillage_result'] == null
+          ? null
+          : (json['pillage_result'] as Map<String, dynamic>)
+              .map((k, v) => MapEntry(k, (v as num).toInt())),
     );
   }
 

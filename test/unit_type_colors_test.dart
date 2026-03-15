@@ -21,7 +21,7 @@ void main() {
     });
 
     test('all 13 Color values are distinct — no two unit types share a color', () {
-      final colorValues = unitTypeColors.values.map((c) => c.value).toSet();
+      final colorValues = unitTypeColors.values.map((c) => c.toARGB32()).toSet();
       expect(
         colorValues.length,
         equals(13),
