@@ -182,21 +182,22 @@ const Map<BuildingType, Map<ResourceType, int>> buildingBaseCosts = {
 
 /// Base upgrade time in minutes for each building type at level 0.
 /// Formula: upgradeDurationMinutes = ceil(base_time * 1.2^currentLevel)
+/// NOTE: Values reduced to 1/10 for faster testing.
 const Map<BuildingType, int> buildingBaseTimes = {
-  BuildingType.townHall: 10,
-  BuildingType.warehouse: 5,
-  BuildingType.barracks: 8,
-  BuildingType.shipyard: 12,
-  BuildingType.academy: 10,
-  BuildingType.embassy: 6,
-  BuildingType.tradingPort: 8,
-  BuildingType.townWall: 10,
-  BuildingType.hideout: 5,
-  BuildingType.tavern: 6,
-  BuildingType.sawmill: 3,
-  BuildingType.quarry: 4,
-  BuildingType.glassblower: 4,
-  BuildingType.sulfurPit: 4,
+  BuildingType.townHall: 1,
+  BuildingType.warehouse: 1,
+  BuildingType.barracks: 1,
+  BuildingType.shipyard: 1,
+  BuildingType.academy: 1,
+  BuildingType.embassy: 1,
+  BuildingType.tradingPort: 1,
+  BuildingType.townWall: 1,
+  BuildingType.hideout: 1,
+  BuildingType.tavern: 1,
+  BuildingType.sawmill: 1,
+  BuildingType.quarry: 1,
+  BuildingType.glassblower: 1,
+  BuildingType.sulfurPit: 1,
 };
 
 /// Growth factor applied to resource costs per level.
@@ -221,4 +222,16 @@ Map<ResourceType, int> upgradeCost(BuildingType type, int currentLevel) {
 int upgradeDurationMinutes(BuildingType type, int currentLevel) {
   final baseTime = buildingBaseTimes[type]!;
   return (baseTime * pow(timeGrowthFactor, currentLevel)).ceil();
+}
+
+/// Calculates the resource protection floor provided by a Hideout at [level].
+/// Each of the 4 pillageable resources (wood, marble, crystal, sulfur) is
+/// independently protected up to this amount.
+/// If [level] is null (no Hideout built), returns 50 per resource (base protection
+/// for new players — per user decision).
+/// Otherwise: floor(100 * 1.5^level). Level 0 = 100 per resource.
+/// Matches the SQL formula in resolve_battles() pillage logic.
+int hideoutProtectionFloor(int? level) {
+  if (level == null) return 50;
+  return (100.0 * pow(1.5, level)).floor();
 }
