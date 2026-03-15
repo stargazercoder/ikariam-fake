@@ -67,23 +67,23 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ESPY-01 | — | Pending |
-| ESPY-02 | — | Pending |
-| TRAD-01 | — | Pending |
-| MOVE-01 | — | Pending |
-| MOVE-02 | — | Pending |
-| UIPL-01 | — | Pending |
-| UIPL-02 | — | Pending |
-| UIPL-03 | — | Pending |
-| DEVT-01 | — | Pending |
-| DEVT-02 | — | Pending |
-| DEVT-03 | — | Pending |
+| DEVT-01 | Phase 13 | Pending |
+| DEVT-02 | Phase 13 | Pending |
+| DEVT-03 | Phase 13 | Pending |
+| MOVE-01 | Phase 14 | Pending |
+| MOVE-02 | Phase 14 | Pending |
+| TRAD-01 | Phase 15 | Pending |
+| ESPY-01 | Phase 16 | Pending |
+| ESPY-02 | Phase 16 | Pending |
+| UIPL-01 | Phase 17 | Pending |
+| UIPL-02 | Phase 17 | Pending |
+| UIPL-03 | Phase 17 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 11 total
-- Mapped to phases: 0
-- Unmapped: 11
+- Mapped to phases: 11
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-16*
-*Last updated: 2026-03-16 after initial definition*
+*Last updated: 2026-03-16 after roadmap creation (all 11 requirements mapped)*
