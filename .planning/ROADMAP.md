@@ -41,7 +41,7 @@ Full details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 - [x] **Phase 13: Dev Acceleration** — Bulk unit spawning and 5x faster timers in dev toolbar (completed 2026-03-16)
 - [x] **Phase 14: Movement Visibility** — Armies and cargo in transit shown with destinations, ETAs, and carried resources (completed 2026-03-16)
 - [x] **Phase 15: Resource Trading** — Send resources to other players via cargo ships with travel time (completed 2026-03-16)
-- [ ] **Phase 16: Espionage & City Viewing** — Spy on enemy cities and view read-only city screens
+- [x] **Phase 16: Espionage & City Viewing** — Spy on enemy cities and view read-only city screens (completed 2026-03-16)
 - [ ] **Phase 17: UI Polish** — Clean up city view layout, color-code cities and units
 
 ## Phase Details
@@ -97,7 +97,7 @@ Plans:
   2. Spy action resolves instantly (no travel time, no spy unit consumed)
   3. Player can navigate to any other player's city screen and see a read-only version of their building grid and city stats
   4. Read-only city view clearly indicates it is not the player's own city (no action buttons, ownership label visible)
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 16-00-PLAN.md — Wave 0 test scaffold (unit + widget test stubs for Nyquist compliance)
 - [ ] 16-01-PLAN.md — DB migration (spy_reports table) + spy-city Edge Function + SpyReport model + repository + providers
@@ -136,5 +136,5 @@ Plans:
 | 13. Dev Acceleration | 2/2 | Complete    | 2026-03-16 | - |
 | 14. Movement Visibility | 2/2 | Complete    | 2026-03-16 | - |
 | 15. Resource Trading | 2/2 | Complete    | 2026-03-16 | - |
-| 16. Espionage & City Viewing | 2/3 | In Progress|  | - |
+| 16. Espionage & City Viewing | 3/3 | Complete   | 2026-03-16 | - |
 | 17. UI Polish | v1.2 | 0/? | Not started | - |
