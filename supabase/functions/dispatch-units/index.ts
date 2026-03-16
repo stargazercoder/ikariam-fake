@@ -24,6 +24,11 @@ const BASE_SECONDS_PER_GRID_UNIT = 10;
 // NOTE: Must stay in sync with baseMinutesPerGridUnit in lib/core/constants/unit_constants.dart
 const BASE_MINUTES_PER_GRID_UNIT = 2;
 
+// Dev acceleration: 1/5 travel time when not in production (Phase 13 DEVT-03)
+const APP_ENV = Deno.env.get('APP_ENVIRONMENT') ?? 'development';
+const IS_PRODUCTION = APP_ENV === 'production';
+const DEV_SPEED_MULTIPLIER = IS_PRODUCTION ? 1.0 : 0.2;
+
 /**
  * Calculates travel time in minutes between two island grid positions.
  * Formula: max(1, ceil(sqrt(dx^2 + dy^2) * baseMinutesPerUnit))
@@ -186,11 +191,12 @@ Deno.serve(async (req: Request) => {
     return errorResponse('Database error fetching destination island coordinates', 500);
   }
 
-  // 7. Calculate travel time
-  const travelMinutes = calcTravelMinutes(originIsland, destIsland);
-  if (!Number.isFinite(travelMinutes) || travelMinutes <= 0) {
+  // 7. Calculate travel time (1/5 in dev mode, minimum 1 minute floor)
+  const rawTravelMinutes = calcTravelMinutes(originIsland, destIsland);
+  if (!Number.isFinite(rawTravelMinutes) || rawTravelMinutes <= 0) {
     return errorResponse('Failed to calculate travel time', 500);
   }
+  const travelMinutes = Math.max(1, Math.ceil(rawTravelMinutes * DEV_SPEED_MULTIPLIER));
 
   // 8. Deduct units from origin city (validate + deduct last, right before insert)
   // Note: Non-atomic deduction — acceptable for v1 per project decision.

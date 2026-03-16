@@ -66,6 +66,11 @@ const UNIT_BASE_TIMES: Record<string, number> = {
 const VALID_UNIT_TYPES = new Set(Object.keys(UNIT_UNLOCK_LEVELS));
 const MAX_QUANTITY = 50;
 
+// Dev acceleration: 1/5 training time when not in production (Phase 13 DEVT-02)
+const APP_ENV = Deno.env.get('APP_ENVIRONMENT') ?? 'development';
+const IS_PRODUCTION = APP_ENV === 'production';
+const DEV_SPEED_MULTIPLIER = IS_PRODUCTION ? 1.0 : 0.2;
+
 /** Returns a JSON error response with the given status code. */
 function errorResponse(message: string, status: number): Response {
   return new Response(
@@ -221,8 +226,8 @@ Deno.serve(async (req: Request) => {
     }
   }
 
-  // 9. Calculate finish_at: NOW() + base_time * quantity minutes
-  const durationMinutes = UNIT_BASE_TIMES[unit_type] * quantity;
+  // 9. Calculate finish_at: NOW() + base_time * quantity minutes (1/5 in dev mode)
+  const durationMinutes = UNIT_BASE_TIMES[unit_type] * quantity * DEV_SPEED_MULTIPLIER;
   const finishAt = new Date(Date.now() + durationMinutes * 60 * 1000).toISOString();
 
   // 10. Insert into training_queue
