@@ -55,7 +55,10 @@ Full details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
   2. Unit training completes at 1/5 of normal time when dev mode is active
   3. Unit travel and arrival completes at 1/5 of normal time when dev mode is active
   4. Bulk spawn and timer overrides are invisible and inert in production builds
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 13-01-PLAN.md — Server-side RPC functions and Edge Function timer speed-ups
+- [ ] 13-02-PLAN.md — Flutter dev toolbar bulk spawn dialog and instant complete button
 
 ### Phase 14: Movement Visibility
 **Goal**: Players can see all their armies and cargo currently in transit with full context (destination, ETA, composition)
@@ -117,7 +120,7 @@ Full details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 | 10. Economy Foundation | v1.1 | 3/3 | Complete | 2026-03-13 |
 | 11. Island Upgrades + Resource Rate UI | v1.1 | 2/2 | Complete | 2026-03-13 |
 | 12. Combat Depth | v1.1 | 3/3 | Complete | 2026-03-15 |
-| 13. Dev Acceleration | v1.2 | 0/? | Not started | - |
+| 13. Dev Acceleration | v1.2 | 0/2 | Not started | - |
 | 14. Movement Visibility | v1.2 | 0/? | Not started | - |
 | 15. Resource Trading | v1.2 | 0/? | Not started | - |
 | 16. Espionage & City Viewing | v1.2 | 0/? | Not started | - |
