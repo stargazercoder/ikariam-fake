@@ -12,7 +12,7 @@
 
 ### Trading
 
-- [ ] **TRAD-01**: User can send resources to another player's city via cargo ships (with travel time)
+- [x] **TRAD-01**: User can send resources to another player's city via cargo ships (with travel time)
 
 ### Movement Visibility
 
@@ -72,7 +72,7 @@
 | DEVT-03 | Phase 13 | Complete |
 | MOVE-01 | Phase 14 | Complete |
 | MOVE-02 | Phase 14 | Complete |
-| TRAD-01 | Phase 15 | Pending |
+| TRAD-01 | Phase 15 | Complete |
 | ESPY-01 | Phase 16 | Pending |
 | ESPY-02 | Phase 16 | Pending |
 | UIPL-01 | Phase 17 | Pending |
