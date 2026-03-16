@@ -13,6 +13,7 @@ class UnitMovement {
     required this.arriveAt,
     required this.createdAt,
     this.cargo,
+    this.movementType = 'attack',
   });
 
   final String id;
@@ -35,6 +36,10 @@ class UnitMovement {
   /// Keys are resource types, values are amounts.
   final Map<String, int>? cargo;
 
+  /// The type of movement. Either 'attack' (outgoing assault) or 'return'
+  /// (army returning home). Defaults to 'attack' for backward compatibility.
+  final String movementType; // 'attack' | 'return'
+
   /// Parses a Supabase JSON row into a [UnitMovement] instance.
   /// The 'units' JSONB field is parsed from Map<String, dynamic> to Map<String, int>.
   factory UnitMovement.fromJson(Map<String, dynamic> json) {
@@ -52,6 +57,7 @@ class UnitMovement {
           ? null
           : (json['cargo'] as Map<String, dynamic>)
               .map((k, v) => MapEntry(k, (v as num).toInt())),
+      movementType: json['movement_type'] as String? ?? 'attack',
     );
   }
 
@@ -66,7 +72,8 @@ class UnitMovement {
   @override
   String toString() =>
       'UnitMovement(id: $id, originCityId: $originCityId, '
-      'destinationCityId: $destinationCityId, units: $units, arriveAt: $arriveAt)';
+      'destinationCityId: $destinationCityId, units: $units, '
+      'movementType: $movementType, arriveAt: $arriveAt)';
 
   @override
   bool operator ==(Object other) =>
