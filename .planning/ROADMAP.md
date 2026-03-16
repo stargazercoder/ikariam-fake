@@ -83,7 +83,10 @@ Plans:
   3. Cargo ships arrive at the destination city after the distance-based travel time and the resources are added to the recipient's warehouse
   4. Both sender and recipient can see the in-transit cargo in their movement lists (Phase 14 visibility)
   5. Trade is blocked if the sender has insufficient resources or the recipient's warehouse would overflow
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 15-01-PLAN.md — DB migration (trade movement type + deduct_resources RPC) and send-trade Edge Function
+- [ ] 15-02-PLAN.md — TradeRepository, TradeDialog with sliders, island screen trade integration, movements screen trade display
 
 ### Phase 16: Espionage & City Viewing
 **Goal**: Players can spy on enemy cities to gather intelligence and view any player's city layout in read-only mode
@@ -125,6 +128,6 @@ Plans:
 | 12. Combat Depth | v1.1 | 3/3 | Complete | 2026-03-15 |
 | 13. Dev Acceleration | 2/2 | Complete    | 2026-03-16 | - |
 | 14. Movement Visibility | 2/2 | Complete    | 2026-03-16 | - |
-| 15. Resource Trading | v1.2 | 0/? | Not started | - |
+| 15. Resource Trading | v1.2 | 0/2 | Not started | - |
 | 16. Espionage & City Viewing | v1.2 | 0/? | Not started | - |
 | 17. UI Polish | v1.2 | 0/? | Not started | - |
