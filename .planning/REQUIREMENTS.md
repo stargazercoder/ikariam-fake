@@ -16,8 +16,8 @@
 
 ### Movement Visibility
 
-- [ ] **MOVE-01**: User can see a list of outgoing army movements (attack, return) with destination, ETA, and unit composition
-- [ ] **MOVE-02**: User can see returning cargo ships with carried resource amounts (pillage loot and trade cargo)
+- [x] **MOVE-01**: User can see a list of outgoing army movements (attack, return) with destination, ETA, and unit composition
+- [x] **MOVE-02**: User can see returning cargo ships with carried resource amounts (pillage loot and trade cargo)
 
 ### UI Polish
 
@@ -70,8 +70,8 @@
 | DEVT-01 | Phase 13 | Complete |
 | DEVT-02 | Phase 13 | Complete |
 | DEVT-03 | Phase 13 | Complete |
-| MOVE-01 | Phase 14 | Pending |
-| MOVE-02 | Phase 14 | Pending |
+| MOVE-01 | Phase 14 | Complete |
+| MOVE-02 | Phase 14 | Complete |
 | TRAD-01 | Phase 15 | Pending |
 | ESPY-01 | Phase 16 | Pending |
 | ESPY-02 | Phase 16 | Pending |
