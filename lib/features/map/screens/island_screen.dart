@@ -9,7 +9,9 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../city/providers/city_provider.dart';
+import '../../trade/screens/trade_dialog.dart';
 import '../../../core/constants/island_constants.dart';
+import '../models/island.dart';
 import '../models/island_city_slot.dart';
 import '../providers/island_detail_provider.dart';
 import '../providers/islands_provider.dart';
@@ -222,11 +224,8 @@ class _IslandDetailBody extends ConsumerWidget {
                 currentUserId: currentUserId,
                 onTap: () {
                   if (slot == null || !slot.isOccupied) return;
-                  if (slot.ownerId == currentUserId) {
-                    context.go('/city');
-                  } else if (slot.cityId != null) {
-                    _showEnemyCityDialog(context, ref, slot);
-                  }
+                  _showCityActionDialog(
+                      context, ref, slot, currentUserId, island);
                 },
               );
             },
@@ -236,8 +235,20 @@ class _IslandDetailBody extends ConsumerWidget {
     );
   }
 
-  void _showEnemyCityDialog(BuildContext context, WidgetRef ref, CitySlot slot) {
+  /// Shows a unified city action dialog for any occupied slot.
+  ///
+  /// Own city: "Go to City" (primary) + "Trade" (secondary).
+  /// Enemy city: "Trade" (primary) + "Attack" (secondary/error style).
+  void _showCityActionDialog(
+    BuildContext context,
+    WidgetRef ref,
+    CitySlot slot,
+    String? currentUserId,
+    Island island,
+  ) {
+    final isOwn = slot.ownerId == currentUserId;
     final playerCityId = _playerCityId(ref) ?? '';
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -247,36 +258,78 @@ class _IslandDetailBody extends ConsumerWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                slot.cityName ?? 'Enemy City',
+                slot.cityName ?? 'City',
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Owner: ${_shortId(slot.ownerId ?? '')}'),
-            const SizedBox(height: 4),
-            Text('City ID: ${_shortId(slot.cityId ?? '')}'),
-          ],
-        ),
+        content: isOwn
+            ? null
+            : Text(
+                'Owner: ${_shortId(slot.ownerId ?? '')}',
+                style: TextStyle(color: Colors.grey.shade600),
+              ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton.icon(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              context.push(
-                '/dispatch?cityId=$playerCityId&targetCityId=${slot.cityId}',
-              );
-            },
-            icon: const Icon(Icons.gps_fixed_outlined, size: 18),
-            label: const Text('Attack'),
-          ),
+          if (isOwn) ...[
+            // Own city: Trade (secondary) + Go to City (primary).
+            OutlinedButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                showTradeDialog(
+                  context,
+                  originCityId: playerCityId,
+                  destinationCityId: slot.cityId!,
+                  destinationCityName: slot.cityName ?? 'City',
+                  originIslandX: island.gridX,
+                  originIslandY: island.gridY,
+                  destIslandX: island.gridX,
+                  destIslandY: island.gridY,
+                );
+              },
+              child: const Text('Trade'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                context.go('/city');
+              },
+              child: const Text('Go to City'),
+            ),
+          ],
+          if (!isOwn) ...[
+            // Enemy city: Attack (error style) + Trade (primary).
+            OutlinedButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                context.push(
+                  '/dispatch?cityId=$playerCityId&targetCityId=${slot.cityId}',
+                );
+              },
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+                side: BorderSide(
+                    color: Theme.of(context).colorScheme.error),
+              ),
+              child: const Text('Attack'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                showTradeDialog(
+                  context,
+                  originCityId: playerCityId,
+                  destinationCityId: slot.cityId!,
+                  destinationCityName: slot.cityName ?? 'City',
+                  originIslandX: island.gridX,
+                  originIslandY: island.gridY,
+                  destIslandX: island.gridX,
+                  destIslandY: island.gridY,
+                );
+              },
+              child: const Text('Trade'),
+            ),
+          ],
         ],
       ),
     );

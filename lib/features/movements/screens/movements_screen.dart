@@ -76,6 +76,20 @@ class MovementsScreen extends ConsumerWidget {
   }
 }
 
+/// Returns the appropriate icon for a movement type.
+IconData _movementIcon(String type) => switch (type) {
+      'return' => Icons.call_received,
+      'trade' => Icons.local_shipping,
+      _ => Icons.call_made,
+    };
+
+/// Returns the appropriate color for a movement type.
+Color _movementColor(String type, ThemeData theme) => switch (type) {
+      'return' => Colors.grey.shade600,
+      'trade' => Colors.green,
+      _ => theme.colorScheme.primary,
+    };
+
 /// Card widget displaying a single in-transit movement row.
 ///
 /// Shows movement direction icon, destination city name (resolved from UUID),
@@ -100,13 +114,9 @@ class _MovementCard extends ConsumerWidget {
             Row(
               children: [
                 Icon(
-                  movement.movementType == 'return'
-                      ? Icons.call_received
-                      : Icons.call_made,
+                  _movementIcon(movement.movementType),
                   size: 18,
-                  color: movement.movementType == 'return'
-                      ? Colors.grey.shade600
-                      : theme.colorScheme.primary,
+                  color: _movementColor(movement.movementType, theme),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -133,10 +143,12 @@ class _MovementCard extends ConsumerWidget {
             // Row 2: Unit summary
             const SizedBox(height: 4),
             Text(
-              movement.units.entries
-                  .map((e) =>
-                      '${unitTypeFromDbName(e.key).displayName} x${e.value}')
-                  .join(', '),
+              movement.movementType == 'trade'
+                  ? 'Cargo shipment'
+                  : movement.units.entries
+                        .map((e) =>
+                            '${unitTypeFromDbName(e.key).displayName} x${e.value}')
+                        .join(', '),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: Colors.grey.shade600,
               ),
