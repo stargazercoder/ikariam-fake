@@ -60,8 +60,9 @@ Source: `lib/core/theme/app_theme.dart` — Material 3 TextTheme (Roboto). Phase
 | Label | `labelLarge` | 14px | 500 medium | 1.4 |
 | Heading (dialog title) | `titleLarge` | 22px | 700 bold | 1.2 |
 | Sub-heading (section title) | `titleSmall` | 14px | 700 bold | 1.2 |
+| Caption / sub-labels | `bodySmall` | 12px | 400 regular | 1.4 |
 
-Two weights in use: **400 (regular)** and **700 (bold)**. `labelLarge` at weight 500 is a Material 3 system default — not a custom declaration.
+Two custom weights in use: **400 (regular)** and **700 (bold)**. `labelLarge` at weight 500 is a Material 3 system default — not a custom declaration. `bodySmall` at 12px is a Material 3 system default — not a custom declaration; included here for executor reference only.
 
 Apply `fontWeight: FontWeight.bold` to: dialog header city name, resource row labels at zero balance (same pattern as `building_upgrade_sheet.dart` line 180).
 
@@ -115,7 +116,7 @@ Dialog(
 
 Content layout (top to bottom, all inside `SingleChildScrollView > Padding(all: 16)`):
 
-1. **Header row** — `Icons.local_shipping` (size 32, color `theme.colorScheme.primary`) + city name in `titleLarge bold` + `Icons.close` button. No subtitle line needed.
+1. **Header row** — `Icons.local_shipping` (size 32, color `theme.colorScheme.primary`) + city name in `titleLarge bold` + `Icons.close` button (tooltip: 'Close dialog'). No subtitle line needed.
 2. **Divider** — `Divider(height: 24)`
 3. **Travel time row** — `Icons.timer_outlined` (size 18, `Colors.grey.shade600`) + "Arrives in: Xh Ym" in `bodyMedium`. Computed client-side using `calcTravelMinutes()`. Static text (not a CountdownTimerWidget — departure is in the future so the countdown has no meaningful state before sending).
 4. **Divider** — `Divider(height: 24)`
@@ -133,7 +134,7 @@ Content layout (top to bottom, all inside `SingleChildScrollView > Padding(all: 
            Spacer(),
            Text('${sliderValue.toInt()} / ${senderAvailable.toInt()}',
                 color: sufficient ? Colors.green.shade700 : theme.colorScheme.error,
-                fontWeight: FontWeight.w600),
+                fontWeight: FontWeight.bold),
          ]
        ),
        Slider(
@@ -165,7 +166,7 @@ Content layout (top to bottom, all inside `SingleChildScrollView > Padding(all: 
    - Loading state: `CircularProgressIndicator(strokeWidth: 2, color: Colors.white)` replaces icon, label becomes "Sending..."
    - Label when enabled: "Send Trade" (see Copywriting)
 
-7. **Close button** — `OutlinedButton` full width, label "Cancel" (see Copywriting)
+7. **Close button** — `OutlinedButton` full width, label "Discard Trade" (see Copywriting)
 
 ### Patched: `movements_screen.dart` — `_MovementCard`
 
@@ -204,7 +205,7 @@ Own-city "Go to City" button calls `context.go('/city')`. "Trade" button calls `
 | Element | Copy |
 |---------|------|
 | Primary CTA | **Send Trade** |
-| Dialog close / cancel | **Cancel** |
+| Dialog close / cancel | **Discard Trade** |
 | Loading state CTA | **Sending...** |
 | Own city action — primary action | **Go to City** |
 | Own city action — trade option | **Trade** |
@@ -298,3 +299,4 @@ No third-party component registries are used. All components are from `flutter/m
 
 *Phase: 15-resource-trading*
 *UI-SPEC created: 2026-03-16*
+*UI-SPEC revised: 2026-03-16 — fixed checker issues: "Cancel" -> "Discard Trade" (copywriting + component inventory), Icons.close tooltip added, bodySmall added to typography table, FontWeight.w600 -> FontWeight.bold in slider value row*
