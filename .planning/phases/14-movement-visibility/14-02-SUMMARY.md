@@ -53,8 +53,8 @@ completed: 2026-03-16
 
 - **Duration:** ~15 min
 - **Started:** 2026-03-16T09:15:00Z
-- **Completed:** 2026-03-16T09:30:00Z
-- **Tasks:** 2 of 3 (Task 3 is checkpoint:human-verify — awaiting user verification)
+- **Completed:** 2026-03-16T12:20:00Z
+- **Tasks:** 3 of 3 (all complete including human-verify checkpoint)
 - **Files modified:** 3
 
 ## Accomplishments
@@ -71,7 +71,7 @@ Each task was committed atomically:
 
 1. **Task 1: Add Movements route and navigation tab** - `05b7d39` (feat)
 2. **Task 2: Create MovementsScreen with _MovementCard** - `7af712e` (feat)
-3. **Task 3: Verify Movements screen end-to-end** - awaiting human verification (checkpoint)
+3. **Task 3: Verify Movements screen end-to-end** - checkpoint:human-verify approved by user
 
 ## Files Created/Modified
 - `lib/features/movements/screens/movements_screen.dart` - MovementsScreen + _MovementCard (183 lines)
@@ -106,9 +106,9 @@ None beyond the lint fixes above.
 None - no external service configuration required.
 
 ## Next Phase Readiness
-- Movements screen is fully functional and connected to the data layer from Plan 01
-- Awaiting human verification (Task 3 checkpoint) to confirm real-time behavior end-to-end
-- After approval, Phase 14 is complete — MOVE-01 and MOVE-02 requirements satisfied
+- Phase 14 is complete — MOVE-01 and MOVE-02 requirements satisfied
+- Movements screen verified end-to-end: empty state, real-time card updates, city name resolution, unit composition, ETA countdown, and card disappearance on arrival all confirmed
+- Ready for Phase 15: Resource Trading (cargo ship sending from city to player)
 
 ---
 *Phase: 14-movement-visibility*

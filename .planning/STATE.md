@@ -3,11 +3,27 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Espionage, Trading & Polish
 status: roadmap_ready
-stopped_at: Completed 14-02-PLAN.md — movements screen UI done, awaiting Task 3 human verification
-last_updated: "2026-03-16T09:12:25.951Z"
+stopped_at: Completed 14-02-PLAN.md — Phase 14 Movement Visibility fully verified and complete
+last_updated: "2026-03-16T12:42:02.295Z"
 last_activity: 2026-03-16 — Roadmap created
 progress:
   total_phases: 5
+  completed_phases: 2
+  total_plans: 4
+  completed_plans: 4
+  percent: 100
+---
+
+---
+gsd_state_version: 1.0
+milestone: v1.2
+milestone_name: Espionage, Trading & Polish
+status: roadmap_ready
+stopped_at: Completed 14-02-PLAN.md — Phase 14 fully verified and complete
+last_updated: "2026-03-16T12:20:00.000Z"
+last_activity: 2026-03-16 — Roadmap created
+progress:
+  [██████████] 100%
   completed_phases: 2
   total_plans: 4
   completed_plans: 4
@@ -97,7 +113,7 @@ Carried from v1.1 (tech debt):
 
 ## Session Continuity
 
-Last session: 2026-03-16T09:12:25.949Z
-Stopped at: Completed 14-02-PLAN.md — movements screen UI done, awaiting Task 3 human verification
+Last session: 2026-03-16T12:42:02.292Z
+Stopped at: Completed 14-02-PLAN.md — Phase 14 Movement Visibility fully verified and complete
 Resume file: None
-Next action: `/gsd:plan-phase 13`
+Next action: `/gsd:plan-phase 15` (Resource Trading)
