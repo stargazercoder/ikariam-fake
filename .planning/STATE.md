@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Espionage, Trading & Polish
 status: roadmap_ready
-stopped_at: Completed 14-01-PLAN.md — movement data layer done
-last_updated: "2026-03-16T09:08:31.767Z"
+stopped_at: Completed 14-02-PLAN.md — movements screen UI done, awaiting Task 3 human verification
+last_updated: "2026-03-16T09:12:25.951Z"
 last_activity: 2026-03-16 — Roadmap created
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 ---
@@ -71,6 +71,7 @@ All decisions logged in PROJECT.md Key Decisions table.
 - [Phase 13-dev-acceleration]: New Bulk Spawn and Instant Complete buttons placed after Trigger Battle preserving existing button order
 - [Phase 14-movement-visibility]: movementType uses String with 'attack' default (not enum) for DB compatibility and null-safety on legacy rows
 - [Phase 14-movement-visibility]: cityNameProvider uses FutureProvider.family (single fetch) not StreamProvider — city names are static, no realtime needed
+- [Phase 14-movement-visibility]: Removed dart:ui import from MovementsScreen — FontFeature re-exported by flutter/material.dart; nested Consumer per card for cityNameProvider rebuild isolation
 
 ### v1.2 Design Notes
 
@@ -96,7 +97,7 @@ Carried from v1.1 (tech debt):
 
 ## Session Continuity
 
-Last session: 2026-03-16T09:08:31.765Z
-Stopped at: Completed 14-01-PLAN.md — movement data layer done
+Last session: 2026-03-16T09:12:25.949Z
+Stopped at: Completed 14-02-PLAN.md — movements screen UI done, awaiting Task 3 human verification
 Resume file: None
 Next action: `/gsd:plan-phase 13`

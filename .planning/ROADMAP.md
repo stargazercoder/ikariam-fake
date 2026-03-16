@@ -39,7 +39,7 @@ Full details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 ### v1.2 Espionage, Trading & Polish (Phases 13-17)
 
 - [x] **Phase 13: Dev Acceleration** — Bulk unit spawning and 5x faster timers in dev toolbar (completed 2026-03-16)
-- [ ] **Phase 14: Movement Visibility** — Armies and cargo in transit shown with destinations, ETAs, and carried resources
+- [x] **Phase 14: Movement Visibility** — Armies and cargo in transit shown with destinations, ETAs, and carried resources (completed 2026-03-16)
 - [ ] **Phase 15: Resource Trading** — Send resources to other players via cargo ships with travel time
 - [ ] **Phase 16: Espionage & City Viewing** — Spy on enemy cities and view read-only city screens
 - [ ] **Phase 17: UI Polish** — Clean up city view layout, color-code cities and units
@@ -68,7 +68,7 @@ Plans:
   1. Player sees a list of all outgoing army movements showing destination city, arrival ETA, and the unit types and counts in the movement
   2. Player sees returning cargo ships in the same movement list showing the resource amounts being carried (pillage loot or trade cargo)
   3. Movement list updates in real-time as new dispatches are sent and arrivals are confirmed
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 14-01-PLAN.md — UnitMovement model update, global movements stream, and movement providers
 - [ ] 14-02-PLAN.md — Movements screen UI, navigation tab, and end-to-end verification
@@ -124,7 +124,7 @@ Plans:
 | 11. Island Upgrades + Resource Rate UI | v1.1 | 2/2 | Complete | 2026-03-13 |
 | 12. Combat Depth | v1.1 | 3/3 | Complete | 2026-03-15 |
 | 13. Dev Acceleration | 2/2 | Complete    | 2026-03-16 | - |
-| 14. Movement Visibility | 1/2 | In Progress|  | - |
+| 14. Movement Visibility | 2/2 | Complete   | 2026-03-16 | - |
 | 15. Resource Trading | v1.2 | 0/? | Not started | - |
 | 16. Espionage & City Viewing | v1.2 | 0/? | Not started | - |
 | 17. UI Polish | v1.2 | 0/? | Not started | - |
