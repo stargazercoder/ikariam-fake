@@ -60,18 +60,18 @@ Flutter Material 3 TextTheme is the source of truth. Declared roles mapped to M3
 | Role | M3 Token | Approx Size | Weight | Line Height |
 |------|----------|-------------|--------|-------------|
 | Body | `bodyMedium` | 14sp | 400 (regular) | 1.5 |
-| Label | `labelLarge` | 14sp | 600 (semibold) | 1.3 |
-| Heading | `titleMedium` | 16sp | 600 (semibold) | 1.4 |
+| Label | `labelLarge` | 14sp | 700 (bold) | 1.3 |
+| Heading | `titleMedium` | 16sp | 700 (bold) | 1.4 |
 | Display | `titleLarge` | 22sp | 700 (bold) | 1.2 |
 
-**Allowed font weights:** 400 (regular) and 600/700 (semibold/bold) only — matches existing codebase usage.
+**Allowed font weights:** 400 (regular) and 700 (bold) only — exactly 2 weights.
 
 Specific typography decisions for Phase 16:
 
 - **Spy report dialog title** (city name): `titleLarge` + `fontWeight: FontWeight.bold` — same as trade dialog header. Source: `trade_dialog.dart` line 134.
 - **Spy report section headers** (Resources, Buildings, Army): `labelLarge` + `color: colorScheme.primary` + `fontWeight: FontWeight.bold` — same as `_SectionHeader` in battles screen. Source: `battles_screen.dart` line 125.
-- **Spy report data rows**: `bodyMedium` at weight 400 for labels, `bodySmall` at weight 600 for values.
-- **Spy log list tile title**: `bodyMedium` + `fontWeight: FontWeight.w600` — matches `_BattleTile` pattern. Source: `battles_screen.dart` line 171.
+- **Spy report data rows**: `bodyMedium` at weight 400 for labels, `bodySmall` at weight 700 for values.
+- **Spy log list tile title**: `bodyMedium` + `fontWeight: FontWeight.bold` — matches `_BattleTile` pattern. Source: `battles_screen.dart` line 171.
 - **Enemy city view AppBar title**: `titleLarge` in AppBar foreground (white) — same as all AppBars.
 - **Read-only notice chip**: `bodySmall` at weight 400, color `colorScheme.onSurface.withAlpha(140)`.
 
@@ -132,12 +132,12 @@ Triggered immediately when "Spy (100 gold)" is tapped. No confirmation step (loc
 | State | Visual |
 |-------|--------|
 | Loading | `CircularProgressIndicator` centered in dialog body; close button disabled |
-| Success | Report sections rendered (see layout below); "View City" and "Close" buttons visible |
+| Success | Report sections rendered (see layout below); "View City" and "Close Report" buttons visible |
 | Insufficient gold | Dialog pops; SnackBar shown with error color and message |
 | Network error | Dialog pops; SnackBar shown with error color and retry message |
 
 **Spy Report Dialog Layout (success state, top to bottom):**
-1. Header row: `Icons.visibility` (32px, primaryColor) + city name (`titleLarge` bold) + close `IconButton`
+1. Header row: `Icons.visibility` (32px, primaryColor) + city name (`titleLarge` bold) + close `IconButton(icon: Icon(Icons.close), tooltip: 'Close spy report', onPressed: ...)`
 2. `Divider(height: 24)`
 3. Subtitle row: owner name (`bodyMedium`, `Colors.grey.shade600`)
 4. `Divider(height: 24)`
@@ -149,7 +149,7 @@ Triggered immediately when "Spy (100 gold)" is tapped. No confirmation step (loc
 10. `SizedBox(height: 8)`
 11. "View City" button — `FilledButton` full width (height 48)
 12. `SizedBox(height: 8)`
-13. "Close" button — `OutlinedButton` full width
+13. "Close Report" button — `OutlinedButton` full width
 
 **Spy icon:** `Icons.visibility` — represents scouting/observation without implying violence.
 
@@ -177,7 +177,7 @@ Accessible from the Battles screen via a `FloatingActionButton` with `Icons.hist
 
 **Spy Log Tile layout (matches `_BattleTile` pattern):**
 - Leading: `Icons.visibility` icon, `primaryColor`
-- Title: city name (`bodyMedium`, `fontWeight: FontWeight.w600`)
+- Title: city name (`bodyMedium`, `fontWeight: FontWeight.bold`)
 - Subtitle: report timestamp formatted as "Mar 16, 2026 · 14:32" (`bodySmall`, grey)
 - Trailing: `Icons.chevron_right` (grey) — taps open spy report dialog (read mode, no gold cost re-run)
 
@@ -201,7 +201,8 @@ Accessible from the Battles screen via a `FloatingActionButton` with `Icons.hist
 | Spy report section — army | "Army" |
 | Spy report army row | "Total units: {N}" |
 | Spy report CTA | "View City" |
-| Spy report secondary action | "Close" |
+| Spy report secondary action | "Close Report" |
+| Spy report close icon tooltip | "Close spy report" |
 | Loading state (spy in progress) | CircularProgressIndicator only — no label |
 | Enemy city view AppBar | "{CityName} ({PlayerName})" |
 | Enemy city read-only notice | "Viewing enemy city — read only" |
