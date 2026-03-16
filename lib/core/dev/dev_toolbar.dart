@@ -207,6 +207,116 @@ class _DevToolbarFabState extends ConsumerState<_DevToolbarFab> {
     }
   }
 
+  Future<void> _bulkSpawnUnits() async {
+    final cityId = _currentCityId();
+    if (cityId == null) {
+      _showSnack('No city loaded — cannot bulk spawn units');
+      return;
+    }
+
+    // Pre-create controllers to avoid TextEditingController rebuild pitfall inside itemBuilder
+    final controllers = {
+      for (final type in _unitTypes) type: TextEditingController(text: '50'),
+    };
+    var checkedTypes = <String>{};
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Bulk Spawn Units'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 400,
+          child: StatefulBuilder(
+            builder: (ctx2, setStateDialog) => ListView.builder(
+              itemCount: _unitTypes.length,
+              itemBuilder: (_, index) {
+                final type = _unitTypes[index];
+                return Row(
+                  children: [
+                    Checkbox(
+                      value: checkedTypes.contains(type),
+                      onChanged: (checked) {
+                        setStateDialog(() {
+                          if (checked == true) {
+                            checkedTypes.add(type);
+                            controllers[type]!.text = '50';
+                          } else {
+                            checkedTypes.remove(type);
+                          }
+                        });
+                      },
+                    ),
+                    Expanded(child: Text(type)),
+                    SizedBox(
+                      width: 80,
+                      child: TextField(
+                        controller: controllers[type],
+                        keyboardType: TextInputType.number,
+                        enabled: checkedTypes.contains(type),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Spawn'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) {
+      for (final c in controllers.values) {
+        c.dispose();
+      }
+      return;
+    }
+
+    final toSpawn = {
+      for (final type in checkedTypes)
+        type: int.tryParse(controllers[type]!.text) ?? 50,
+    };
+
+    for (final c in controllers.values) {
+      c.dispose();
+    }
+
+    if (toSpawn.isEmpty) return;
+
+    try {
+      await _devRpc.bulkSpawnUnits(cityId, toSpawn);
+      _showSnack(
+        'Spawned: ${toSpawn.entries.map((e) => "${e.value} ${e.key}").join(", ")}',
+      );
+    } catch (_) {
+      _showSnack('Failed to bulk spawn units');
+    }
+  }
+
+  Future<void> _instantComplete() async {
+    final cityId = _currentCityId();
+    if (cityId == null) {
+      _showSnack('No city loaded — cannot instant complete');
+      return;
+    }
+    try {
+      await _devRpc.instantComplete(cityId);
+      _showSnack('Completed all training & construction');
+    } catch (_) {
+      _showSnack('Failed to instant complete');
+    }
+  }
+
   Future<void> _triggerBattle() async {
     final cityId = _currentCityId();
     if (cityId == null) {
@@ -260,7 +370,8 @@ class _DevToolbarFabState extends ConsumerState<_DevToolbarFab> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return IntrinsicWidth(
+      child: Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -289,6 +400,18 @@ class _DevToolbarFabState extends ConsumerState<_DevToolbarFab> {
             onPressed: _triggerBattle,
           ),
           const SizedBox(height: 8),
+          _ActionButton(
+            icon: Icons.dynamic_feed,
+            label: 'Bulk Spawn',
+            onPressed: _bulkSpawnUnits,
+          ),
+          const SizedBox(height: 8),
+          _ActionButton(
+            icon: Icons.fast_forward,
+            label: 'Instant Complete',
+            onPressed: _instantComplete,
+          ),
+          const SizedBox(height: 8),
         ],
         FloatingActionButton(
           heroTag: 'dev_toolbar_fab',
@@ -299,6 +422,7 @@ class _DevToolbarFabState extends ConsumerState<_DevToolbarFab> {
           child: const Icon(Icons.developer_mode, color: Colors.white),
         ),
       ],
+    ),
     );
   }
 }
