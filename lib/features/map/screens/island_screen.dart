@@ -9,6 +9,8 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../city/providers/city_provider.dart';
+import '../../espionage/providers/espionage_providers.dart';
+import '../../espionage/screens/spy_report_dialog.dart';
 import '../../trade/screens/trade_dialog.dart';
 import '../../../core/constants/island_constants.dart';
 import '../models/island.dart';
@@ -298,7 +300,7 @@ class _IslandDetailBody extends ConsumerWidget {
             ),
           ],
           if (!isOwn) ...[
-            // Enemy city: Attack (error style) + Trade (primary).
+            // Enemy city: Attack (error style) + Trade (primary) + Spy + View City.
             OutlinedButton(
               onPressed: () {
                 Navigator.of(ctx).pop();
@@ -329,6 +331,41 @@ class _IslandDetailBody extends ConsumerWidget {
               },
               child: const Text('Trade'),
             ),
+            // Spy button — always enabled for enemy cities.
+            FilledButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                showSpyReportDialog(
+                  context,
+                  targetCityId: slot.cityId!,
+                  targetCityName: slot.cityName ?? 'City',
+                );
+              },
+              child: const Text('Spy (100 gold)'),
+            ),
+            // View City button — enabled only if player has spied on this city.
+            Consumer(builder: (_, ref, _) {
+              final hasSpied =
+                  ref.watch(hasSpiedProvider(slot.cityId!)).whenOrNull(
+                        data: (v) => v,
+                      ) ??
+                      false;
+              return OutlinedButton(
+                onPressed: hasSpied
+                    ? () {
+                        Navigator.of(ctx).pop();
+                        context.push(
+                          '/city-view'
+                          '?cityId=${Uri.encodeComponent(slot.cityId!)}'
+                          '&cityName=${Uri.encodeComponent(slot.cityName ?? 'City')}'
+                          '&ownerName=${Uri.encodeComponent(_shortId(slot.ownerId ?? ''))}',
+                        );
+                      }
+                    : null,
+                child:
+                    Text(hasSpied ? 'View City' : 'View City (spy first)'),
+              );
+            }),
           ],
         ],
       ),

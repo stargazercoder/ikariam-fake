@@ -17,6 +17,8 @@ import '../../features/military/screens/barracks_screen.dart';
 import '../../features/movements/screens/movements_screen.dart';
 import '../../features/military/screens/dispatch_screen.dart';
 import '../../features/military/screens/shipyard_screen.dart';
+import '../../features/map/screens/enemy_city_view_screen.dart';
+import '../../features/espionage/screens/spy_log_screen.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../features/profile/screens/create_profile_screen.dart';
 
@@ -135,6 +137,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/create-profile',
         builder: (context, state) => const CreateProfileScreen(),
       ),
+      // Enemy city view — full-screen detail overlay (no bottom nav).
+      GoRoute(
+        path: '/city-view',
+        builder: (context, state) => EnemyCityViewScreen(
+          cityId: state.uri.queryParameters['cityId'] ?? '',
+          cityName: Uri.decodeComponent(
+              state.uri.queryParameters['cityName'] ?? 'City'),
+          ownerName: Uri.decodeComponent(
+              state.uri.queryParameters['ownerName'] ?? 'Unknown'),
+        ),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             MainShellScreen(navigationShell: navigationShell),
@@ -197,6 +210,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => BattleDetailScreen(
                   battleId: state.uri.queryParameters['battleId'] ?? '',
                 ),
+              ),
+              // Spy log nested inside battles branch — bottom nav stays visible.
+              GoRoute(
+                path: '/spy-log',
+                builder: (context, state) => const SpyLogScreen(),
               ),
             ],
           ),

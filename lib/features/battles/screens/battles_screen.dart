@@ -29,6 +29,13 @@ class BattlesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Battles'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.visibility),
+            tooltip: 'Spy Log',
+            onPressed: () => context.push('/spy-log'),
+          ),
+        ],
       ),
       body: battles.isEmpty
           ? const _EmptyBattles()
