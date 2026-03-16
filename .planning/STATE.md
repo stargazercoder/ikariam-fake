@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Espionage, Trading & Polish
 status: roadmap_ready
-stopped_at: Phase 13 context gathered
-last_updated: "2026-03-15T22:04:28.278Z"
+stopped_at: Completed 13-01-PLAN.md
+last_updated: "2026-03-16T08:06:37.012Z"
 last_activity: 2026-03-16 — Roadmap created
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
 ---
 
 ---
@@ -65,6 +65,8 @@ v1.2 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
 ### Decisions
 
 All decisions logged in PROJECT.md Key Decisions table.
+- [Phase 13]: construction_queue instant-complete sets finish_at to past so existing cron handles level-up logic unchanged
+- [Phase 13]: dispatch-units rawTravelMinutes rename applies multiplier while preserving Math.max(1) floor and response body
 
 ### v1.2 Design Notes
 
@@ -90,7 +92,7 @@ Carried from v1.1 (tech debt):
 
 ## Session Continuity
 
-Last session: 2026-03-15T22:04:28.250Z
-Stopped at: Phase 13 context gathered
-Resume file: .planning/phases/13-dev-acceleration/13-CONTEXT.md
+Last session: 2026-03-16T08:06:37.010Z
+Stopped at: Completed 13-01-PLAN.md
+Resume file: None
 Next action: `/gsd:plan-phase 13`

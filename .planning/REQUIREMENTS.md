@@ -27,9 +27,9 @@
 
 ### Dev Acceleration
 
-- [ ] **DEVT-01**: Dev toolbar supports bulk unit spawning (select multiple types and quantities in one action)
-- [ ] **DEVT-02**: Unit training times reduced to 1/5 of normal in dev mode
-- [ ] **DEVT-03**: Unit travel/arrival times reduced to 1/5 of normal in dev mode
+- [x] **DEVT-01**: Dev toolbar supports bulk unit spawning (select multiple types and quantities in one action)
+- [x] **DEVT-02**: Unit training times reduced to 1/5 of normal in dev mode
+- [x] **DEVT-03**: Unit travel/arrival times reduced to 1/5 of normal in dev mode
 
 ## v1.3+ Requirements
 
@@ -67,9 +67,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DEVT-01 | Phase 13 | Pending |
-| DEVT-02 | Phase 13 | Pending |
-| DEVT-03 | Phase 13 | Pending |
+| DEVT-01 | Phase 13 | Complete |
+| DEVT-02 | Phase 13 | Complete |
+| DEVT-03 | Phase 13 | Complete |
 | MOVE-01 | Phase 14 | Pending |
 | MOVE-02 | Phase 14 | Pending |
 | TRAD-01 | Phase 15 | Pending |
