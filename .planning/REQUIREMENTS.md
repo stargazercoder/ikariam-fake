@@ -7,8 +7,8 @@
 
 ### Espionage
 
-- [ ] **ESPY-01**: User can send a spy to an enemy city to reveal resource amounts, building levels, and army counts
-- [ ] **ESPY-02**: User can view a read-only version of another player's city screen (buildings layout)
+- [x] **ESPY-01**: User can send a spy to an enemy city to reveal resource amounts, building levels, and army counts
+- [x] **ESPY-02**: User can view a read-only version of another player's city screen (buildings layout)
 
 ### Trading
 
@@ -73,8 +73,8 @@
 | MOVE-01 | Phase 14 | Complete |
 | MOVE-02 | Phase 14 | Complete |
 | TRAD-01 | Phase 15 | Complete |
-| ESPY-01 | Phase 16 | Pending |
-| ESPY-02 | Phase 16 | Pending |
+| ESPY-01 | Phase 16 | Complete |
+| ESPY-02 | Phase 16 | Complete |
 | UIPL-01 | Phase 17 | Pending |
 | UIPL-02 | Phase 17 | Pending |
 | UIPL-03 | Phase 17 | Pending |

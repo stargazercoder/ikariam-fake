@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Espionage, Trading & Polish
 status: roadmap_ready
-stopped_at: Phase 16 context gathered
-last_updated: "2026-03-16T18:54:27.835Z"
+stopped_at: Completed 16-00-PLAN.md — Wave 0 test scaffold for espionage
+last_updated: "2026-03-16T20:41:36.886Z"
 last_activity: 2026-03-16 — Roadmap created
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 9
+  completed_plans: 7
   percent: 100
 ---
 
@@ -92,6 +92,7 @@ All decisions logged in PROJECT.md Key Decisions table.
 - [Phase 15]: Self-trade (origin == destination) allowed in send-trade — no rejection, per TRAD-01 spec
 - [Phase 15-02]: TradeRepository.sendTrade returns Map to surface travel_minutes for success SnackBar
 - [Phase 15-02]: Unified _showCityActionDialog replaces both own/enemy city tap handlers on island screen
+- [Phase 16-espionage-city-viewing]: testWidgets skip parameter only accepts bool? not String — used skip: true for widget tests (flutter_test API constraint)
 
 ### v1.2 Design Notes
 
@@ -117,7 +118,7 @@ Carried from v1.1 (tech debt):
 
 ## Session Continuity
 
-Last session: 2026-03-16T18:54:27.823Z
-Stopped at: Phase 16 context gathered
-Resume file: .planning/phases/16-espionage-city-viewing/16-CONTEXT.md
+Last session: 2026-03-16T20:41:36.884Z
+Stopped at: Completed 16-00-PLAN.md — Wave 0 test scaffold for espionage
+Resume file: None
 Next action: `/gsd:plan-phase 15` (Resource Trading)
