@@ -120,7 +120,7 @@ Plans:
 | 10. Economy Foundation | v1.1 | 3/3 | Complete | 2026-03-13 |
 | 11. Island Upgrades + Resource Rate UI | v1.1 | 2/2 | Complete | 2026-03-13 |
 | 12. Combat Depth | v1.1 | 3/3 | Complete | 2026-03-15 |
-| 13. Dev Acceleration | 2/2 | Complete   | 2026-03-16 | - |
+| 13. Dev Acceleration | 2/2 | Complete    | 2026-03-16 | - |
 | 14. Movement Visibility | v1.2 | 0/? | Not started | - |
 | 15. Resource Trading | v1.2 | 0/? | Not started | - |
 | 16. Espionage & City Viewing | v1.2 | 0/? | Not started | - |

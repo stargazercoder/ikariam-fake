@@ -4,7 +4,7 @@ milestone: v1.2
 milestone_name: Espionage, Trading & Polish
 status: roadmap_ready
 stopped_at: Completed 13-02-PLAN.md
-last_updated: "2026-03-16T08:07:10.854Z"
+last_updated: "2026-03-16T08:10:08.166Z"
 last_activity: 2026-03-16 — Roadmap created
 progress:
   total_phases: 5
