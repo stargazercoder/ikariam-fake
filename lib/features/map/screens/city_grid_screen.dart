@@ -140,12 +140,14 @@ class BuildingsGrid extends StatelessWidget {
     required this.cityId,
     required this.currentResources,
     required this.activeConstruction,
+    this.readOnly = false,
   });
 
   final List<CityBuilding> buildings;
   final String cityId;
   final List<CityResource> currentResources;
   final ConstructionQueueEntry? activeConstruction;
+  final bool readOnly;
 
   /// Size of each grid cell in logical pixels.
   static const double cellSize = 60.0;
@@ -192,6 +194,7 @@ class BuildingsGrid extends StatelessWidget {
                         cityId: cityId,
                         currentResources: currentResources,
                         activeConstruction: activeConstruction,
+                        readOnly: readOnly,
                       ),
                     );
                   },
@@ -250,12 +253,14 @@ class BuildingCell extends StatelessWidget {
     required this.cityId,
     required this.currentResources,
     required this.activeConstruction,
+    this.readOnly = false,
   });
 
   final CityBuilding building;
   final String cityId;
   final List<CityResource> currentResources;
   final ConstructionQueueEntry? activeConstruction;
+  final bool readOnly;
 
   bool get _isBeingUpgraded =>
       activeConstruction != null &&
@@ -270,25 +275,27 @@ class BuildingCell extends StatelessWidget {
         : theme.colorScheme.primary;
 
     return GestureDetector(
-      onTap: () {
-        // Barracks and Shipyard navigate to their dedicated military screens.
-        if (building.buildingType == BuildingType.barracks) {
-          context.push('/barracks?cityId=$cityId');
-          return;
-        }
-        if (building.buildingType == BuildingType.shipyard) {
-          context.push('/shipyard?cityId=$cityId');
-          return;
-        }
-        // All other buildings show the upgrade bottom sheet.
-        showBuildingUpgradeSheet(
-          context,
-          building: building,
-          cityId: cityId,
-          currentResources: currentResources,
-          activeConstruction: activeConstruction,
-        );
-      },
+      onTap: readOnly
+          ? null
+          : () {
+              // Barracks and Shipyard navigate to their dedicated military screens.
+              if (building.buildingType == BuildingType.barracks) {
+                context.push('/barracks?cityId=$cityId');
+                return;
+              }
+              if (building.buildingType == BuildingType.shipyard) {
+                context.push('/shipyard?cityId=$cityId');
+                return;
+              }
+              // All other buildings show the upgrade bottom sheet.
+              showBuildingUpgradeSheet(
+                context,
+                building: building,
+                cityId: cityId,
+                currentResources: currentResources,
+                activeConstruction: activeConstruction,
+              );
+            },
       child: Container(
         decoration: BoxDecoration(
           color: color.withAlpha(_isBeingUpgraded ? 200 : 160),
