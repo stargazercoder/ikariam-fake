@@ -26,8 +26,8 @@ decisions:
   - "Consumer(builder: (_, ref, _)) pattern used for hasSpiedProvider in island dialog (single underscore per lint rule)"
 metrics:
   duration_seconds: 289
-  completed_date: "2026-03-16"
-  tasks_completed: 2
+  completed_date: "2026-03-17"
+  tasks_completed: 3
   tasks_total: 3
   files_created: 3
   files_modified: 4
@@ -47,6 +47,7 @@ Build all Flutter UI for espionage: spy report dialog, enemy city view screen, s
 |------|------|--------|-------|
 | 1 | Add readOnly to BuildingsGrid/BuildingCell, create EnemyCityViewScreen and SpyReportDialog | 3130668 | city_grid_screen.dart, enemy_city_view_screen.dart, spy_report_dialog.dart |
 | 2 | Create SpyLogScreen, wire island action dialog, register GoRouter routes | b4c3743 | spy_log_screen.dart, island_screen.dart, app_router.dart, battles_screen.dart |
+| 3 | Verify complete espionage flow end-to-end (checkpoint approved) | — | All 9 verification steps passed |
 
 ## What Was Built
 
@@ -107,10 +108,18 @@ Build all Flutter UI for espionage: spy report dialog, enemy city view screen, s
 2. `/city-view` registered as top-level GoRoute (hides bottom nav) — enemy city is a full-screen detail overlay.
 3. `/spy-log` nested inside battles `StatefulShellBranch` (keeps bottom nav visible) per CONTEXT.md locked decision.
 
-## Checkpoint Reached
+## Checkpoint Verification
 
-Task 3 is `checkpoint:human-verify` — requires manual end-to-end verification of the complete espionage flow.
+Task 3 was a `checkpoint:human-verify` — all 9 manual verification steps passed:
+1. Island tab: enemy city dialog shows Attack, Trade, Spy (100 gold), View City (spy first) [greyed]
+2. Spy (100 gold): loading spinner, then full spy report with resources, buildings, army
+3. View City from report: red AppBar, read-only banner, building grid, taps do nothing
+4. Enemy city dialog after spy: View City button enabled (not greyed)
+5. Battles tab: bottom navigation bar visible
+6. Battles AppBar: spy icon button present
+7. Spy Log: shows report with timestamp, bottom nav still visible
+8. Resources: 100 gold deducted from player's city
 
 ## Self-Check: PASSED
 
-All created files exist on disk. Both task commits (3130668, b4c3743) verified in git log.
+All created files exist on disk. Task commits (3130668, b4c3743) verified in git log. Plan fully complete with all 3 tasks done.
