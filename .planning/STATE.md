@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Espionage, Trading & Polish
 status: roadmap_ready
-stopped_at: Completed 16-00-PLAN.md — Wave 0 test scaffold for espionage
-last_updated: "2026-03-16T20:41:36.886Z"
+stopped_at: Completed 16-01-PLAN.md
+last_updated: "2026-03-16T20:46:36.679Z"
 last_activity: 2026-03-16 — Roadmap created
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
   percent: 100
 ---
 
@@ -93,6 +93,7 @@ All decisions logged in PROJECT.md Key Decisions table.
 - [Phase 15-02]: TradeRepository.sendTrade returns Map to surface travel_minutes for success SnackBar
 - [Phase 15-02]: Unified _showCityActionDialog replaces both own/enemy city tap handlers on island screen
 - [Phase 16-espionage-city-viewing]: testWidgets skip parameter only accepts bool? not String — used skip: true for widget tests (flutter_test API constraint)
+- [Phase 16-espionage-city-viewing]: spy-city Edge Function uses Supabase aggregate query syntax for army_count and EspionageException mirrors TradeException pattern
 
 ### v1.2 Design Notes
 
@@ -118,7 +119,7 @@ Carried from v1.1 (tech debt):
 
 ## Session Continuity
 
-Last session: 2026-03-16T20:41:36.884Z
-Stopped at: Completed 16-00-PLAN.md — Wave 0 test scaffold for espionage
+Last session: 2026-03-16T20:46:36.677Z
+Stopped at: Completed 16-01-PLAN.md
 Resume file: None
 Next action: `/gsd:plan-phase 15` (Resource Trading)
