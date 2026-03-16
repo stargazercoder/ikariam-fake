@@ -98,4 +98,34 @@ class DevRpcService {
       rethrow;
     }
   }
+
+  /// Spawns multiple unit types at once in [cityId].
+  ///
+  /// [units] is a map of unit_type -> quantity (e.g. {'hoplite': 100, 'archer': 50}).
+  /// Calls: dev_bulk_spawn_units(p_city_id, p_units)
+  Future<void> bulkSpawnUnits(String cityId, Map<String, int> units) async {
+    try {
+      await _client.rpc('dev_bulk_spawn_units', params: {
+        'p_city_id': cityId,
+        'p_units': units,
+      });
+    } catch (e) {
+      debugPrint('[DevRpcService] bulkSpawnUnits error: $e');
+      rethrow;
+    }
+  }
+
+  /// Instantly completes all training queue and construction queue entries for [cityId].
+  ///
+  /// Calls: dev_instant_complete(p_city_id)
+  Future<void> instantComplete(String cityId) async {
+    try {
+      await _client.rpc('dev_instant_complete', params: {
+        'p_city_id': cityId,
+      });
+    } catch (e) {
+      debugPrint('[DevRpcService] instantComplete error: $e');
+      rethrow;
+    }
+  }
 }
