@@ -89,6 +89,26 @@ class MilitaryRepository {
         );
   }
 
+  /// Returns a live stream of ALL [UnitMovement] rows owned by the current
+  /// user, sorted by arriveAt ascending (soonest arrival first).
+  ///
+  /// Unlike [watchOutgoingMovements], this does NOT filter by originCityId.
+  /// Used by the global Movements screen.
+  Stream<List<UnitMovement>> watchAllMovements() {
+    final userId = supabaseClient.auth.currentUser?.id;
+    if (userId == null) return const Stream.empty();
+    return supabaseClient
+        .from('unit_movements')
+        .stream(primaryKey: ['id'])
+        .eq('owner_id', userId)
+        .map(
+          (rows) => rows
+              .map((r) => UnitMovement.fromJson(r))
+              .toList()
+            ..sort((a, b) => a.arriveAt.compareTo(b.arriveAt)),
+        );
+  }
+
   /// Invokes the train-units Edge Function to queue a unit training job.
   ///
   /// Throws [TrainingException] on non-200 responses with the server error
