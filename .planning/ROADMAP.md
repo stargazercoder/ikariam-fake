@@ -128,6 +128,6 @@ Plans:
 | 12. Combat Depth | v1.1 | 3/3 | Complete | 2026-03-15 |
 | 13. Dev Acceleration | 2/2 | Complete    | 2026-03-16 | - |
 | 14. Movement Visibility | 2/2 | Complete    | 2026-03-16 | - |
-| 15. Resource Trading | 2/2 | Complete   | 2026-03-16 | - |
+| 15. Resource Trading | 2/2 | Complete    | 2026-03-16 | - |
 | 16. Espionage & City Viewing | v1.2 | 0/? | Not started | - |
 | 17. UI Polish | v1.2 | 0/? | Not started | - |
