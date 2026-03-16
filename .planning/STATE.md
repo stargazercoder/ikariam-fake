@@ -4,7 +4,7 @@ milestone: v1.2
 milestone_name: Espionage, Trading & Polish
 status: roadmap_ready
 stopped_at: Completed 14-02-PLAN.md — Phase 14 Movement Visibility fully verified and complete
-last_updated: "2026-03-16T12:42:02.295Z"
+last_updated: "2026-03-16T12:45:12.139Z"
 last_activity: 2026-03-16 — Roadmap created
 progress:
   total_phases: 5
