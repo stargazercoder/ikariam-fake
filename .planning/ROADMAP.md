@@ -40,7 +40,7 @@ Full details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 
 - [x] **Phase 13: Dev Acceleration** — Bulk unit spawning and 5x faster timers in dev toolbar (completed 2026-03-16)
 - [x] **Phase 14: Movement Visibility** — Armies and cargo in transit shown with destinations, ETAs, and carried resources (completed 2026-03-16)
-- [ ] **Phase 15: Resource Trading** — Send resources to other players via cargo ships with travel time
+- [x] **Phase 15: Resource Trading** — Send resources to other players via cargo ships with travel time (completed 2026-03-16)
 - [ ] **Phase 16: Espionage & City Viewing** — Spy on enemy cities and view read-only city screens
 - [ ] **Phase 17: UI Polish** — Clean up city view layout, color-code cities and units
 
@@ -83,7 +83,7 @@ Plans:
   3. Cargo ships arrive at the destination city after the distance-based travel time and the resources are added to the recipient's warehouse
   4. Both sender and recipient can see the in-transit cargo in their movement lists (Phase 14 visibility)
   5. Trade is blocked if the sender has insufficient resources or the recipient's warehouse would overflow
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 15-01-PLAN.md — DB migration (trade movement type + deduct_resources RPC) and send-trade Edge Function
 - [ ] 15-02-PLAN.md — TradeRepository, TradeDialog with sliders, island screen trade integration, movements screen trade display
@@ -128,6 +128,6 @@ Plans:
 | 12. Combat Depth | v1.1 | 3/3 | Complete | 2026-03-15 |
 | 13. Dev Acceleration | 2/2 | Complete    | 2026-03-16 | - |
 | 14. Movement Visibility | 2/2 | Complete    | 2026-03-16 | - |
-| 15. Resource Trading | 1/2 | In Progress|  | - |
+| 15. Resource Trading | 2/2 | Complete   | 2026-03-16 | - |
 | 16. Espionage & City Viewing | v1.2 | 0/? | Not started | - |
 | 17. UI Polish | v1.2 | 0/? | Not started | - |

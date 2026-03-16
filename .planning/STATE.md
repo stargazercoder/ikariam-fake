@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Espionage, Trading & Polish
 status: roadmap_ready
-stopped_at: Completed 15-01-PLAN.md — send-trade Edge Function and DB migration
-last_updated: "2026-03-16T15:06:14.452Z"
+stopped_at: Completed 15-02-PLAN.md — Flutter trade UI feature complete
+last_updated: "2026-03-16T15:07:41.160Z"
 last_activity: 2026-03-16 — Roadmap created
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
   percent: 100
 ---
 
@@ -90,6 +90,8 @@ All decisions logged in PROJECT.md Key Decisions table.
 - [Phase 14-movement-visibility]: Removed dart:ui import from MovementsScreen — FontFeature re-exported by flutter/material.dart; nested Consumer per card for cityNameProvider rebuild isolation
 - [Phase 15]: Migration renamed from 20260316000001 to 20260316000002 due to timestamp conflict with dev migration
 - [Phase 15]: Self-trade (origin == destination) allowed in send-trade — no rejection, per TRAD-01 spec
+- [Phase 15-02]: TradeRepository.sendTrade returns Map to surface travel_minutes for success SnackBar
+- [Phase 15-02]: Unified _showCityActionDialog replaces both own/enemy city tap handlers on island screen
 
 ### v1.2 Design Notes
 
@@ -115,7 +117,7 @@ Carried from v1.1 (tech debt):
 
 ## Session Continuity
 
-Last session: 2026-03-16T15:06:14.449Z
-Stopped at: Completed 15-01-PLAN.md — send-trade Edge Function and DB migration
+Last session: 2026-03-16T15:07:41.157Z
+Stopped at: Completed 15-02-PLAN.md — Flutter trade UI feature complete
 Resume file: None
 Next action: `/gsd:plan-phase 15` (Resource Trading)
