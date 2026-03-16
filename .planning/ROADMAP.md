@@ -97,8 +97,9 @@ Plans:
   2. Spy action resolves instantly (no travel time, no spy unit consumed)
   3. Player can navigate to any other player's city screen and see a read-only version of their building grid and city stats
   4. Read-only city view clearly indicates it is not the player's own city (no action buttons, ownership label visible)
-**Plans:** 2 plans
+**Plans:** 3 plans
 Plans:
+- [ ] 16-00-PLAN.md — Wave 0 test scaffold (unit + widget test stubs for Nyquist compliance)
 - [ ] 16-01-PLAN.md — DB migration (spy_reports table) + spy-city Edge Function + SpyReport model + repository + providers
 - [ ] 16-02-PLAN.md — Spy report dialog, enemy city view screen, spy log, island screen integration, router
 
@@ -113,8 +114,8 @@ Plans:
   4. Color coding is consistent across all screens that display units or city markers
 **Plans:** 2 plans
 Plans:
-- [ ] 16-01-PLAN.md — DB migration (spy_reports table) + spy-city Edge Function + SpyReport model + repository + providers
-- [ ] 16-02-PLAN.md — Spy report dialog, enemy city view screen, spy log, island screen integration, router
+- [ ] 17-01-PLAN.md — [To be planned]
+- [ ] 17-02-PLAN.md — [To be planned]
 
 ## Progress
 
@@ -135,5 +136,5 @@ Plans:
 | 13. Dev Acceleration | 2/2 | Complete    | 2026-03-16 | - |
 | 14. Movement Visibility | 2/2 | Complete    | 2026-03-16 | - |
 | 15. Resource Trading | 2/2 | Complete    | 2026-03-16 | - |
-| 16. Espionage & City Viewing | v1.2 | 0/2 | In progress | - |
+| 16. Espionage & City Viewing | v1.2 | 0/3 | In progress | - |
 | 17. UI Polish | v1.2 | 0/? | Not started | - |
