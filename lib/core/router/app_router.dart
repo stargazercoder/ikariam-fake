@@ -14,6 +14,7 @@ import '../../features/map/screens/world_map_screen.dart';
 import '../../features/battles/screens/battle_detail_screen.dart';
 import '../../features/battles/screens/battles_screen.dart';
 import '../../features/military/screens/barracks_screen.dart';
+import '../../features/movements/screens/movements_screen.dart';
 import '../../features/military/screens/dispatch_screen.dart';
 import '../../features/military/screens/shipyard_screen.dart';
 import '../../features/profile/providers/profile_provider.dart';
@@ -25,6 +26,7 @@ final _worldNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'worldNav');
 final _islandNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'islandNav');
 final _cityNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'cityNav');
 final _battlesNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'battlesNav');
+final _movementsNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'movementsNav');
 
 /// Bridges Riverpod provider changes to GoRouter's [ChangeNotifier] system.
 ///
@@ -37,7 +39,10 @@ final _battlesNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'battlesNav')
 class _RouterNotifier extends ChangeNotifier {
   _RouterNotifier(this._ref) {
     // Watch auth state — notifies router on sign-in / sign-out.
+    // Invalidate profile on auth change so it re-fetches for the new user
+    // and doesn't show stale loading/null state from a previous session.
     _ref.listen<Object?>(authStateChangesProvider, (prev, next) {
+      _ref.invalidate(profileProvider);
       notifyListeners();
     });
 
@@ -175,6 +180,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: '/dispatch',
                 builder: (context, state) => DispatchScreen(
                   originCityId: state.uri.queryParameters['cityId'] ?? '',
+                  initialTargetCityId: state.uri.queryParameters['targetCityId'],
                 ),
               ),
             ],
@@ -191,6 +197,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => BattleDetailScreen(
                   battleId: state.uri.queryParameters['battleId'] ?? '',
                 ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _movementsNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/movements',
+                builder: (context, state) => const MovementsScreen(),
               ),
             ],
           ),
