@@ -97,7 +97,10 @@ Plans:
   2. Spy action resolves instantly (no travel time, no spy unit consumed)
   3. Player can navigate to any other player's city screen and see a read-only version of their building grid and city stats
   4. Read-only city view clearly indicates it is not the player's own city (no action buttons, ownership label visible)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 16-01-PLAN.md — DB migration (spy_reports table) + spy-city Edge Function + SpyReport model + repository + providers
+- [ ] 16-02-PLAN.md — Spy report dialog, enemy city view screen, spy log, island screen integration, router
 
 ### Phase 17: UI Polish
 **Goal**: City view, map, and military screens are visually cleaner and players can instantly distinguish their own vs enemy cities and unit types by color
@@ -108,7 +111,10 @@ Plans:
   2. On the island view and world map, each city slot uses a distinct color to differentiate own city (green), allied cities, and enemy cities
   3. Unit type rows in military screens (training queue, battle reports, army lists) render with the matching color from unitTypeColors for that unit type
   4. Color coding is consistent across all screens that display units or city markers
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 16-01-PLAN.md — DB migration (spy_reports table) + spy-city Edge Function + SpyReport model + repository + providers
+- [ ] 16-02-PLAN.md — Spy report dialog, enemy city view screen, spy log, island screen integration, router
 
 ## Progress
 
@@ -129,5 +135,5 @@ Plans:
 | 13. Dev Acceleration | 2/2 | Complete    | 2026-03-16 | - |
 | 14. Movement Visibility | 2/2 | Complete    | 2026-03-16 | - |
 | 15. Resource Trading | 2/2 | Complete    | 2026-03-16 | - |
-| 16. Espionage & City Viewing | v1.2 | 0/? | Not started | - |
+| 16. Espionage & City Viewing | v1.2 | 0/2 | In progress | - |
 | 17. UI Polish | v1.2 | 0/? | Not started | - |
