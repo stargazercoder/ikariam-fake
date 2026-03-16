@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Espionage, Trading & Polish
 status: roadmap_ready
-stopped_at: Completed 15-02-PLAN.md — Flutter trade UI feature complete
-last_updated: "2026-03-16T15:11:26.153Z"
+stopped_at: Phase 16 context gathered
+last_updated: "2026-03-16T18:54:27.835Z"
 last_activity: 2026-03-16 — Roadmap created
 progress:
   total_phases: 5
@@ -117,7 +117,7 @@ Carried from v1.1 (tech debt):
 
 ## Session Continuity
 
-Last session: 2026-03-16T15:07:41.157Z
-Stopped at: Completed 15-02-PLAN.md — Flutter trade UI feature complete
-Resume file: None
+Last session: 2026-03-16T18:54:27.823Z
+Stopped at: Phase 16 context gathered
+Resume file: .planning/phases/16-espionage-city-viewing/16-CONTEXT.md
 Next action: `/gsd:plan-phase 15` (Resource Trading)
