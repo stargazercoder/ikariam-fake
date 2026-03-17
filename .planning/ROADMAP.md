@@ -251,7 +251,7 @@ Plans:
 | 17. UI Polish | v1.2 | 2/2 | Complete | 2026-03-17 |
 | 18. Bot Schema Foundation | 1/1 | Complete    | 2026-03-17 | - |
 | 19. Bot Behavior Engine | 2/2 | Complete    | 2026-03-17 | - |
-| 20. Seed Data | 1/1 | Complete   | 2026-03-17 | - |
+| 20. Seed Data | 1/1 | Complete    | 2026-03-17 | - |
 | 21. GodMode Backend | v1.3 | 0/TBD | Not started | - |
 | 22. GodMode Flutter Dashboard | v1.3 | 0/TBD | Not started | - |
 | 23. Unit Tests | v1.3 | 0/TBD | Not started | - |
