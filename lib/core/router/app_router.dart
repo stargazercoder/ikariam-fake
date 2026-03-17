@@ -19,7 +19,7 @@ import '../../features/military/screens/dispatch_screen.dart';
 import '../../features/military/screens/shipyard_screen.dart';
 import '../../features/map/screens/enemy_city_view_screen.dart';
 import '../../features/espionage/screens/spy_log_screen.dart';
-import '../../features/godmode/screens/godmode_placeholder_screen.dart';
+import '../../features/godmode/screens/godmode_dashboard_screen.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../features/profile/screens/create_profile_screen.dart';
 
@@ -157,7 +157,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // GodMode admin dashboard — full-screen, no bottom nav.
       GoRoute(
         path: '/godmode',
-        builder: (context, state) => const GodModePlaceholderScreen(),
+        builder: (context, state) => const GodModeDashboardScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
