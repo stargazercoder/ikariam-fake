@@ -43,10 +43,22 @@ Players can build and manage cities, gather resources, and engage in real-time t
 - ✓ Battle outcome: pillage (steal resources on victory, Hideout protection floor) — v1.1
 - ✓ Battle reports: turn-by-turn unit loss visualization with color-coded unit types — v1.1
 - ✓ Tavern happiness configuration (wine spending rate adjustable) — v1.1
+- ✓ Espionage system: spy on enemy cities to see resources, buildings, army counts — v1.2
+- ✓ View other players' city screens (read-only) — v1.2
+- ✓ Player-to-player resource trading via cargo ships — v1.2
+- ✓ Movement visibility: armies and cargo in transit with destinations and ETAs — v1.2
+- ✓ UI polish: transparent city AppBar, ownership color borders, unit type icons — v1.2
+- ✓ Dev toolbar: bulk unit spawn, instant complete, 5x faster timers — v1.2
 
 ### Active
 
-- [ ] Player-to-player resource trading via cargo ships
+- [ ] AI bot players with periodic pg_cron-driven behaviors (attack, train, upgrade)
+- [ ] 20 bot accounts with diverse game states seeded at init
+- [ ] GodMode admin dashboard for observing all players and world state
+- [ ] GodMode controls for pausing/resuming bots and modifying game state
+- [ ] Rich seed data script for realistic test environments
+- [ ] Unit tests for critical Edge Functions and Flutter widgets
+- [ ] Automation scripts: DB reset, seed, serve, build, test, lint pipeline
 - [ ] Marketplace with buy/sell orders (order book)
 - [ ] Research system with 4 branches: Seafaring, Economy, Science, Military
 - [ ] Research prerequisites (tech tree with dependencies)
@@ -118,17 +130,18 @@ Players can build and manage cities, gather resources, and engage in real-time t
 | Pillage ratio: LEAST(0.75, total_land_units / 50.0 * 0.10) | Scales with surviving attackers, caps at 75% | ✓ Good — v1.1, needs balance tuning |
 | SELECT FOR UPDATE on defender resources during pillage | Prevents race condition with concurrent resource tick | ✓ Good — v1.1 |
 
-## Current Milestone: v1.2 Espionage, Trading & Polish
+## Current Milestone: v1.3 Bots, Testing & Automation
 
-**Goal:** Add espionage (spy on enemy cities), player-to-player resource trading via cargo ships, movement visibility (armies/cargo in transit), and UI polish (city view cleanup, color-coded cities/units, dev toolbar improvements).
+**Goal:** Populate the world with 20 AI bot players that autonomously build, train, and fight on periodic schedules; add a full-page GodMode admin dashboard to observe and control the living world; enrich seed data for realistic testing; add unit tests for critical paths; and provide automation scripts for dev setup, DB reset, and CI/CD pipeline.
 
 **Target features:**
-- Espionage system: spy on enemy cities to see resources, buildings, army counts
-- View other players' city screens (read-only)
-- Resource trading: send resources to other players via cargo ships
-- Movement visibility: see outgoing/returning armies and cargo in transit with carried resources
-- UI polish: remove city view title bar, color-code cities and units
-- Dev toolbar: bulk unit spawn, 5x faster training and travel times
+- Bot system: 20 AI accounts with varied military, building, and resource levels running on pg_cron schedules
+- Bot behaviors: periodic attacks, army retraining, island resource upgrades
+- GodMode admin dashboard: full-page screen showing all players, armies, battles, resources in real-time
+- GodMode controls: pause/resume bots, force actions, modify player state
+- Rich seed data: project init creates 20 diverse bot accounts with realistic game states
+- Unit tests: critical server-side functions and Flutter widgets covered
+- Automation scripts: DB reset + seed, Edge Functions serve, Flutter build, test runner, lint check — single-command dev setup and CI/CD pipeline
 
 ---
-*Last updated: 2026-03-16 after v1.2 milestone start*
+*Last updated: 2026-03-17 after v1.3 milestone start*
