@@ -184,10 +184,9 @@ Plans:
   3. godmode_force_action() RPC triggers one immediate bot decision for the specified bot without waiting for the cron schedule
   4. admin_set_resources() RPC modifies any player's resource balances; calling it as a non-admin user is rejected at the Postgres layer
   5. A /godmode route guard in app_router.dart redirects non-admin users before any GodMode widget renders — the guard reads isAdmin from the Profile model, not a client-side flag
-**Plans**: 1 plan
+**Plans:** 1 plan
 Plans:
-- [ ] 20-01-PLAN.md — 20 bot accounts with tiered buildings, armies, resources, and bot_schedules
-
+- [ ] 21-01-PLAN.md — GodMode SECURITY DEFINER RPCs and /godmode route guard
 ### Phase 22: GodMode Flutter Dashboard
 **Goal**: An admin user can open a full-page dashboard to observe every player's state in real time and control bot behaviors without leaving the app
 **Depends on**: Phase 21 (requires all GodMode RPCs to be stable and tested)
@@ -252,7 +251,7 @@ Plans:
 | 18. Bot Schema Foundation | 1/1 | Complete    | 2026-03-17 | - |
 | 19. Bot Behavior Engine | 2/2 | Complete    | 2026-03-17 | - |
 | 20. Seed Data | 1/1 | Complete    | 2026-03-17 | - |
-| 21. GodMode Backend | v1.3 | 0/TBD | Not started | - |
+| 21. GodMode Backend | v1.3 | 0/1 | Not started | - |
 | 22. GodMode Flutter Dashboard | v1.3 | 0/TBD | Not started | - |
 | 23. Unit Tests | v1.3 | 0/TBD | Not started | - |
 | 24. Automation & CI | v1.3 | 0/TBD | Not started | - |
