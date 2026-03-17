@@ -26,8 +26,8 @@ Requirements for v1.3 Bots, Testing & Automation. Each maps to roadmap phases.
 
 ### Seed Data
 
-- [ ] **SEED-01**: Project init creates 20 bot accounts with diverse game states (varied resources, buildings, armies)
-- [ ] **SEED-02**: Seed script is idempotent — can be re-run without conflicts or duplicate data
+- [x] **SEED-01**: Project init creates 20 bot accounts with diverse game states (varied resources, buildings, armies)
+- [x] **SEED-02**: Seed script is idempotent — can be re-run without conflicts or duplicate data
 
 ### Testing
 
@@ -91,8 +91,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BOT-03 | Phase 19 | Complete |
 | BOT-04 | Phase 19 | Complete |
 | BOT-05 | Phase 19 | Complete |
-| SEED-01 | Phase 20 | Pending |
-| SEED-02 | Phase 20 | Pending |
+| SEED-01 | Phase 20 | Complete |
+| SEED-02 | Phase 20 | Complete |
 | GOD-05 | Phase 21 | Pending |
 | GOD-01 | Phase 22 | Pending |
 | GOD-02 | Phase 22 | Pending |

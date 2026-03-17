@@ -54,7 +54,7 @@ Full details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 
 - [x] **Phase 18: Bot Schema Foundation** — DB migration adding is_bot/is_admin columns and bot_schedules table; updated Profile Dart model (completed 2026-03-17)
 - [x] **Phase 19: Bot Behavior Engine** — PL/pgSQL run_bot_decisions() + pg_cron bot-think-tick driving attack, retrain, and upgrade behaviors (completed 2026-03-17)
-- [ ] **Phase 20: Seed Data** — 20 diverse bot accounts with varied buildings, armies, and resources seeded idempotently on db reset
+- [x] **Phase 20: Seed Data** — 20 diverse bot accounts with varied buildings, armies, and resources seeded idempotently on db reset (completed 2026-03-17)
 - [ ] **Phase 21: GodMode Backend** — SECURITY DEFINER RPCs for world-state reads and bot/player controls; go_router admin route guard
 - [ ] **Phase 22: GodMode Flutter Dashboard** — Full-page admin screen with player table, bot pause controls, event feed, and resource edit form
 - [ ] **Phase 23: Unit Tests** — Deno test suite for critical Edge Functions; Flutter widget tests with isolated ProviderContainer
@@ -251,7 +251,7 @@ Plans:
 | 17. UI Polish | v1.2 | 2/2 | Complete | 2026-03-17 |
 | 18. Bot Schema Foundation | 1/1 | Complete    | 2026-03-17 | - |
 | 19. Bot Behavior Engine | 2/2 | Complete    | 2026-03-17 | - |
-| 20. Seed Data | v1.3 | 0/1 | Planning | - |
+| 20. Seed Data | 1/1 | Complete   | 2026-03-17 | - |
 | 21. GodMode Backend | v1.3 | 0/TBD | Not started | - |
 | 22. GodMode Flutter Dashboard | v1.3 | 0/TBD | Not started | - |
 | 23. Unit Tests | v1.3 | 0/TBD | Not started | - |

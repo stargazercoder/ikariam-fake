@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Bots, Testing & Automation
 status: planning
-stopped_at: Phase 20 context gathered
-last_updated: "2026-03-17T14:42:02.363Z"
+stopped_at: Completed 20-01-PLAN.md
+last_updated: "2026-03-17T15:11:26.415Z"
 last_activity: 2026-03-17 — v1.3 roadmap created; Phases 18-24 defined; ready to plan Phase 18
 progress:
   total_phases: 12
-  completed_phases: 7
-  total_plans: 14
-  completed_plans: 14
+  completed_phases: 8
+  total_plans: 15
+  completed_plans: 15
 ---
 
 # Project State
@@ -62,6 +62,8 @@ v1.3 architecture decisions locked in:
 - [Phase 19-01]: Dev speed multiplier hardcoded 0.2 in PL/pgSQL (pg_cron cannot read APP_ENVIRONMENT env var); TODO comment added for game_config parameterization
 - [Phase 19]: bot_decide_attack returns void (fire-and-forget): attack is lowest priority; orchestrator branches on boolean return of upgrade/train, not attack
 - [Phase 19]: Aggression 0 bots never attack: 0/3.0=0.0, random() always >=0.0, so probability gate always returns early
+- [Phase 20-01]: Bot UUIDs use deterministic pattern b{NN}00000 for easy identification and ON CONFLICT correctness
+- [Phase 20-01]: All seed inserts for bots use ON CONFLICT — seed script survives supabase db reset run twice consecutively (SEED-02)
 
 ### Pending Todos
 
@@ -80,7 +82,7 @@ v1.3 design work deferred to planning:
 
 ## Session Continuity
 
-Last session: 2026-03-17T14:42:02.359Z
-Stopped at: Phase 20 context gathered
-Resume file: .planning/phases/20-seed-data/20-CONTEXT.md
+Last session: 2026-03-17T15:11:26.413Z
+Stopped at: Completed 20-01-PLAN.md
+Resume file: None
 Next action: /gsd:plan-phase 18
