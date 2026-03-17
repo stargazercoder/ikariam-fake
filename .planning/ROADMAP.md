@@ -42,7 +42,7 @@ Full details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 - [x] **Phase 14: Movement Visibility** — Armies and cargo in transit shown with destinations, ETAs, and carried resources (completed 2026-03-16)
 - [x] **Phase 15: Resource Trading** — Send resources to other players via cargo ships with travel time (completed 2026-03-16)
 - [x] **Phase 16: Espionage & City Viewing** — Spy on enemy cities and view read-only city screens (completed 2026-03-16)
-- [ ] **Phase 17: UI Polish** — Clean up city view layout, color-code cities and units
+- [x] **Phase 17: UI Polish** — Clean up city view layout, color-code cities and units (completed 2026-03-17)
 
 ## Phase Details
 
@@ -112,7 +112,7 @@ Plans:
   2. On the island view and world map, each city slot uses a distinct color to differentiate own city (green), allied cities, and enemy cities
   3. Unit type rows in military screens (training queue, battle reports, army lists) render with the matching color from unitTypeColors for that unit type
   4. Color coding is consistent across all screens that display units or city markers
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 17-01-PLAN.md — Constants (ownership colors, unit type icons) and transparent AppBar on city screens
 - [ ] 17-02-PLAN.md — Ownership color borders on maps and CircleAvatar unit icons on military screens
@@ -137,4 +137,4 @@ Plans:
 | 14. Movement Visibility | 2/2 | Complete    | 2026-03-16 | - |
 | 15. Resource Trading | 2/2 | Complete    | 2026-03-16 | - |
 | 16. Espionage & City Viewing | 3/3 | Complete    | 2026-03-16 | - |
-| 17. UI Polish | 1/2 | In Progress|  | - |
+| 17. UI Polish | 2/2 | Complete   | 2026-03-17 | - |

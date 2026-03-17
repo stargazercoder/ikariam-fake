@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Espionage, Trading & Polish
 status: roadmap_ready
-stopped_at: Completed 17-01-PLAN.md — Phase 17 Plan 01 fully verified and complete
-last_updated: "2026-03-17T00:45:10.615Z"
+stopped_at: Completed 17-02-PLAN.md — Phase 17 Plan 02 fully verified and complete
+last_updated: "2026-03-17T00:51:06.315Z"
 last_activity: 2026-03-16 — Roadmap created
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
   percent: 100
 ---
 
@@ -98,6 +98,8 @@ All decisions logged in PROJECT.md Key Decisions table.
 - [Phase 16-espionage-city-viewing]: /city-view top-level GoRoute (hides bottom nav); /spy-log nested in battles branch (bottom nav stays visible)
 - [Phase 17-01]: CityScreen city name uses white color + drop shadow instead of primary color — visible over transparent AppBar
 - [Phase 17-01]: EnemyCityViewScreen banner text updated to include cityName+ownerName since AppBar title removed; body uses Padding not SafeArea for correct Column expansion
+- [Phase 17-02]: valueOrNull not in Riverpod 3.x — world_map_screen uses whenOrNull(data: (v) => v) instead
+- [Phase 17-02]: Removed _isNaval helper from dispatch_screen — no longer needed after CircleAvatar replaces icon
 
 ### v1.2 Design Notes
 
@@ -123,7 +125,7 @@ Carried from v1.1 (tech debt):
 
 ## Session Continuity
 
-Last session: 2026-03-17T00:45:10.613Z
-Stopped at: Completed 17-01-PLAN.md — Phase 17 Plan 01 fully verified and complete
+Last session: 2026-03-17T00:51:06.313Z
+Stopped at: Completed 17-02-PLAN.md — Phase 17 Plan 02 fully verified and complete
 Resume file: None
 Next action: `/gsd:plan-phase 15` (Resource Trading)
