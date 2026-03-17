@@ -11,9 +11,9 @@ Requirements for v1.3 Bots, Testing & Automation. Each maps to roadmap phases.
 
 - [x] **BOT-01**: 20 bot accounts exist on the world map with varied military, building, and resource levels
 - [ ] **BOT-02**: Bots periodically attack neighboring cities via pg_cron schedule
-- [ ] **BOT-03**: Bots retrain armies after suffering losses
-- [ ] **BOT-04**: Bots upgrade island resource buildings they occupy
-- [ ] **BOT-05**: Bots upgrade buildings in their own cities
+- [x] **BOT-03**: Bots retrain armies after suffering losses
+- [x] **BOT-04**: Bots upgrade island resource buildings they occupy
+- [x] **BOT-05**: Bots upgrade buildings in their own cities
 - [x] **BOT-06**: Bot behaviors are guarded by is_bot flag and invisible to non-admin players
 
 ### GodMode Dashboard
@@ -88,9 +88,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BOT-01 | Phase 18 | Complete |
 | BOT-06 | Phase 18 | Complete |
 | BOT-02 | Phase 19 | Pending |
-| BOT-03 | Phase 19 | Pending |
-| BOT-04 | Phase 19 | Pending |
-| BOT-05 | Phase 19 | Pending |
+| BOT-03 | Phase 19 | Complete |
+| BOT-04 | Phase 19 | Complete |
+| BOT-05 | Phase 19 | Complete |
 | SEED-01 | Phase 20 | Pending |
 | SEED-02 | Phase 20 | Pending |
 | GOD-05 | Phase 21 | Pending |
