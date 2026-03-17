@@ -19,6 +19,7 @@ import '../../features/military/screens/dispatch_screen.dart';
 import '../../features/military/screens/shipyard_screen.dart';
 import '../../features/map/screens/enemy_city_view_screen.dart';
 import '../../features/espionage/screens/spy_log_screen.dart';
+import '../../features/godmode/screens/godmode_placeholder_screen.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../features/profile/screens/create_profile_screen.dart';
 
@@ -107,6 +108,11 @@ String? _redirect(Ref ref, GoRouterState state) {
     return '/map';
   }
 
+  // Rule 4b: Non-admin accessing /godmode → redirect to /map
+  if (location == '/godmode' && !profileNotifier.isAdmin) {
+    return '/map';
+  }
+
   // Rule 5: No redirect needed.
   return null;
 }
@@ -147,6 +153,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ownerName: Uri.decodeComponent(
               state.uri.queryParameters['ownerName'] ?? 'Unknown'),
         ),
+      ),
+      // GodMode admin dashboard — full-screen, no bottom nav.
+      GoRoute(
+        path: '/godmode',
+        builder: (context, state) => const GodModePlaceholderScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
