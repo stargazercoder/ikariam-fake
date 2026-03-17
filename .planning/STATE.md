@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Espionage, Trading & Polish
 status: roadmap_ready
-stopped_at: Phase 17 context gathered
-last_updated: "2026-03-16T23:48:25.376Z"
+stopped_at: Phase 17 UI-SPEC approved
+last_updated: "2026-03-17T00:19:25.551Z"
 last_activity: 2026-03-16 — Roadmap created
 progress:
   total_phases: 5
@@ -121,7 +121,7 @@ Carried from v1.1 (tech debt):
 
 ## Session Continuity
 
-Last session: 2026-03-16T23:48:25.357Z
-Stopped at: Phase 17 context gathered
-Resume file: .planning/phases/17-ui-polish/17-CONTEXT.md
+Last session: 2026-03-17T00:19:25.530Z
+Stopped at: Phase 17 UI-SPEC approved
+Resume file: .planning/phases/17-ui-polish/17-UI-SPEC.md
 Next action: `/gsd:plan-phase 15` (Resource Trading)
