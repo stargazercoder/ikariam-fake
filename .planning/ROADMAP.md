@@ -170,7 +170,9 @@ Plans:
   2. Bot accounts show at least 3 distinct development profiles: low (level 1-2 buildings, small army), mid (level 3-4 buildings, moderate army), high (level 5+ buildings, large army)
   3. Running supabase db reset a second time immediately after the first completes with exit code 0 and no duplicate key errors
   4. All 20 bots have bot_schedules rows with varied aggression levels (0-3) distributed across the range
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 20-01-PLAN.md — 20 bot accounts with tiered buildings, armies, resources, and bot_schedules
 
 ### Phase 21: GodMode Backend
 **Goal**: SECURITY DEFINER RPCs expose full world state and bot/player controls to admin users only — the service_role key never appears in any Flutter file
@@ -182,7 +184,9 @@ Plans:
   3. godmode_force_action() RPC triggers one immediate bot decision for the specified bot without waiting for the cron schedule
   4. admin_set_resources() RPC modifies any player's resource balances; calling it as a non-admin user is rejected at the Postgres layer
   5. A /godmode route guard in app_router.dart redirects non-admin users before any GodMode widget renders — the guard reads isAdmin from the Profile model, not a client-side flag
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 20-01-PLAN.md — 20 bot accounts with tiered buildings, armies, resources, and bot_schedules
 
 ### Phase 22: GodMode Flutter Dashboard
 **Goal**: An admin user can open a full-page dashboard to observe every player's state in real time and control bot behaviors without leaving the app
@@ -194,7 +198,9 @@ Plans:
   3. Admin sees a live event feed panel displaying the last N battles, trades, and espionage actions across all players, refreshing every 30 seconds
   4. Admin can open a resource edit form for any player, enter new resource amounts, and submit — the player's resource display reflects the change within one poll cycle
   5. Bot accounts appear with a distinct visual marker visible only to admin; to all other players they appear as normal human players
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 20-01-PLAN.md — 20 bot accounts with tiered buildings, armies, resources, and bot_schedules
 
 ### Phase 23: Unit Tests
 **Goal**: Critical Edge Function logic and GodMode Flutter widgets are covered by automated tests that run locally without a live Supabase instance
@@ -205,7 +211,9 @@ Plans:
   2. Each Deno test file imports only the extracted pure function module — no HTTP server, no Supabase client instantiated
   3. Running flutter test test/ executes GodMode widget tests where each test creates its own isolated ProviderContainer with explicit provider overrides — no test state leaks between runs
   4. All tests pass when run in suite order and in reverse order (proving no inter-test state dependency)
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 20-01-PLAN.md — 20 bot accounts with tiered buildings, armies, resources, and bot_schedules
 
 ### Phase 24: Automation & CI
 **Goal**: A developer can set up the full project from scratch with one command, and every push to main automatically runs the full quality gate
@@ -216,7 +224,9 @@ Plans:
   2. A GitHub Actions workflow triggers on push to main and runs flutter analyze, flutter test, deno test, and flutter build web — all steps must pass for the workflow to succeed
   3. Deno is pinned to 2.2.x in the CI workflow file with an inline comment referencing the Supabase Edge Runtime lock file constraint
   4. A failed flutter analyze (lint error) or failed deno test causes the CI workflow to exit non-zero and block the push
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 20-01-PLAN.md — 20 bot accounts with tiered buildings, armies, resources, and bot_schedules
 
 ## Progress
 
@@ -241,7 +251,7 @@ Plans:
 | 17. UI Polish | v1.2 | 2/2 | Complete | 2026-03-17 |
 | 18. Bot Schema Foundation | 1/1 | Complete    | 2026-03-17 | - |
 | 19. Bot Behavior Engine | 2/2 | Complete    | 2026-03-17 | - |
-| 20. Seed Data | v1.3 | 0/TBD | Not started | - |
+| 20. Seed Data | v1.3 | 0/1 | Planning | - |
 | 21. GodMode Backend | v1.3 | 0/TBD | Not started | - |
 | 22. GodMode Flutter Dashboard | v1.3 | 0/TBD | Not started | - |
 | 23. Unit Tests | v1.3 | 0/TBD | Not started | - |
