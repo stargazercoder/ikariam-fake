@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Bots, Testing & Automation
 status: planning
-stopped_at: Phase 18 context gathered
-last_updated: "2026-03-17T13:13:07.872Z"
+stopped_at: Completed 18-01-PLAN.md
+last_updated: "2026-03-17T13:27:23.490Z"
 last_activity: 2026-03-17 — v1.3 roadmap created; Phases 18-24 defined; ready to plan Phase 18
 progress:
   total_phases: 12
-  completed_phases: 5
-  total_plans: 11
-  completed_plans: 11
+  completed_phases: 6
+  total_plans: 12
+  completed_plans: 12
 ---
 
 # Project State
@@ -57,6 +57,8 @@ v1.3 architecture decisions locked in:
 - Bot actions write directly to training_queue / construction_queue / unit_movements — same tables as Edge Functions; no pg_net HTTP round-trips from pg_cron
 - All seed inserts use ON CONFLICT — seed script must survive supabase db reset run twice consecutively
 - Deno pinned to 2.2.x in CI — Supabase Edge Runtime does not support Deno 2.3+ lock file v5 yet (track supabase/supabase#33093)
+- [Phase 18]: is_bot/is_admin use NOT NULL DEFAULT false — PostgreSQL backfills existing rows without UPDATE migration
+- [Phase 18]: bot_schedules has RLS enabled with zero policies — deny-all for clients; only SECURITY DEFINER functions access it
 
 ### Pending Todos
 
@@ -75,7 +77,7 @@ v1.3 design work deferred to planning:
 
 ## Session Continuity
 
-Last session: 2026-03-17T13:13:07.855Z
-Stopped at: Phase 18 context gathered
-Resume file: .planning/phases/18-bot-schema-foundation/18-CONTEXT.md
+Last session: 2026-03-17T13:27:23.488Z
+Stopped at: Completed 18-01-PLAN.md
+Resume file: None
 Next action: /gsd:plan-phase 18

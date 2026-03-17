@@ -52,7 +52,7 @@ Full details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 
 **Milestone Goal:** Populate the world with 20 AI bot players that autonomously build, train, and fight; add a GodMode admin dashboard to observe and control the living world; enrich seed data; add unit tests for critical paths; and provide single-command automation for dev setup and CI/CD.
 
-- [ ] **Phase 18: Bot Schema Foundation** — DB migration adding is_bot/is_admin columns and bot_schedules table; updated Profile Dart model
+- [x] **Phase 18: Bot Schema Foundation** — DB migration adding is_bot/is_admin columns and bot_schedules table; updated Profile Dart model (completed 2026-03-17)
 - [ ] **Phase 19: Bot Behavior Engine** — PL/pgSQL run_bot_decisions() + pg_cron bot-think-tick driving attack, retrain, and upgrade behaviors
 - [ ] **Phase 20: Seed Data** — 20 diverse bot accounts with varied buildings, armies, and resources seeded idempotently on db reset
 - [ ] **Phase 21: GodMode Backend** — SECURITY DEFINER RPCs for world-state reads and bot/player controls; go_router admin route guard
@@ -142,7 +142,7 @@ Plans:
   2. bot_schedules table exists with aggression (0-3), is_paused, and next_action_at columns; RLS is enabled with no client-facing policies
   3. Profile Dart model exposes isBot and isAdmin fields that round-trip correctly through the existing profile provider
   4. A bot profile row (is_bot = true) cannot be read or modified by a non-admin player through any existing RLS policy
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 18-01-PLAN.md — Bot schema migration (profiles columns + bot_schedules table) and Profile Dart model getters
 
@@ -236,7 +236,7 @@ Plans:
 | 15. Resource Trading | v1.2 | 2/2 | Complete | 2026-03-16 |
 | 16. Espionage & City Viewing | v1.2 | 3/3 | Complete | 2026-03-16 |
 | 17. UI Polish | v1.2 | 2/2 | Complete | 2026-03-17 |
-| 18. Bot Schema Foundation | v1.3 | 0/1 | Planning | - |
+| 18. Bot Schema Foundation | 1/1 | Complete   | 2026-03-17 | - |
 | 19. Bot Behavior Engine | v1.3 | 0/TBD | Not started | - |
 | 20. Seed Data | v1.3 | 0/TBD | Not started | - |
 | 21. GodMode Backend | v1.3 | 0/TBD | Not started | - |
