@@ -236,7 +236,7 @@ Plans:
 | 15. Resource Trading | v1.2 | 2/2 | Complete | 2026-03-16 |
 | 16. Espionage & City Viewing | v1.2 | 3/3 | Complete | 2026-03-16 |
 | 17. UI Polish | v1.2 | 2/2 | Complete | 2026-03-17 |
-| 18. Bot Schema Foundation | 1/1 | Complete   | 2026-03-17 | - |
+| 18. Bot Schema Foundation | 1/1 | Complete    | 2026-03-17 | - |
 | 19. Bot Behavior Engine | v1.3 | 0/TBD | Not started | - |
 | 20. Seed Data | v1.3 | 0/TBD | Not started | - |
 | 21. GodMode Backend | v1.3 | 0/TBD | Not started | - |
