@@ -36,35 +36,43 @@ class EnemyCityViewScreen extends ConsumerWidget {
     final activeConstruction = constructionAsync.whenOrNull(data: (e) => e);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.red.shade800,
-        foregroundColor: Colors.white,
-        title: Text('$cityName ($ownerName)'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+          shadows: [Shadow(blurRadius: 4, color: Colors.black54)],
+        ),
       ),
-      body: Column(
-        children: [
-          // Read-only notice banner.
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: Colors.red.shade50,
-            child: Row(
-              children: [
-                Icon(Icons.visibility_outlined,
-                    size: 16, color: Colors.red.shade800),
-                const SizedBox(width: 8),
-                Text(
-                  'Viewing enemy city — read only',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withAlpha(140),
-                      ),
-                ),
-              ],
+      body: Padding(
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top + kToolbarHeight,
+        ),
+        child: Column(
+          children: [
+            // Read-only notice banner (also shows city/owner context).
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: Colors.red.shade50,
+              child: Row(
+                children: [
+                  Icon(Icons.visibility_outlined,
+                      size: 16, color: Colors.red.shade800),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Viewing $cityName ($ownerName) — read only',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.red.shade800,
+                          ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
           // Construction banner (if active).
           if (activeConstruction != null)
             _EnemyConstructionBanner(entry: activeConstruction),
@@ -105,6 +113,7 @@ class EnemyCityViewScreen extends ConsumerWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }

@@ -47,18 +47,18 @@ class CityScreen extends ConsumerWidget {
             1);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: cityAsync.when(
-          data: (city) => Text(city?['name'] as String? ?? 'My City'),
-          loading: () => const SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: Colors.white,
-            ),
-          ),
-          error: (err, stack) => const Text('My City'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+          shadows: [Shadow(blurRadius: 4, color: Colors.black54)],
+        ),
+        actionsIconTheme: const IconThemeData(
+          color: Colors.white,
+          shadows: [Shadow(blurRadius: 4, color: Colors.black54)],
         ),
         actions: [
           // Player avatar + display name.
@@ -75,6 +75,7 @@ class CityScreen extends ConsumerWidget {
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
+                      shadows: [Shadow(blurRadius: 4, color: Colors.black54)],
                     ),
                   ),
                 const SizedBox(width: 4),
@@ -142,7 +143,12 @@ class _CityBody extends ConsumerWidget {
         resourcesAsync.whenOrNull(data: (r) => r) ?? <CityResource>[];
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + kToolbarHeight + 8,
+        left: 16,
+        right: 16,
+        bottom: 16,
+      ),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
@@ -154,7 +160,10 @@ class _CityBody extends ConsumerWidget {
                 cityName,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Colors.white,
+                      shadows: const [
+                        Shadow(blurRadius: 4, color: Colors.black54),
+                      ],
                     ),
                 textAlign: TextAlign.center,
               ),
