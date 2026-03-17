@@ -1,49 +1,63 @@
-# Requirements: Ikariam Clone v1.2
+# Requirements: Ikariam Clone v1.3
 
-**Defined:** 2026-03-16
+**Defined:** 2026-03-17
 **Core Value:** Players can build and manage cities, gather resources, and engage in real-time turn-based warfare — the core loop of build, expand, and conquer must feel satisfying and strategically meaningful.
 
-## v1.2 Requirements
+## v1.3 Requirements
 
-### Espionage
+Requirements for v1.3 Bots, Testing & Automation. Each maps to roadmap phases.
 
-- [x] **ESPY-01**: User can send a spy to an enemy city to reveal resource amounts, building levels, and army counts
-- [x] **ESPY-02**: User can view a read-only version of another player's city screen (buildings layout)
+### Bot System
 
-### Trading
+- [ ] **BOT-01**: 20 bot accounts exist on the world map with varied military, building, and resource levels
+- [ ] **BOT-02**: Bots periodically attack neighboring cities via pg_cron schedule
+- [ ] **BOT-03**: Bots retrain armies after suffering losses
+- [ ] **BOT-04**: Bots upgrade island resource buildings they occupy
+- [ ] **BOT-05**: Bots upgrade buildings in their own cities
+- [ ] **BOT-06**: Bot behaviors are guarded by is_bot flag and invisible to non-admin players
 
-- [x] **TRAD-01**: User can send resources to another player's city via cargo ships (with travel time)
+### GodMode Dashboard
 
-### Movement Visibility
+- [ ] **GOD-01**: Admin sees all players' resources, armies, and building levels in a single full-page dashboard table
+- [ ] **GOD-02**: Admin can pause, resume, and adjust speed of bot behaviors
+- [ ] **GOD-03**: Admin sees a live event feed showing battles, trades, and espionage actions
+- [ ] **GOD-04**: Admin can modify any player's resources and army counts
+- [ ] **GOD-05**: GodMode access is secured via is_admin check at Postgres layer — service_role key never reaches Flutter client
 
-- [x] **MOVE-01**: User can see a list of outgoing army movements (attack, return) with destination, ETA, and unit composition
-- [x] **MOVE-02**: User can see returning cargo ships with carried resource amounts (pillage loot and trade cargo)
+### Seed Data
 
-### UI Polish
+- [ ] **SEED-01**: Project init creates 20 bot accounts with diverse game states (varied resources, buildings, armies)
+- [ ] **SEED-02**: Seed script is idempotent — can be re-run without conflicts or duplicate data
 
-- [x] **UIPL-01**: City view screen removes the AppBar title for cleaner layout
-- [x] **UIPL-02**: Cities on island/world map use distinct colors to differentiate own vs enemy vs ally
-- [x] **UIPL-03**: Unit types in military screens use subtle color coding consistent with unitTypeColors
+### Testing
 
-### Dev Acceleration
+- [ ] **TEST-01**: Critical Edge Functions are unit tested with Deno test runner
+- [ ] **TEST-02**: GodMode and critical Flutter widgets are tested with Riverpod ProviderContainer
 
-- [x] **DEVT-01**: Dev toolbar supports bulk unit spawning (select multiple types and quantities in one action)
-- [x] **DEVT-02**: Unit training times reduced to 1/5 of normal in dev mode
-- [x] **DEVT-03**: Unit travel/arrival times reduced to 1/5 of normal in dev mode
+### Automation
 
-## v1.3+ Requirements
+- [ ] **AUTO-01**: Single command runs DB reset + seed + Edge Functions serve + Flutter build
+- [ ] **AUTO-02**: GitHub Actions CI pipeline runs tests, lint, and build automatically on push
 
-### Trading (Advanced)
+## v1.3+ Future Requirements
+
+### Bot Intelligence
+
+- **BOT-F01**: Bot archetypes (militarist, economist, builder) with weighted decision-making
+- **BOT-F02**: Bots form temporary alliances and coordinate attacks
+- **BOT-F03**: Bot difficulty scaling based on player progression
+
+### Admin Tools
+
+- **GOD-F01**: GodMode world map overlay showing all bot paths and battle zones
+- **GOD-F02**: Time-travel replay of past game events
+- **GOD-F03**: Economy analytics dashboard (resource flow graphs)
+
+### Previously Deferred (from v1.2)
 
 - **TRAD-02**: Marketplace with buy/sell orders (order book system)
-
-### Combat (Advanced)
-
 - **CMBT-05**: Battle outcome: occupation (city takeover)
 - **CMBT-06**: Players can send reinforcements during ongoing battles
-
-### Other Deferred
-
 - **RSCH-01**: Research system with 4 branches (Seafaring, Economy, Science, Military)
 - **RSCH-02**: Research prerequisites (tech tree with dependencies)
 - **RSCH-03**: Academy building generates research points hourly
@@ -57,33 +71,43 @@
 
 | Feature | Reason |
 |---------|--------|
-| Marketplace order book | Complex economy feature; direct trading first |
-| City occupation (takeover) | Requires stable espionage + trading first |
-| Counter-espionage | Keep v1.2 simple; add defensive spy mechanics later |
-| Alliance-based trading bonuses | Alliance system not yet built |
-| Spy unit training | v1.2 espionage uses instant action (no spy unit type); unit-based spying deferred |
+| LLM/AI-powered bot decisions | Overcomplicated for 20 bots; simple pg_cron rules sufficient |
+| Bot-to-bot diplomacy | Requires alliance system (not yet built) |
+| Bot trading behavior | Trading adds complexity; focus on combat + building first |
+| Mobile CI/CD (iOS/Android builds) | Web-only for now |
+| Performance load testing | Premature — bot system is dev-mode, not production scale |
+| Counter-espionage | Keep simple; add defensive spy mechanics later |
+| Spy unit training | Espionage uses instant action; unit-based spying deferred |
 
 ## Traceability
 
+Which phases cover which requirements. Updated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DEVT-01 | Phase 13 | Complete |
-| DEVT-02 | Phase 13 | Complete |
-| DEVT-03 | Phase 13 | Complete |
-| MOVE-01 | Phase 14 | Complete |
-| MOVE-02 | Phase 14 | Complete |
-| TRAD-01 | Phase 15 | Complete |
-| ESPY-01 | Phase 16 | Complete |
-| ESPY-02 | Phase 16 | Complete |
-| UIPL-01 | Phase 17 | Complete |
-| UIPL-02 | Phase 17 | Complete |
-| UIPL-03 | Phase 17 | Complete |
+| BOT-01 | TBD | Pending |
+| BOT-02 | TBD | Pending |
+| BOT-03 | TBD | Pending |
+| BOT-04 | TBD | Pending |
+| BOT-05 | TBD | Pending |
+| BOT-06 | TBD | Pending |
+| GOD-01 | TBD | Pending |
+| GOD-02 | TBD | Pending |
+| GOD-03 | TBD | Pending |
+| GOD-04 | TBD | Pending |
+| GOD-05 | TBD | Pending |
+| SEED-01 | TBD | Pending |
+| SEED-02 | TBD | Pending |
+| TEST-01 | TBD | Pending |
+| TEST-02 | TBD | Pending |
+| AUTO-01 | TBD | Pending |
+| AUTO-02 | TBD | Pending |
 
 **Coverage:**
-- v1.2 requirements: 11 total
-- Mapped to phases: 11
-- Unmapped: 0
+- v1.3 requirements: 17 total
+- Mapped to phases: 0
+- Unmapped: 17 ⚠️
 
 ---
-*Requirements defined: 2026-03-16*
-*Last updated: 2026-03-16 after roadmap creation (all 11 requirements mapped)*
+*Requirements defined: 2026-03-17*
+*Last updated: 2026-03-17 after initial definition*
