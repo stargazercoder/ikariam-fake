@@ -137,4 +137,4 @@ Plans:
 | 14. Movement Visibility | 2/2 | Complete    | 2026-03-16 | - |
 | 15. Resource Trading | 2/2 | Complete    | 2026-03-16 | - |
 | 16. Espionage & City Viewing | 3/3 | Complete    | 2026-03-16 | - |
-| 17. UI Polish | 2/2 | Complete   | 2026-03-17 | - |
+| 17. UI Polish | 2/2 | Complete    | 2026-03-17 | - |
