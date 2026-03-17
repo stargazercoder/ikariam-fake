@@ -18,19 +18,32 @@ import '../providers/unit_movements_provider.dart';
 /// and a Dispatch button. Also displays active outgoing movements with
 /// arrival countdowns.
 class DispatchScreen extends ConsumerStatefulWidget {
-  const DispatchScreen({super.key, required this.originCityId});
+  const DispatchScreen({
+    super.key,
+    required this.originCityId,
+    this.initialTargetCityId,
+  });
 
   final String originCityId;
+  final String? initialTargetCityId;
 
   @override
   ConsumerState<DispatchScreen> createState() => _DispatchScreenState();
 }
 
 class _DispatchScreenState extends ConsumerState<DispatchScreen> {
-  final TextEditingController _targetCityController = TextEditingController();
+  late final TextEditingController _targetCityController;
   // Map of unit_type (DB snake_case) -> quantity to dispatch.
   final Map<String, TextEditingController> _dispatchControllers = {};
   bool _isDispatching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _targetCityController = TextEditingController(
+      text: widget.initialTargetCityId ?? '',
+    );
+  }
 
   @override
   void dispose() {
@@ -277,7 +290,11 @@ class _UnitDispatchRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final displayName = _displayName(unit.unitType);
-    final isNaval = _isNaval(unit.unitType);
+
+    UnitType? parsedType;
+    try {
+      parsedType = unitTypeFromDbName(unit.unitType);
+    } catch (_) {}
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -285,11 +302,18 @@ class _UnitDispatchRow extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            Icon(
-              isNaval ? Icons.sailing : Icons.shield,
-              size: 20,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+            if (parsedType != null)
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: unitTypeColors[parsedType] ?? Colors.grey,
+                child: Icon(
+                  unitTypeIcons[parsedType] ?? Icons.help_outline,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              )
+            else
+              const Icon(Icons.help_outline, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -343,13 +367,6 @@ class _UnitDispatchRow extends StatelessWidget {
     }
   }
 
-  bool _isNaval(String dbName) {
-    try {
-      return unitTypeFromDbName(dbName).isNaval;
-    } catch (_) {
-      return false;
-    }
-  }
 }
 
 // ---------------------------------------------------------------------------

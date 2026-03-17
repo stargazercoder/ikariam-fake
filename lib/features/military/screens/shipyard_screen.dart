@@ -236,17 +236,33 @@ class _TrainingBanner extends StatelessWidget {
       unitName = entry.unitType as String;
     }
 
+    UnitType? unitType;
+    try {
+      unitType = unitTypeFromDbName(entry.unitType as String);
+    } catch (_) {}
+
     return Card(
       color: theme.colorScheme.primaryContainer,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Icon(
-              Icons.sailing,
-              size: 32,
-              color: theme.colorScheme.onPrimaryContainer,
-            ),
+            if (unitType != null)
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: unitTypeColors[unitType],
+                child: Icon(
+                  unitTypeIcons[unitType] ?? Icons.help_outline,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              )
+            else
+              Icon(
+                Icons.sailing,
+                size: 32,
+                color: theme.colorScheme.onPrimaryContainer,
+              ),
             const SizedBox(height: 8),
             Text(
               'Training $unitName x${entry.quantity}',
@@ -442,7 +458,22 @@ class _NavyRosterSection extends StatelessWidget {
         children: units
             .map(
               (u) => ListTile(
-                leading: const Icon(Icons.sailing),
+                leading: Builder(builder: (_) {
+                  UnitType? type;
+                  try {
+                    type = unitTypeFromDbName(u.unitType);
+                  } catch (_) {}
+                  if (type == null) return const Icon(Icons.help_outline);
+                  return CircleAvatar(
+                    radius: 16,
+                    backgroundColor: unitTypeColors[type],
+                    child: Icon(
+                      unitTypeIcons[type] ?? Icons.help_outline,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                  );
+                }),
                 title: Text(_displayName(u.unitType)),
                 trailing: Text(
                   '${u.quantity}',

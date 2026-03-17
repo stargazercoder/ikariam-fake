@@ -423,6 +423,27 @@ class _ArmyColumn extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Builder(builder: (_) {
+                            UnitType? type;
+                            try {
+                              type = unitTypeFromDbName(e.key);
+                            } catch (_) {}
+                            if (type == null) {
+                              return const SizedBox(width: 24);
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 6),
+                              child: CircleAvatar(
+                                radius: 10,
+                                backgroundColor: unitTypeColors[type],
+                                child: Icon(
+                                  unitTypeIcons[type] ?? Icons.help_outline,
+                                  color: Colors.white,
+                                  size: 10,
+                                ),
+                              ),
+                            );
+                          }),
                           Expanded(
                             child: Text(
                               _displayName(e.key),
