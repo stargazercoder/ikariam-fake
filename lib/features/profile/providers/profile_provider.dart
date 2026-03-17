@@ -31,6 +31,24 @@ class ProfileNotifier extends AsyncNotifier<Map<String, dynamic>?> {
         false;
   }
 
+  /// Returns true when the current user's account is flagged as a bot.
+  /// Always false for real players; only true for server-managed bot accounts.
+  bool get isBot {
+    return state.whenOrNull(
+          data: (profile) => (profile?['is_bot'] as bool?) ?? false,
+        ) ??
+        false;
+  }
+
+  /// Returns true when the current user has admin (GodMode) access.
+  /// Used by GoRouter redirect guard and future GodMode screen.
+  bool get isAdmin {
+    return state.whenOrNull(
+          data: (profile) => (profile?['is_admin'] as bool?) ?? false,
+        ) ??
+        false;
+  }
+
   /// Re-fetches the profile from the database.
   /// Call this after a successful profile update.
   Future<void> refresh() async {
