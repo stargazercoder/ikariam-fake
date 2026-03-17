@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Bots, Testing & Automation
 status: planning
-stopped_at: "Completed 22-02-PLAN.md — awaiting checkpoint:human-verify"
-last_updated: "2026-03-17T19:16:42.597Z"
+stopped_at: Completed 22-02-PLAN.md — Phase 22 GodMode Flutter Dashboard complete
+last_updated: "2026-03-17T19:46:28.776Z"
 last_activity: 2026-03-17 — v1.3 roadmap created; Phases 18-24 defined; ready to plan Phase 18
 progress:
   total_phases: 12
@@ -70,6 +70,8 @@ v1.3 architecture decisions locked in:
 - [Phase 22-02]: GodModeDashboardScreen uses ref.read(notifier) for isRefreshing/lastUpdated snapshot to avoid rebuild loops
 - [Phase 22-02]: EventFeed uses GodmodeEventFilterNotifier.setFilter() method since plan 01 used NotifierProvider not StateProvider
 - [Phase 22-02]: Army edit fields pre-filled with 0 - army counts not in world_state detail; admin enters absolute desired values
+- [Phase 22-godmode-flutter-dashboard]: godmode_get_world_state and godmode_get_events changed from RETURNS jsonb to RETURNS SETOF json — PostgREST cannot introspect opaque jsonb; SETOF json enables schema discovery
+- [Phase 22-godmode-flutter-dashboard]: GodmodeRepository.getWorldState() parses result as List<dynamic> directly (not Map with 'players' key) after RPC return type fix
 
 ### Pending Todos
 
@@ -88,7 +90,7 @@ v1.3 design work deferred to planning:
 
 ## Session Continuity
 
-Last session: 2026-03-17T19:16:42.595Z
-Stopped at: Completed 22-02-PLAN.md — awaiting checkpoint:human-verify
+Last session: 2026-03-17T19:46:28.773Z
+Stopped at: Completed 22-02-PLAN.md — Phase 22 GodMode Flutter Dashboard complete
 Resume file: None
 Next action: /gsd:plan-phase 18
