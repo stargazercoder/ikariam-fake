@@ -234,6 +234,26 @@ const Map<UnitType, Color> unitTypeColors = {
   UnitType.divingBoat:   Color(0xFF009688), // teal
 };
 
+/// Icon for each unit type, used in military screen CircleAvatars.
+/// Always access via `unitTypeIcons[type] ?? Icons.help_outline` for null safety.
+const Map<UnitType, IconData> unitTypeIcons = {
+  // Land units
+  UnitType.hoplite:      Icons.shield,
+  UnitType.phalanx:      Icons.view_column,
+  UnitType.archer:       Icons.gps_fixed,
+  UnitType.cavalry:      Icons.speed,
+  UnitType.catapult:     Icons.launch,
+  UnitType.mortar:       Icons.expand_less,
+  UnitType.medic:        Icons.local_hospital,
+  UnitType.cook:         Icons.restaurant,
+  // Naval units
+  UnitType.cargoShip:    Icons.directions_boat,
+  UnitType.ramShip:      Icons.arrow_forward,
+  UnitType.catapultShip: Icons.thunderstorm,
+  UnitType.mortarShip:   Icons.wb_sunny,
+  UnitType.divingBoat:   Icons.water,
+};
+
 /// Canonical order for land unit types in chart stack building.
 /// Always iterate in this order to ensure consistent fromY/toY in stacked bars.
 const List<UnitType> orderedLandTypes = [
