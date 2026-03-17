@@ -1,12 +1,12 @@
 # Feature Research
 
-**Domain:** Ikariam-style browser strategy game — v1.1 Economy & Combat Depth features
-**Researched:** 2026-03-13
-**Confidence:** HIGH (Ikariam Fandom wiki, community guides, original game mechanics cross-referenced)
+**Domain:** Ikariam-style browser strategy game — v1.3 Bots, Testing & Automation features
+**Researched:** 2026-03-17
+**Confidence:** MEDIUM (FSM/bot patterns from academic research + community sources; Supabase testing from official docs HIGH; CI/CD patterns HIGH)
 
-> **Scope note:** This document focuses on the 9 new features targeted for v1.1. The v0.1.0
-> feature landscape was documented in the prior research pass. All existing systems (auth,
-> buildings, combat, map) are treated as stable dependencies here.
+> **Scope note:** This document covers only the NEW features targeted for v1.3. All existing systems
+> (buildings, combat, happiness, pillage, trading, espionage, dev toolbar) are stable dependencies.
+> The v1.1 feature research document remains authoritative for earlier mechanics.
 
 ---
 
@@ -14,142 +14,151 @@
 
 ### Table Stakes (Users Expect These)
 
-Features users assume exist in any Ikariam-like game. Missing these = product feels incomplete.
+Features that a game with AI bots and an admin dashboard must have. Missing these = the feature area feels half-built.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Happiness system (tavern + wine → mood) | Every Ikariam player knows this mechanic; without it the Tavern building serves no purpose | MEDIUM | Tavern gives +12 happiness/level; wine loads give +60/load; pg_cron distributes wine every 20 min; happiness formula = 196 + tavern + wine - population - corruption |
-| Population growth driven by happiness | Core Ikariam loop: happiness → population → workers → production; missing this breaks the city progression curve | MEDIUM | happiness score > population = growth; 1 point of "total satisfaction" above current pop = 1 citizen/period; natural cap forms as city grows |
-| Tax / gold income from population | Players expect gold to scale with city size; if gold only comes from idle citizens at a flat rate the economy feels static | LOW | In original: each idle citizen = +3 gold/hr; each worker = 0 gold (they work, not tax); a tax-rate slider (0–33%) is the standard UI control for this |
-| Configurable wine spending rate | Tavern slider to control happiness-vs-wine tradeoff is genre standard; without it players can't manage wine scarcity | LOW | Slider sets % of hourly wine supply fed to tavern; at 0% no wine is served (happiness drops); at 100% maximum happiness boost; stored as city setting |
-| Island resource buildings upgradeable | All Ikariam players expect to click on the sawmill and donate wood to upgrade it for the whole island; skipping this breaks the island cooperation loop | MEDIUM | Shared building level, stored per island (not per city); all cities on island benefit; donations proportional to upgrade cost (wood only for tier 1); upgrade gates more workers |
-| Resource production rate visible in UI | Players cannot plan without knowing their hourly rates; the resource bar without a rate label is a major UX gap | LOW | Show +X/hr next to each resource in top bar; tooltip or detail screen shows worker breakdown: base rate x island level x research bonus |
-| Pillage resources on battle victory | Winning a battle must have a tangible economic reward; without pillage, aggressive play has no incentive | MEDIUM | Cargo ships required to carry loot; warehouse protects a fixed floor (e.g. 100 + 480/warehouse level); stolen proportional to resource ratios in target warehouse; 15 goods/ship/minute loading rate |
-| Battle report shows unit losses per turn | After a 5-minute turn-based battle players need to see what died when; flat win/loss summary feels inadequate | MEDIUM | Turn-by-turn table: attacker losses vs defender losses per unit type; color-code unit types; naval phase then land phase per turn; already have raw data in battle_turns or equivalent |
+| Bots that actually attack players | If bots exist, players expect to be raided; idle bots break the "living world" premise | MEDIUM | Bot dispatches military units to a nearby target city on a schedule; uses existing `dispatch-units` infrastructure and pg_cron trigger |
+| Bots that train units over time | Bots with static armies become trivially exploitable; players expect them to replenish after combat | MEDIUM | Bot checks army size vs a target threshold; if below, queues training via existing `train-units` flow or a direct DB insert bypassing Edge Functions (for bot authority) |
+| Bots that upgrade buildings | Economic progression is the game loop; bots must participate in it or their cities stagnate | MEDIUM | Bot evaluates which building gives highest ROI next, queues upgrade; uses same construction queue as players |
+| 20 bot accounts with distinct game states | A world where all bots are at level 1 feels fake; players expect varied opponents | MEDIUM | Seed script creates 20 profiles + cities across multiple islands with varying resource, building, and army levels |
+| GodMode: view all player states in one screen | Any admin tool must let the admin see the whole world without navigating city by city | MEDIUM | Full-page Flutter screen; reads from admin-scoped Supabase queries; shows resource levels, army sizes, active battles, bot status |
+| GodMode: pause/resume bots | Essential for debugging and balance tuning; without a kill switch, a misbehaving bot cannot be stopped without DB intervention | LOW | `is_bot_paused` flag on profile row; bot tick function skips paused bots; toggle via admin UI button |
+| Automation script: DB reset + reseed | Without this, every developer must manually reset state; standard for any project with seeded data | LOW | Bash/npm script: `supabase db reset && deno run seed.ts`; single command restores known state |
+| Unit tests for critical Edge Functions | Server-side calculations (pillage, battle, resource tick) are where bugs cause economy exploits; teams always test these | MEDIUM | Deno test runner (`deno test`) in `supabase/functions/tests/`; tests use local Supabase via `supabase start` |
+| Flutter widget tests for critical screens | Resource bar, battle report, city view widget tree — any regression here is immediately visible to players | MEDIUM | `flutter_test` package; `testWidgets()` for key screens; mock Riverpod providers with `ProviderContainer` overrides |
 
 ### Differentiators (Competitive Advantage)
 
-Features not strictly required by genre expectations but that meaningfully elevate this game above the original Ikariam's UX.
+Features that elevate this game's AI and tooling above a minimal implementation.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Marketplace order book (buy/sell offers posted globally) | Original Ikariam trading is radius-limited search; a global order book with async fill creates a real economy and more player interaction | HIGH | Players post: resource type, amount, price-per-unit in gold; buyer accepts offer → cargo ships depart; order remains open until accepted or cancelled; requires Trading Port building; no gold-for-gold trades (original Ikariam rule) |
-| Direct player-to-player resource transfer | Faster than marketplace for allied trades or targeted help; simpler UX for informal economy | LOW | Both players need Trading Port; sender selects city, target city, resource type, amount; cargo ships carry 500 units each; travel time = distance / ship speed; already have dispatch infrastructure |
-| Battle report visualization with color-coded unit chart | Showing a stacked bar or table of unit losses per turn (each unit type in its own color) is far above original Ikariam's text-based reports | MEDIUM | fl_chart (bar chart) per turn; attacker side blue, defender red; each unit type a color segment; click turn to expand detail; no external lib needed beyond fl_chart (already pub.dev standard) |
+| Bot personality archetypes (militarist, economist, builder) | Bots with differentiated strategies create varied and more realistic opponents than a uniform AI | MEDIUM | 3 archetypes stored on bot profile row; militarist prioritizes unit training and attacks; economist prioritizes island donations and trading; builder focuses on upgrading buildings; behavior weights differ per archetype |
+| Bot tick with stochastic jitter (not all bots tick at same cron interval) | Synchronized bots acting at exactly the same time create unnatural world patterns; jitter makes the world feel alive | LOW | Bot cron fires every 15 minutes; within the function, each bot rolls a random skip (20% chance) so actions are distributed unevenly across time |
+| GodMode: force-trigger bot action | Lets admin validate bot behavior instantly rather than waiting 15 minutes for the next cron cycle | LOW | Admin button calls an RPC `run_bot_tick(bot_profile_id)` immediately; same logic path as cron tick |
+| GodMode: modify player resource balances | Balance testing requires setting specific resource levels; doing this via SQL manually is error-prone | LOW | Admin form with player selector + resource sliders; calls a privileged RPC `admin_set_resources(city_id, wood, marble, ...)` |
+| Rich seed data: diverse island distribution | Bots distributed across multiple islands (not all on one) creates a realistic sparse world and tests island-level interactions | MEDIUM | Seed assigns bots to 8-10 different islands; each island has 2-4 bot cities + reserved slots for real players |
+| CI pipeline with lint + test + build in single workflow | Flutter + Supabase projects rarely have a complete CI pipeline; having one signals code quality discipline | MEDIUM | GitHub Actions workflow: `flutter analyze` + `flutter test` + `deno lint` + `deno test` + `flutter build web`; triggers on push to main |
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| Automatic wine restocking / trade routes | Players don't want to manually send wine to cities | Removes resource scarcity tension; wine management IS the happiness gameplay loop | Manual wine transport via cargo ships; optional: configurable auto-send if player sets standing transfer |
-| Instant pillage (no cargo ship travel) | Simpler implementation | Breaks balance — attackers would farm resources instantly with no risk window; the cargo loading delay is intentional counterplay | Keep 15-goods/ship/minute loading rate; defenders can surrender or reinforce before loading completes |
-| Negative happiness → population loss | Seems realistic | Catastrophic death spiral if a new player runs out of wine; extremely punishing for beginners | Cap minimum growth at 0 (no shrink); happiness just controls growth rate, not population decay |
-| Gold-for-gold marketplace trades | Financial speculation appeal | Original Ikariam explicitly prohibits gold trades; enables gold laundering / real-money trade workarounds | Resources only in marketplace; gold is the pricing unit, not a tradeable commodity |
-| Per-city island resource ownership (only your city benefits from upgrade) | Simpler DB model | Removes island cooperation social dynamic — the key differentiator; players would never donate for others | Shared island-level building; all cities benefit equally regardless of who donated |
-| Real-time happiness ticker (WebSocket every second) | More responsive UI | Battery drain on mobile web; happiness changes slowly (once/20 min tick); overkill for the mechanic | Refresh on pg_cron tick (5 min) + manual pull-to-refresh; Realtime only for battle events |
-| Complex tax rate formula with diminishing returns and corruption | Depth appeal | Harder to communicate to players; original Ikariam's corruption mechanic is widely disliked for being opaque | Simple: idle citizens x gold_rate x tax_pct; corruption only at high city count (defer to v1.2+) |
+| ML/LLM-based adaptive bot AI | More intelligent bots that learn from player patterns | Massively over-engineered for a small-community game; adds inference latency, cost, and complexity with no validated player benefit | FSM with 3 archetypes + random jitter; revisit if player counts justify it |
+| Bots that use player Edge Functions directly | Cleaner code reuse | Player Edge Functions enforce RLS and auth context; bots would need to impersonate player auth tokens — a security footgun | Bots call internal SQL functions directly with postgres role; no HTTP Edge Function calls from cron |
+| Real-time bot action streaming to all clients | Players can watch bots act in real-time | Supabase Realtime is designed for player-owned data subscriptions; broadcasting all bot actions to all clients causes O(n) subscription overhead | Bot actions update DB normally; clients only receive updates for cities/battles they are subscribed to |
+| GodMode accessible to all users (soft admin flag in profile) | Easier to implement | If admin detection is a simple profile column, a DB exploit or misconfigured RLS reveals controls to non-admins | Hardcode admin user IDs in Flutter app (constants file); double-check on backend with `auth.uid() = ANY(admin_uids)` |
+| 100% code coverage mandate | Engineering thoroughness appeal | For a rapid-iteration game, 100% coverage forces tests on trivial getters and UI glue code; slows development without proportional bug reduction | Cover critical paths only: battle resolution, resource tick, pillage, construction queue; target ~60-70% coverage on Edge Functions |
+| Integration tests that spin up a full Supabase instance in CI | Comprehensive testing | Supabase local startup in CI takes 60-120 seconds per run; dramatically slows the feedback loop | Unit tests with mocked Supabase client for Flutter; Deno tests use `supabase functions serve` locally (developer runs these, not CI) |
+| Bot actions via Supabase Realtime events (event-driven) | Reactive rather than polling | pg_cron is already the proven pattern for periodic game actions in this codebase; Realtime adds a new event bus with additional failure modes | Stick with pg_cron scheduled functions for all bot actions; bot tick is a SQL function, not an event handler |
 
 ---
 
 ## Feature Dependencies
 
 ```
-[Happiness System]
-    └──requires──> [Tavern Building] (already built v0.1.0)
-    └──requires──> [Wine resource supply] (already built v0.1.0)
-    └──requires──> [pg_cron wine distribution tick] (new tick handler)
-    └──enables──>  [Population Growth Rate] (calculated from happiness surplus)
+[Bot System]
+    └──requires──> [profiles table with is_bot + bot_archetype columns] (schema addition)
+    └──requires──> [pg_cron bot-tick job] (new cron schedule)
+    └──requires──> [bot_tick() SQL function] (new function)
+    └──uses──>     [complete_training()] (already exists)
+    └──uses──>     [complete_building_upgrades()] (already exists)
+    └──uses──>     [process_arrivals()] (already exists)
 
-[Population Growth Rate]
-    └──requires──> [Happiness System]
-    └──enables──>  [Tax Income] (more citizens = more gold)
-    └──enables──>  [More Workers] (larger pool to assign)
+[Bot Behaviors: Attack]
+    └──requires──> [Bot System]
+    └──requires──> [dispatch_units() or direct unit_movements insert] (already exists)
+    └──requires──> [battle system] (already exists)
 
-[Tax Income]
-    └──requires──> [Population system] (citizen count)
-    └──requires──> [Tax rate setting] (configurable per city)
-    └──enhances──> [Gold resource] (additional income stream)
+[Bot Behaviors: Train Units]
+    └──requires──> [Bot System]
+    └──requires──> [training_queue table] (already exists)
+    └──requires──> [city_units table] (already exists)
 
-[Tavern Happiness Config]
-    └──requires──> [Tavern Building] (already built v0.1.0)
-    └──requires──> [Happiness System]
-    └──enables──>  [Player control over wine burn rate]
+[Bot Behaviors: Upgrade Buildings]
+    └──requires──> [Bot System]
+    └──requires──> [construction_queue table] (already exists)
+    └──requires──> [city_buildings table] (already exists)
 
-[Island Resource Upgrade]
-    └──requires──> [Island model with resource_building_level] (schema change)
-    └──requires──> [Wood donation mechanism] (Edge Function)
-    └──enables──>  [Higher worker capacity at island resource]
-    └──enables──>  [Higher production rate for all island cities]
+[GodMode Dashboard]
+    └──requires──> [Admin identity check] (hardcoded UID constant)
+    └──requires──> [admin_* RPC functions] (new privileged functions, SECURITY DEFINER)
+    └──requires──> [Bot System] (to show bot status)
+    └──reads──>    [all player profiles, cities, resources, battles, movements]
 
-[Resource Rate UI]
-    └──requires──> [Production formula already implemented] (v0.1.0)
-    └──requires──> [Island building level exposed to client] (island resource upgrade)
-    └──no new backend needed──> [Pure frontend enhancement]
+[GodMode Controls]
+    └──requires──> [GodMode Dashboard]
+    └──requires──> [is_bot_paused flag on profiles] (schema addition)
+    └──requires──> [admin_set_resources() RPC] (new privileged function)
+    └──requires──> [run_bot_tick() RPC] (new privileged function)
 
-[Player-to-Player Trading]
-    └──requires──> [Trading Port Building] (already built v0.1.0)
-    └──requires──> [Cargo Ship unit] (already built v0.1.0 as naval unit? verify)
-    └──requires──> [Dispatch infrastructure] (already built v0.1.0 for military)
-    └──enhances──> [Island resource cooperation] (wine transport between islands)
+[Rich Seed Data]
+    └──requires──> [Bot System schema] (bot profile columns must exist before seeding)
+    └──requires──> [All existing tables] (cities, buildings, units, resources)
+    └──outputs──>  [20 bot profiles across 8-10 islands with varied states]
 
-[Marketplace Order Book]
-    └──requires──> [Player-to-Player Trading] (cargo ship transport mechanic)
-    └──requires──> [marketplace_orders table] (new schema)
-    └──requires──> [Trading Port Building] (already built)
-    └──enhances──> [Player-to-Player Trading]
+[Unit Tests: Edge Functions]
+    └──requires──> [supabase start] (local Supabase running)
+    └──requires──> [deno test runner] (built into Deno)
+    └──tests──>    [upgrade-building, train-units, dispatch-units, spy-city, send-trade]
 
-[Pillage Mechanic]
-    └──requires──> [Battle system] (already built v0.1.0)
-    └──requires──> [Battle victory detection] (already built)
-    └──requires──> [Cargo ships present in attacking fleet] (new check)
-    └──requires──> [Warehouse protection formula] (new calculation)
-    └──modifies──> [Resource balances of both players] (via Edge Function)
+[Unit Tests: Flutter Widgets]
+    └──requires──> [flutter_test package] (ships with Flutter SDK)
+    └──requires──> [Riverpod ProviderContainer overrides] (mock game state)
+    └──tests──>    [ResourceBar, BattleReport, CityView, IslandView widgets]
 
-[Battle Report Visualization]
-    └──requires──> [Battle turn data] (already stored server-side v0.1.0)
-    └──requires──> [fl_chart Flutter package] (frontend only)
-    └──enhances──> [Battle reports] (already sent via Realtime v0.1.0)
-    └──no new backend needed──> [Pure frontend enhancement]
+[CI/CD Pipeline]
+    └──requires──> [Unit Tests: Edge Functions] (runs in pipeline)
+    └──requires──> [Unit Tests: Flutter Widgets] (runs in pipeline)
+    └──requires──> [flutter analyze] (lint)
+    └──requires──> [deno lint] (lint)
+    └──outputs──>  [GitHub Actions workflow .github/workflows/ci.yml]
+
+[Automation Scripts]
+    └──requires──> [Supabase CLI] (already used)
+    └──requires──> [Rich Seed Data script] (seed.ts or seed.sql)
+    └──outputs──>  [scripts/reset.sh, scripts/seed.sh, scripts/serve.sh, scripts/test.sh]
 ```
 
 ### Dependency Notes
 
-- **Island Resource Upgrade requires schema change**: `islands` table needs `resource_building_level` (int) and `resource_building_donated_wood` (int) columns. All cities on island read from this shared row.
-- **Pillage depends on cargo ships in fleet**: Attacking fleet must include at least one Cargo Ship to loot; if none sent, battle can still happen but no resources are taken. This is original Ikariam's design — intentional choice.
-- **Battle Report Visualization is pure frontend**: All turn data already exists server-side from v0.1.0. This is a UI-only phase; no new Edge Functions needed.
-- **Resource Rate UI is pure frontend**: Production formula (workers x island_level x research_bonus) is already server-side. Frontend just needs to display the rate it can calculate from known values.
-- **Tax Income integrates into existing pg_cron tick**: The 5-minute resource tick already runs; gold from tax is added to the same calculation (idle_citizens x gold_rate x tax_pct_decimal).
-- **Happiness System needs new pg_cron handler**: Every 20 minutes (or every 5-min tick), wine is deducted from city storage and happiness is updated. Population growth applies once per tick based on surplus happiness.
-- **Marketplace Order Book is independent of direct trading**: Both can exist simultaneously. Marketplace is async (post offer, wait for match); direct trading is synchronous (both players agree out-of-game, then transfer).
+- **Bot System must exist before Seed Data**: The seed script inserts rows into `profiles` with `is_bot=true` and `bot_archetype` columns; those columns must exist in the migration before seeding runs.
+- **GodMode requires no new auth system**: Admin identity is checked client-side (hardcoded UID in `lib/config/admin.dart`) and server-side in every admin RPC using `SECURITY DEFINER` with an explicit `auth.uid() = ANY('{uuid1,uuid2}'::uuid[])` guard.
+- **Bot functions must use postgres role, not player auth**: The `bot_tick()` SQL function runs with `SECURITY DEFINER` under the postgres superuser so it can write to any city without being blocked by RLS policies intended for players.
+- **Unit tests are independent of CI**: Developers run `deno test` and `flutter test` locally; CI runs the same commands. The test suite must work without a running Supabase instance (mock client) for CI speed.
+- **Seed data depends on DB reset being idempotent**: The automation script runs `supabase db reset` (wipes and re-applies all migrations) then `seed.ts`; seed script must handle the clean-slate state and not assume prior data.
 
 ---
 
 ## MVP Definition
 
-### Launch With (v1.1 — this milestone)
+### Launch With (v1.3 — this milestone)
 
-- [x] Happiness system: pg_cron distributes wine to tavern, calculates happiness score, updates population growth rate — closes the tavern building's purpose
-- [x] Tavern happiness configuration: wine spending rate slider (0–100%), stored per city
-- [x] Population-based tax income: idle_citizens x 3 gold/hr included in 5-min resource tick
-- [x] Island resource building upgrade: donation screen, shared level per island, all cities benefit
-- [x] Resource rate UI: +X/hr suffix in top resource bar; detail breakdown in building screen
-- [x] Player-to-player resource transfer: send resources via cargo ships (direct, no order book)
-- [x] Marketplace order book: post buy/sell offers, accept offers, cargo ships fulfill
-- [x] Pillage mechanic: cargo ships load resources after battle win; warehouse protection floor
-- [x] Battle report visualization: turn-by-turn unit loss table with color-coded unit types
+- [ ] Bot schema additions: `is_bot BOOLEAN`, `bot_archetype TEXT`, `is_bot_paused BOOLEAN` on `profiles` — enables all bot features
+- [ ] `bot_tick()` SQL function: per-bot FSM logic for attack / train / upgrade decisions based on archetype weights
+- [ ] pg_cron `bot-tick` job: every 15 minutes, calls `bot_tick()` for all non-paused bot profiles
+- [ ] Seed script: 20 bot accounts across 8-10 islands, varied building levels (1-8), unit counts (0-200), resource balances
+- [ ] GodMode dashboard screen: full-page admin view showing all players (bot + human), resource levels, army sizes, active battles
+- [ ] GodMode bot controls: pause/resume toggle per bot; force-tick button
+- [ ] GodMode resource edit: set resource balances for any city (for balance testing)
+- [ ] Unit tests: `upgrade-building` and `train-units` Edge Functions (highest bug-surface functions)
+- [ ] Widget tests: `ResourceBar` and `BattleReportScreen` (most data-sensitive widgets)
+- [ ] Automation scripts: `reset-and-seed`, `serve` (Edge Functions), `test` (combined Flutter + Deno runner)
+- [ ] CI workflow: GitHub Actions with `flutter analyze` + `flutter test` + `deno lint` on push to main
 
 ### Add After Validation (v1.x)
 
-- [ ] Corruption mechanic (gold penalty at high city count) — only relevant once players have 3+ cities; defer to v1.2
-- [ ] Marketplace trade treaties (priority access for allied cities) — requires alliance system maturity
-- [ ] Auto wine-send standing orders — quality-of-life once wine management is validated as engaging
-- [ ] Population decay from extreme unhappiness — only if players request more punishing mechanics post-launch
+- [ ] Bot personality tuning via GodMode UI (adjust archetype weights without code change) — only needed if bots prove unbalanced post-launch
+- [ ] Bot alliance formation (bots join same alliance to simulate player alliances) — requires alliance system first (v1.4+)
+- [ ] Full CI build artifact: `flutter build web` producing deployable output — add when hosting is configured
+- [ ] Integration test suite (full Supabase + Flutter E2E) — add when team size justifies the maintenance cost
 
 ### Future Consideration (v2+)
 
-- [ ] Museum building for happiness (culture goods) — high complexity, low immediate value
-- [ ] Barbarian village wine supply (PvE wine source) — requires barbarian villages first
-- [ ] Dynamic pricing in marketplace (supply/demand curves) — requires enough player volume
+- [ ] Adaptive bot difficulty (bot archetype shifts based on win/loss ratio) — requires gameplay telemetry first
+- [ ] Public bot leaderboard (show which bot archetype "wins" the world) — novelty feature for established player base
+- [ ] Automated deployment pipeline (CD, not just CI) — deferred until hosting target is chosen
 
 ---
 
@@ -157,116 +166,211 @@ Features not strictly required by genre expectations but that meaningfully eleva
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Resource rate UI (+X/hr display) | HIGH | LOW | P1 — pure frontend, high immediate value |
-| Tavern happiness config slider | HIGH | LOW | P1 — closes existing building's missing function |
-| Happiness system + population growth | HIGH | MEDIUM | P1 — unlocks the city progression curve |
-| Tax income from population | HIGH | LOW | P1 — piggybacks on existing resource tick |
-| Pillage mechanic | HIGH | MEDIUM | P1 — makes combat victories meaningful |
-| Battle report visualization | HIGH | MEDIUM | P1 — improves existing battle report UX significantly |
-| Island resource upgrade | MEDIUM | MEDIUM | P1 — enables island cooperation; needed for production scaling |
-| Player-to-player resource transfer | MEDIUM | LOW | P1 — prerequisite for marketplace; needed for wine trading |
-| Marketplace order book | MEDIUM | HIGH | P1 — drives player interaction and island economy |
+| Bot system (schema + tick function) | HIGH — bots populate the world | MEDIUM | P1 — core of this milestone |
+| Rich seed data (20 bots, varied states) | HIGH — realistic world for testing and new players | MEDIUM | P1 — needed immediately after bot schema |
+| GodMode dashboard (read-only view) | HIGH — essential for admin observation | MEDIUM | P1 — dev tool with high payoff |
+| GodMode bot pause/resume | HIGH — safety control for misbehaving bots | LOW | P1 — must ship with bot system |
+| Automation scripts (reset + seed) | HIGH — eliminates manual dev setup friction | LOW | P1 — first thing every developer needs |
+| Unit tests: Edge Functions | HIGH — prevents economy exploits from regressions | MEDIUM | P1 — battle + pillage functions are high risk |
+| Unit tests: Flutter widgets | MEDIUM — catches UI regressions | MEDIUM | P2 — less critical than backend tests |
+| CI pipeline (GitHub Actions) | MEDIUM — code quality gate | LOW | P2 — set up once, runs forever |
+| GodMode resource edit | MEDIUM — balance testing accelerator | LOW | P2 — useful but not blocking |
+| Bot archetypes (3 personalities) | MEDIUM — world variety | LOW | P1 — cheap differentiation from uniform bots |
 
 **Priority key:**
-- P1: Must have for v1.1 launch (all features in this milestone are P1)
-- P2: Should have, add in v1.2 after validation
-- P3: Nice to have, v2+
+- P1: Must have for v1.3 launch
+- P2: Should have, add when possible
+- P3: Nice to have, future consideration
+
+---
+
+## Bot Behavior Design
+
+### FSM State Machine (Per Bot, Per Tick)
+
+Each bot evaluates its current state and takes at most one action per tick to avoid overwhelming game queues.
+
+```
+[Evaluate State]
+    ├── army_strength < archetype_target_army?
+    │       └── [Train Units] — queue highest-priority unit type for archetype
+    ├── has_idle_construction_slot AND gold >= next_upgrade_cost?
+    │       └── [Upgrade Building] — pick building with highest archetype ROI
+    ├── army_strength >= attack_threshold AND cooldown_expired?
+    │       └── [Select Target] — find nearest city not on same island
+    │               └── [Dispatch Attack] — insert into unit_movements
+    └── [Idle] — do nothing this tick (also triggered by 20% random skip)
+```
+
+### Archetype Weights (MEDIUM confidence — needs balance tuning post-launch)
+
+| Behavior | Militarist | Economist | Builder |
+|----------|------------|-----------|---------|
+| Train units frequency | High (every 2 ticks) | Low (every 5 ticks) | Low (every 5 ticks) |
+| Attack frequency | High (every 3 ticks if army ready) | Low (every 8 ticks) | Very low (every 12 ticks) |
+| Building upgrades | Low priority | Medium priority | High priority (every tick) |
+| Island donations | None | High (donates 20% of wood surplus) | Medium |
+| Target army size | 200 units | 60 units | 80 units |
+
+### pg_cron Implementation Pattern
+
+The `bot_tick()` function follows the established pattern of all other game cron functions in this codebase:
+
+```sql
+-- Scheduled every 15 minutes
+-- Function iterates over all bot profiles where is_bot_paused = false
+-- Each bot evaluates its own city state and inserts into appropriate queue tables
+-- SECURITY DEFINER to bypass RLS (same pattern as process_resource_tick)
+-- Random jitter: bot SKIPS action if random() < 0.2 (20% skip rate per tick)
+```
+
+This is HIGH confidence — it directly mirrors the existing `complete_building_upgrades()`, `complete_training()`, and `process_arrivals()` cron function patterns already in the codebase.
+
+---
+
+## Testing Strategy
+
+### Edge Function Tests (Deno — HIGH confidence from official Supabase docs)
+
+Test files live in `supabase/functions/tests/` as `[function-name]-test.ts`.
+
+```
+Priority 1 (HIGH business risk):
+  - upgrade-building-test.ts  → test cost formula, level cap, queue insertion
+  - train-units-test.ts       → test resource deduction, queue insertion, unit type validation
+  - dispatch-units-test.ts    → test distance calculation, unit deduction, movement insertion
+
+Priority 2 (MEDIUM business risk):
+  - spy-city-test.ts          → test RLS enforcement (can't spy own city)
+  - send-trade-test.ts        → test cargo ship deduction, movement insertion
+```
+
+Test pattern: `deno test --allow-env --allow-net supabase/functions/tests/`
+Requires local Supabase running: `supabase start` before `supabase functions serve`
+
+### Flutter Widget Tests (flutter_test — HIGH confidence from Flutter docs)
+
+```
+Priority 1 (visible to player immediately):
+  - resource_bar_test.dart    → test +X/hr display, capacity bar width
+  - battle_report_test.dart   → test turn-by-turn unit loss display
+
+Priority 2 (less regression risk):
+  - city_view_test.dart       → test building grid renders, button states
+  - island_view_test.dart     → test city slot ownership borders
+```
+
+Use `ProviderContainer` overrides to inject mock game state without network calls.
+Use `pump()` and `pumpAndSettle()` for async widget renders.
+
+### What NOT to Test (Anti-Feature: 100% coverage)
+
+- UI glue code (routing, theming, icon selection)
+- Generated/formulaic code (building definitions, unit stat tables)
+- pg_cron scheduling itself (Supabase manages this; trust the platform)
+- Trivial getters and model constructors with no logic
+
+---
+
+## Automation Scripts Design
+
+### scripts/reset-and-seed.sh
+
+```bash
+#!/bin/bash
+# Resets DB to clean migration state, then seeds bot accounts
+supabase db reset
+deno run --allow-env --allow-net seed/seed.ts
+```
+
+### scripts/serve.sh
+
+```bash
+#!/bin/bash
+# Starts local Edge Functions server for development
+supabase functions serve --env-file .env.local
+```
+
+### scripts/test.sh
+
+```bash
+#!/bin/bash
+# Runs all tests: Flutter unit + widget tests, Deno Edge Function tests
+flutter test
+deno test --allow-env --allow-net supabase/functions/tests/
+```
+
+### scripts/build.sh
+
+```bash
+#!/bin/bash
+# Production Flutter web build
+flutter build web --release
+```
+
+### .github/workflows/ci.yml (CI Pipeline)
+
+Triggers: push to `main`, pull requests to `main`
+
+Steps:
+1. `flutter analyze` — Dart static analysis (zero warnings policy)
+2. `flutter test` — all widget + unit tests
+3. `deno lint supabase/functions/` — TypeScript lint
+4. `deno check supabase/functions/` — TypeScript type check
+5. (Optional P2) `flutter build web --release` — verify build succeeds
+
+---
+
+## GodMode Dashboard Design
+
+### Read-Only World View (P1)
+
+| Panel | Data Shown | Update Strategy |
+|-------|------------|-----------------|
+| Player list | Profile name, is_bot, bot_archetype, is_bot_paused, city count | Poll every 30s |
+| Resource snapshot | Wood/Marble/Crystal/Sulfur/Gold per city (admin query bypasses RLS) | Poll every 30s |
+| Army snapshot | Total units per city, units in transit | Poll every 30s |
+| Active battles | Attacker, defender, current turn, turn count | Poll every 10s |
+| Bot status | Last tick time, last action taken, skip count | Poll every 30s |
+
+### Admin Actions (P1-P2)
+
+| Control | Action | Implementation |
+|---------|--------|----------------|
+| Pause bot | Sets `is_bot_paused = true` on profile | `admin_pause_bot(profile_id)` RPC |
+| Resume bot | Sets `is_bot_paused = false` on profile | `admin_resume_bot(profile_id)` RPC |
+| Force bot tick | Runs `bot_tick()` for one bot immediately | `run_bot_tick(profile_id)` RPC |
+| Set resources | Updates city resource amounts | `admin_set_resources(city_id, ...)` RPC |
+
+All admin RPCs use `SECURITY DEFINER` and check `auth.uid() = ANY('{admin_uuid}'::uuid[])` — no client-side trust.
 
 ---
 
 ## Competitor Feature Analysis
 
-| Feature | Ikariam (original) | Our v1.1 Approach |
-|---------|-------------------|-------------------|
-| Happiness formula | 196 base + tavern(+12/lvl) + wine(+60/load) + museum - population - corruption | Same formula without museum (museum deferred); corruption deferred to v1.2 |
-| Wine distribution | Every 20 min in thirds (HH:00, HH:20, HH:40) | pg_cron every 5 min (simplify); deduct wine, add happiness |
-| Population growth | Happiness surplus = growth/hr; cap at Town Hall housing limit | Same; cap enforced server-side in pg_cron tick |
-| Tax / gold | 3 gold/hr per idle citizen; scientists cost 6/hr | 3 gold/hr per idle citizen; no scientists yet (research deferred) |
-| Island upgrade | All cities donate wood; all benefit equally | Same; level stored on island row; donation Edge Function |
-| Pillage | Cargo ships required; 15 goods/ship/min; warehouse protects floor | Same mechanics; floor = 100 (Town Hall) + 480 per warehouse level |
-| Trading post | Radius-limited offer search; "I offer / I am looking for" UI | Order book global (no radius limit in v1.1 for simplicity); direct transfer also available |
-| Battle reports | Text-based round summaries; morale % per round | Same data + color-coded unit loss chart (fl_chart); naval phase then land phase per turn |
-
----
-
-## Implementation Complexity Notes
-
-### Happiness System (MEDIUM)
-
-The happiness formula is straightforward but requires a new pg_cron job or extended existing tick:
-
-1. Every tick: calculate `happiness_score = 196 + (tavern_level * 12) + (wine_loads_served * 60) - current_population`
-2. Deduct wine from city warehouse (based on slider setting)
-3. If `happiness_score > current_population`: grow population by `(happiness_score - current_population) * growth_factor`
-4. Store `happiness_score` and `population` on city row
-5. Frontend reads and displays happiness bar
-
-Key risk: wine depletion when warehouse runs dry → happiness crash → population stops growing. Handle gracefully: if wine = 0, happiness drops to base (196 + tavern only), growth slows but does not reverse.
-
-### Island Resource Upgrade (MEDIUM)
-
-Schema: add `resource_level INT DEFAULT 1` and `wood_donated INT DEFAULT 0` to `islands` table.
-
-Edge Function `donate-to-island-resource`:
-1. Validate player has a city on the island
-2. Deduct wood from player city warehouse
-3. Add to `wood_donated` on island row
-4. If `wood_donated >= upgrade_cost(resource_level)`: increment `resource_level`, reset `wood_donated = 0`
-5. All production ticks now use `island.resource_level` in formula
-
-Production formula becomes: `workers * island_resource_level * research_bonus`.
-
-### Pillage Mechanic (MEDIUM)
-
-After battle victory detection in existing Edge Function:
-1. Count cargo ships in attacking fleet
-2. Calculate `max_loot = cargo_ship_count * 500` (capacity)
-3. Calculate `unprotected = max(0, target_resource - warehouse_protection(target_warehouse_level))`
-4. Distribute loot proportionally across resource types (ratio matches target's resource ratios)
-5. Deduct from target, add to attacker — both within same DB transaction
-6. Cargo loading is instantaneous at battle end (simplify from original's 15-goods/min — too complex for turn-based model)
-
-Note: Original Ikariam's loading timer made sense for continuous battles. In our 5-minute turn model, simplifying to instant transfer at battle end is more appropriate and avoids a separate cargo-loading state machine.
-
-### Marketplace Order Book (HIGH)
-
-New table: `marketplace_orders(id, seller_city_id, resource_type, amount, price_per_unit, status, created_at)`
-
-Flow:
-1. Player posts offer → insert row, deduct resources from city (held in escrow)
-2. Buyer accepts offer → Edge Function: transfer resources via cargo ship dispatch, transfer gold, mark order filled
-3. Partial fills: split order into filled + remaining
-4. Cancel: return escrowed resources to seller
-
-Key constraint: no client writes to marketplace table directly — all via Edge Functions (existing security model).
-
-### Battle Report Visualization (MEDIUM)
-
-Frontend-only. Data already exists in battle report. Add:
-- `fl_chart` BarChart widget showing attacker vs defender losses per turn
-- Each unit type gets a fixed color (Hoplite=blue, Archer=green, etc.)
-- Naval turns shown separately from land turns
-- Click any turn bar to expand unit-by-unit breakdown in a detail card
+| Feature | Original Ikariam | Other Browser Games (Travian/Grepolis) | Our v1.3 Approach |
+|---------|-----------------|----------------------------------------|-------------------|
+| NPC / bot players | Barbarian villages (PvE targets only, not full players) | AI placeholder accounts in early worlds | Full bot accounts with auth profiles; participate in same game loop as players |
+| Admin tools | GameForge internal — not visible to community | Private GM tools; players report via ticket | In-game GodMode screen for the single admin (project owner); accessible via Flutter route guard |
+| World seeding | Bots and players start fresh simultaneously | Pre-seeded NPC villages at world launch | 20 bot accounts seeded at DB init via migration or seed script |
+| CI/CD | N/A (closed source) | N/A | GitHub Actions: lint + test + build |
+| Test coverage | N/A | N/A | Critical paths only; Edge Functions + key Flutter widgets |
 
 ---
 
 ## Sources
 
-- [Ikariam Fandom: Happiness](https://ikariam.fandom.com/wiki/Happiness) — Happiness formula, tavern mechanics
-- [Ikariam Fandom: Citizen](https://ikariam.fandom.com/wiki/Citizen) — Population and gold per citizen
-- [Ikariam Fandom: Gold](https://ikariam.fandom.com/wiki/Gold) — Gold income mechanics
-- [Ikariam Fandom: Pillaging](https://ikariam.fandom.com/wiki/Pillaging) — Cargo loading, warehouse protection
-- [Ikariam Fandom: Trading](https://ikariam.fandom.com/wiki/Trading) — Trading post offer mechanics
-- [Ikariam Fandom: Trading Resources](https://ikariam.fandom.com/wiki/Trading_Resources) — Resource transfer mechanics
-- [Ikariam Fandom: Cargo Ship](https://ikariam.fandom.com/wiki/Unit-ship:Cargo_Ship) — Capacity (500 units/ship)
-- [Ikariam Fandom: Saw mill](https://ikariam.fandom.com/wiki/Saw_mill) — Island resource upgrade cooperation
-- [Ikariam Forum: About warehouse protection](https://forum.ikariam.gameforge.com/forum/thread/100026-about-warehouse-protection/) — Protection floor formula
-- [Ikariam Forum: Markets and trading system](https://forum.ikariam.gameforge.com/forum/thread/69404-markets-and-trading-system/) — Order book discussion
-- [fl_chart Flutter package (pub.dev)](https://pub.dev/packages/fl_chart) — Battle visualization library
-- [Ikariam Finances and Gold Guide (GuideScroll)](https://guidescroll.com/2011/09/ikariam-finances-and-gold-guide/) — Tax/gold formula details
-- [Ikariam Forum: Happiness calculation bug (2023)](https://forum.ikariam.gameforge.com/forum/thread/96997-fixed-happiness-calculation-in-tavern-slider-does-not-account-for-corruption/) — Slider behavior confirmation
+- [Supabase: Testing your Edge Functions](https://supabase.com/docs/guides/functions/unit-test) — Official Deno test setup, file organization, permissions flags
+- [Supabase: Automated testing using GitHub Actions](https://supabase.com/docs/guides/deployment/ci/testing) — CI/CD workflow patterns for Supabase projects
+- [Supabase: pg_cron extension](https://supabase.com/docs/guides/database/extensions/pg_cron) — Scheduling syntax and patterns
+- [Flutter: Testing overview](https://docs.flutter.dev/testing/overview) — Unit, widget, integration test types
+- [Flutter: Widget testing introduction](https://docs.flutter.dev/cookbook/testing/widget/introduction) — testWidgets(), WidgetTester, pump()
+- [Little Polygon Dev Blog: FSM in game AI](https://blog.littlepolygon.com/posts/fsm/) — FSM decomposition, state/transition patterns
+- [ResearchGate: A Review of Real-Time Strategy Game AI](https://www.researchgate.net/publication/279335137_A_Review_of_Real-Time_Strategy_Game_AI) — Hierarchical AI, behavior trees vs FSMs
+- [Ikabot Collective: ikabot (Ikariam bot)](https://github.com/Ikabot-Collective/ikabot) — Real-world Ikariam automation behaviors (city management, warfare, alerts)
+- [Supabase: Development tips for Edge Functions](https://supabase.com/docs/guides/functions/development-tips) — Local development patterns
 
 ---
 
-*Feature research for: Ikariam clone v1.1 — Economy & Combat Depth (Flutter + Supabase)*
-*Researched: 2026-03-13*
+*Feature research for: Ikariam clone v1.3 — Bots, Testing & Automation (Flutter + Supabase)*
+*Researched: 2026-03-17*

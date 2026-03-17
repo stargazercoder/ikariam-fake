@@ -1,296 +1,299 @@
 # Stack Research
 
-**Domain:** Browser-based multiplayer strategy game — v1.1 Economy & Combat Depth additions
-**Researched:** 2026-03-13
-**Confidence:** HIGH (core additions verified via pub.dev, Ikariam wiki, Supabase docs, fl_chart API docs)
+**Domain:** Browser-based multiplayer strategy game — v1.3 Bots, Testing & Automation additions
+**Researched:** 2026-03-17
+**Confidence:** HIGH (verified via pub.dev, Supabase docs, Riverpod docs, Deno docs, official GitHub)
 
 ---
 
 ## Context: What This Research Covers
 
-v1.1 adds 8 new feature areas to an existing Flutter + Supabase + Riverpod codebase.
-This document covers ONLY what is new or changed for v1.1. The base stack
-(Flutter 3.29, Supabase 2.12.0, Riverpod 3.3.1, Flame 1.35.1, go_router 17.1.0)
-is unchanged and validated — see the v0.1.0 STACK.md for that rationale.
+v1.3 adds five capability areas to an existing Flutter + Supabase + Riverpod codebase.
+This document covers ONLY what is new or changed for v1.3. The base stack
+(Flutter 3.29, Supabase 2.12.0 via supabase_flutter, Riverpod 3.3.1, Flame 1.35.1,
+go_router 17.1.0, fl_chart 1.2.0, mocktail 1.0.4) is validated — see previous STACK.md files.
 
 Feature areas and their stack implications:
 
-| Feature | New Stack Needed? | Verdict |
-|---------|-------------------|---------|
-| Happiness system | No new packages | Pure SQL + Edge Function logic |
-| Population-based tax | No new packages | Pure SQL formula in pg_cron tick |
-| Island resource upgrades | No new packages | New DB table + Edge Function |
-| Resource production UI (hourly rates) | No new packages | Derive from existing DB fields, display in existing Flutter widgets |
-| Player-to-player trading | No new packages | Edge Function + Supabase Realtime (already used) |
-| Marketplace order book | No new packages | Pure SQL (orders table) + Realtime Postgres Changes |
-| Pillage mechanic | No new packages | Edge Function with PostgreSQL atomic transaction (FOR UPDATE) |
-| Battle report visualization | **fl_chart 1.1.1** | Stacked bar chart per turn; no other library needed |
+| Feature Area | New Stack Needed? | Verdict |
+|---|---|---|
+| AI bot players (pg_cron behaviors) | No new packages | Pure PostgreSQL PL/pgSQL + existing pg_cron infrastructure |
+| GodMode admin dashboard | **data_table_2 ^2.7.2** | Sortable, paginated tables for all-players view |
+| Rich seed data (20 bot accounts) | No new packages | Extended seed.sql — existing auth.users insert pattern |
+| Unit tests: Flutter widgets | No new packages | flutter_test (SDK), mocktail 1.0.4 (already in pubspec), Riverpod 3.3.1 ProviderContainer.test |
+| Unit tests: Edge Functions (Deno) | No new packages | Deno built-in test runner + jsr:@std/assert (zero install) |
+| Automation scripts (CI/CD) | **GitHub Actions** | .github/workflows/ci.yml — ubuntu-latest, subosito/flutter-action@v2 |
 
-**Summary:** Only one new Dart package is justified for v1.1: `fl_chart`. Every other
-feature is implemented with existing stack capabilities.
+**Summary:** Only one new Dart package is justified for v1.3: `data_table_2`. Every other
+feature is implemented with existing stack capabilities or zero-cost built-in tooling.
 
 ---
 
 ## Recommended Stack
 
-### New Library for v1.1
+### New Library for v1.3
 
 | Library | Version | Purpose | Why Recommended |
 |---------|---------|---------|-----------------|
-| fl_chart | 1.1.1 | Turn-by-turn battle report visualization — stacked bar chart showing unit losses per turn by unit type, color-coded by unit | The only mature, actively maintained Flutter chart library with `BarChartRodStackItem` stacked bar support. MIT license, 6,200+ GitHub stars, Flutter-native (no WebView). Supports color-per-stack-segment — exactly what color-coded unit type visualization requires. Min Flutter SDK 3.27.4, compatible with our 3.29 environment. |
+| data_table_2 | ^2.7.2 | GodMode admin dashboard — sortable, sticky-header paginated tables showing all players, armies, and battles | Drop-in replacement for Flutter's `DataTable` / `PaginatedDataTable` with sticky column headers (critical for wide admin tables), built-in row sorting, `AsyncPaginatedDataTable2` for stream-fed data, and `DataRow2` for row-level tap. MIT license, actively maintained (last update Nov 2025). No Syncfusion license required. |
 
 ### Existing Stack — How Each Feature Uses It
 
-| Technology | Version | v1.1 Usage |
+| Technology | Version | v1.3 Usage |
 |------------|---------|------------|
-| PostgreSQL (via Supabase) | — | New tables: `island_resource_levels`, `marketplace_orders`, `trade_routes`. New columns on `cities`: `population`, `happiness`, `tax_rate`. Happiness/tax computed in existing `resource-tick` pg_cron function. |
-| pg_cron | — | Extend existing `resource-tick` job to compute: `happiness_delta = tavern_level * wine_rate - population`, `population_growth = f(happiness)`, `gold_income += population * tax_rate`. No new cron jobs needed. |
-| Supabase Edge Functions (Deno/TypeScript) | — | New functions: `create-trade-offer`, `accept-trade`, `place-market-order`, `cancel-market-order`, `match-market-orders`, `pillage-city`, `upgrade-island-resource`. Pattern: all use PostgreSQL `FOR UPDATE` or `SECURITY DEFINER` functions for atomicity. |
-| Supabase Realtime | — | Subscribe to `marketplace_orders` Postgres Changes to update order book in real-time. Existing `battle_turns` subscription already delivers pillage result. Use Broadcast channel for trade accepted/rejected notifications. |
-| flutter_riverpod | 3.3.1 | New `StreamProvider`s for marketplace orders and trade offers. New `FutureProvider`s for happiness/population values. Pattern: matches existing providers in `lib/features/city/providers/`. |
-| Flutter Material widgets | SDK | Happiness slider (Tavern wine rate config), order book list view, hourly rate display in resource bar. `DataTable` or `ListView.builder` for order book. No third-party widget packages needed. |
+| PostgreSQL (via Supabase) | 17 | New tables: `bots` (tracks 20 bot accounts + behavior state), `bot_action_log` (audit trail). New columns on `profiles`: `is_bot boolean DEFAULT false`. New PL/pgSQL functions: `run_bot_tick()`, `bot_attack_target()`, `bot_train_units()`, `bot_upgrade_building()`. |
+| pg_cron | built-in | New cron job: `SELECT cron.schedule('bot-tick', '*/15 * * * *', 'SELECT run_bot_tick()')` — every 15 minutes. Bot tick runs decision logic (attack/train/upgrade) per bot based on resource thresholds. Existing 5-minute resource tick continues unchanged. |
+| Supabase Edge Functions (Deno/TypeScript) | — | New function: `godmode-action` — handles admin-only mutations (pause/resume bot, force action, set resources). Calls existing game mutation functions via service-role client. Bot behaviors are PL/pgSQL (no round-trip latency), not Edge Functions. |
+| Supabase Auth | built-in | `is_admin` claim in JWT `app_metadata` gates GodMode. Set via `supabase.auth.admin.updateUserById()` in seed script. RLS policies check `(auth.jwt()->'app_metadata'->>'is_admin')::boolean`. |
+| flutter_riverpod | 3.3.1 | New `StreamProvider`s for GodMode: all-players list, all battles, bot status. `ProviderContainer.test()` (new in Riverpod 3.0) for unit test isolation — replaces manual container setup + dispose. |
+| go_router | 17.1.0 | New `/admin` route with `redirect` guard: checks `isAdmin` claim on current session, redirects to `/` if false. Existing redirect pattern from auth guard reused. |
+| Flutter Material widgets | SDK | GodMode screens use `Scaffold` + `data_table_2` tables. Bot status page uses existing `ListView.builder` pattern. No additional widget packages. |
+| Deno test runner | built-in | `Deno.test()` for Edge Function unit tests. Import `assertEquals`, `assertRejects` from `jsr:@std/assert`. Run via `deno test --allow-all supabase/functions/tests/`. Zero install — Deno ships with test runner. |
+| flutter_test | SDK | Existing framework for Flutter unit + widget tests. `ProviderContainer.test()` utility (Riverpod 3.3.1) simplifies provider test setup. `tester.container()` extension accesses container in widget tests. |
+| mocktail | 1.0.4 | Already in devDependencies. Used for mocking Supabase client in Flutter widget tests. Pattern: `class MockSupabaseClient extends Mock implements SupabaseClient {}`. |
+| GitHub Actions | — | `.github/workflows/ci.yml` — ubuntu-latest runner. Steps: `supabase db reset`, `flutter analyze`, `flutter test`, `flutter build web`. Uses `subosito/flutter-action@v2` for Flutter setup. |
 
 ---
 
 ## Installation
 
 ```bash
-# Add to existing Flutter project — only new package for v1.1
-flutter pub add fl_chart
+# Add to existing Flutter project — only new package for v1.3
+flutter pub add data_table_2
 ```
 
 ```bash
 # Verify no version conflict after add
-flutter pub deps | grep fl_chart
-# Expected: fl_chart 1.1.1
+flutter pub deps | grep data_table_2
+# Expected: data_table_2 2.7.x
 ```
 
-No Supabase CLI changes needed — new functions follow existing deploy pattern:
+No new Deno dependencies — Deno's built-in test runner and `jsr:@std/assert` require zero installation.
 
+Edge Function test runner invocation (local):
 ```bash
-supabase functions deploy create-trade-offer
-supabase functions deploy accept-trade
-supabase functions deploy place-market-order
-supabase functions deploy cancel-market-order
-supabase functions deploy match-market-orders
-supabase functions deploy pillage-city
-supabase functions deploy upgrade-island-resource
+deno test --allow-all supabase/functions/tests/
 ```
+
+GitHub Actions CI file is created manually at `.github/workflows/ci.yml` — no npm install needed.
 
 ---
 
 ## Feature-by-Feature Implementation Stack
 
-### 1. Happiness System
+### 1. AI Bot Players (pg_cron Periodic Behaviors)
 
-**Stack:** Pure PostgreSQL + pg_cron. Zero new packages.
+**Stack:** Pure PostgreSQL PL/pgSQL + existing pg_cron. Zero new packages.
+
+**Why PL/pgSQL not Edge Functions for bot logic:**
+- Bot behaviors are DB-internal operations (read resources, insert training queue, insert unit_movements)
+- PL/pgSQL runs inside the same transaction — no HTTP latency, no retry overhead
+- Edge Functions add unnecessary round-trip for operations that don't need external calls
+- Existing pg_cron jobs (`resource-tick`, `battle-resolution`) already use this pattern
+
+**Bot decision tree (pseudocode for `run_bot_tick()`):**
+```sql
+-- For each active bot city:
+-- 1. If gold > 500 AND barracks exists AND no active training: train units
+-- 2. If wood > 300 AND construction queue empty: upgrade cheapest building
+-- 3. If army size > threshold AND nearby enemy city: dispatch attack
+-- 4. Respect GodMode pause flag: skip if bots.is_paused = true
+```
 
 **Schema additions:**
-- `cities.happiness` (integer, default 196 — matches Ikariam base value)
-- `cities.population` (integer, computed from happiness growth)
-- `city_resources`: existing `wine` type tracked as consumable (already in schema as `crystal` analogue)
-
-**Logic (pg_cron extension of existing `tick_resources()`):**
 ```sql
--- Happiness formula (simplified from Ikariam wiki):
--- happiness = tavern_base + wine_bonus - population
--- tavern_base = tavern_level * 12
--- wine_bonus = wine_spent_per_hour * 60  (each unit of wine = +60 happiness)
--- population cost: each citizen = -1 happiness
--- Population growth rate = MAX(0, happiness) / 34.66 (citizens per hour, halving curve)
-UPDATE cities SET
-  happiness = GREATEST(0,
-    (SELECT level FROM city_buildings WHERE city_id = cities.id AND building_type = 'tavern') * 12
-    + happiness_wine_bonus  -- from a new cities column storing configured wine/hr
-    - population
-  ),
-  population = population + GREATEST(0, happiness) / 34.66
-WHERE ...;
-```
+ALTER TABLE profiles ADD COLUMN is_bot boolean NOT NULL DEFAULT false;
 
-**Server authority:** All happiness and population mutations happen server-side in the tick. Client only sends `set-wine-rate` action (new Edge Function or extend tavern upgrade function).
-
-### 2. Population-Based Tax
-
-**Stack:** Pure PostgreSQL in existing pg_cron tick. Zero new packages.
-
-**Formula:**
-```sql
--- Gold income from tax = population * tax_rate (gold per tick per citizen)
--- tax_rate is player-configurable (0.0 to 1.0, higher rate = lower happiness)
-UPDATE city_resources cr
-SET amount = LEAST(cr.amount + (c.population * c.tax_rate * tick_minutes / 60.0), capacity)
-FROM cities c
-WHERE cr.city_id = c.id AND cr.resource_type = 'gold';
-```
-
-**New column:** `cities.tax_rate` (numeric, default 0.1). Client sends `set-tax-rate` via Edge Function (or extend town-hall interaction).
-
-### 3. Island Resource Upgrades (Shared Building Levels)
-
-**Stack:** New PostgreSQL table + new Edge Function. Zero new packages.
-
-**Schema:**
-```sql
-CREATE TABLE island_resource_levels (
-  island_id     uuid REFERENCES islands(id),
-  resource_type text NOT NULL,       -- 'wood' or luxury type
-  level         integer DEFAULT 1,
-  PRIMARY KEY (island_id, resource_type)
+CREATE TABLE bot_configs (
+  profile_id   uuid PRIMARY KEY REFERENCES profiles(id),
+  behavior     text NOT NULL DEFAULT 'balanced', -- 'aggressive', 'defensive', 'economic'
+  is_paused    boolean NOT NULL DEFAULT false,
+  last_tick_at timestamptz
 );
 ```
 
-**Logic:** `upgrade-island-resource` Edge Function:
-- Charges resources from the triggering player's city
-- Increments `island_resource_levels.level` (shared — benefits all cities on island)
-- Production formula in tick: `workers * island_level * research_bonus` (already structured this way in v0.1.0, just `island_level` was always 1)
+**Cron job (added in migration):**
+```sql
+SELECT cron.schedule('bot-tick', '*/15 * * * *', 'SELECT run_bot_tick()');
+```
 
-**UI:** Reuse `building_upgrade_sheet.dart` pattern — create `island_resource_upgrade_sheet.dart` with identical structure.
+**Local dev note:** pg_cron jobs registered in migrations run automatically in `supabase db reset`. The known issue of scheduling in `seed.sql` (schema not available) is avoided by registering cron jobs in migration files, which is the existing project pattern.
 
-### 4. Resource Production UI (Hourly Rates)
+### 2. GodMode Admin Dashboard
 
-**Stack:** Pure Flutter computation from existing data. Zero new packages.
+**Stack:** `data_table_2 ^2.7.2` + go_router redirect guard + `is_admin` JWT claim. One new Dart package.
 
-**Approach:** Compute hourly rate client-side from existing DB fields — no new DB columns needed.
+**Why data_table_2 over Flutter's built-in DataTable:**
+- Built-in `PaginatedDataTable` has no sticky headers — admin tables with 20+ bot rows lose context when scrolling horizontally
+- `PaginatedDataTable2` adds sticky headers with zero API change (same `DataColumn`/`DataRow` API)
+- `AsyncPaginatedDataTable2` accepts a `AsyncDataTableSource` that refreshes from Supabase Realtime — eliminates manual stream-to-table wiring
+- Built-in `DataTable` has no row-level tap events on the row itself (only on individual cells) — `DataRow2` adds `onTap` at row level for drill-down navigation
 
+**Route guard pattern (existing go_router pattern extended):**
 ```dart
-// HourlyRateService (new utility class, no package needed):
-double computeHourlyRate({
-  required int workers,
-  required int buildingLevel,
-  required int islandLevel,
-  double researchBonus = 1.0,
-}) {
-  // Tick is every 5 minutes = 12 ticks/hour
-  return workers * buildingLevel * islandLevel * researchBonus * 12;
+GoRoute(
+  path: '/admin',
+  redirect: (context, state) {
+    final isAdmin = ref.read(currentUserProvider)?.appMetadata['is_admin'] == true;
+    return isAdmin ? null : '/';
+  },
+  builder: (context, state) => const GodModeScreen(),
+),
+```
+
+**Admin JWT claim (set once in seed script via service role):**
+```typescript
+// In seed or dev script — service role only
+await supabase.auth.admin.updateUserById(adminUserId, {
+  appMetadata: { is_admin: true }
+});
+```
+
+**RLS policy for admin reads:**
+```sql
+-- Policy allowing admin to read all profiles (bypasses normal user restriction)
+CREATE POLICY "admin_read_all_profiles"
+ON profiles FOR SELECT
+USING ((auth.jwt()->'app_metadata'->>'is_admin')::boolean = true);
+```
+
+### 3. Rich Seed Data (20 Bot Accounts)
+
+**Stack:** Extended `seed.sql` + PL/pgSQL DO block. Zero new packages.
+
+**Pattern:** Same as existing 7 test accounts — `INSERT INTO auth.users` triggers `handle_new_user()` which auto-creates profile + city. The 20 bots are inserted in the same seed file, with varied resource levels patched in a second pass.
+
+**Why seed.sql not a separate script:**
+- `supabase db reset` runs `seed.sql` automatically — single command resets the entire world including bots
+- No separate script invocation needed in CI or local dev
+- Existing automation scripts (`scripts/test_all.sh`) already call `supabase db reset --local`
+
+**Bot diversity strategy (in seed DO block):**
+```sql
+-- After inserting 20 bot auth.users + letting trigger fire:
+-- Pass 2: Set varied resource levels so bots have different game states
+UPDATE city_resources SET amount =
+  CASE (bot_index % 4)
+    WHEN 0 THEN 2000   -- wealthy
+    WHEN 1 THEN 500    -- poor
+    WHEN 2 THEN 1200   -- average
+    WHEN 3 THEN 3500   -- very wealthy
+  END
+WHERE city_id IN (SELECT id FROM cities WHERE owner_id = ANY(bot_ids));
+```
+
+### 4. Unit Tests: Flutter Widgets and Providers
+
+**Stack:** `flutter_test` (SDK) + `mocktail 1.0.4` (already in pubspec) + Riverpod 3.3.1's `ProviderContainer.test()`. Zero new packages.
+
+**Riverpod 3.3.1 testing improvements (verified — released Sept 2025):**
+- `ProviderContainer.test()` — creates a container that auto-disposes after test ends; replaces manual `addTearDown(container.dispose)` boilerplate
+- `WidgetTester.container` extension — accesses the `ProviderContainer` inside widget test tree without manual extraction
+- `NotifierProvider.overrideWithBuild` — mock only `Notifier.build`, preserve real mutation logic; useful for GodMode notifiers
+
+**Provider unit test pattern:**
+```dart
+test('botConfigProvider returns paused state', () async {
+  final container = ProviderContainer.test(
+    overrides: [
+      supabaseClientProvider.overrideWithValue(mockSupabaseClient),
+    ],
+  );
+  // container auto-disposes — no tearDown needed
+  final state = await container.read(botConfigProvider.future);
+  expect(state.isPaused, false);
+});
+```
+
+**Widget test pattern with Riverpod 3.3.1:**
+```dart
+testWidgets('GodMode screen shows player table', (tester) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [allPlayersProvider.overrideWith((ref) => mockPlayers)],
+      child: const MaterialApp(home: GodModeScreen()),
+    ),
+  );
+  await tester.pumpAndSettle();
+  // tester.container is available in Riverpod 3.3.1
+  expect(find.byType(PaginatedDataTable2), findsOneWidget);
+});
+```
+
+### 5. Unit Tests: Supabase Edge Functions (Deno)
+
+**Stack:** Deno built-in test runner + `jsr:@std/assert`. Zero install required.
+
+**Official Supabase recommendation (verified with supabase.com/docs/guides/functions/unit-test):**
+- Test files in `supabase/functions/tests/` named `{function-name}-test.ts`
+- Import assertions from `jsr:@std/assert` (JSR registry — Deno 2.x standard)
+- Use `Deno.test()` with async functions
+- Run with `deno test --allow-all supabase/functions/tests/`
+
+**Why not mock the Supabase client in Edge Function tests:**
+- Mocking ESM imports in Deno is difficult — modules are immutable once loaded
+- Integration-style tests (call the actual function with a local Supabase instance) are more reliable
+- Pattern: spin up local Supabase via `supabase start`, invoke function via `supabase.functions.invoke()`, assert on DB state
+- Unit-level logic (pure functions like `calcUpgradeCost`, `calcBotDecision`) is extracted to separate modules and tested in isolation without mocking
+
+**Pure function extraction pattern (key decision):**
+```typescript
+// supabase/functions/_shared/bot_logic.ts — pure, testable
+export function decideBotAction(resources: BotResources, config: BotConfig): BotAction {
+  if (resources.gold > 500 && config.behavior !== 'defensive') return 'train';
+  if (resources.wood > 300) return 'upgrade';
+  return 'idle';
 }
+
+// Test file — no mocking needed:
+import { decideBotAction } from '../_shared/bot_logic.ts';
+import { assertEquals } from 'jsr:@std/assert';
+
+Deno.test('bot with high gold and non-defensive config trains units', () => {
+  const action = decideBotAction({ gold: 600, wood: 100 }, { behavior: 'balanced' });
+  assertEquals(action, 'train');
+});
 ```
 
-**UI:** Extend existing resource bar widget (`lib/features/city/widgets/`) to show "+X/hr" label next to each resource. Flutter `Text` widget with a small `TextStyle`. No charting library needed for this — just formatted numbers.
+### 6. Automation Scripts and CI/CD
 
-### 5. Player-to-Player Trading (Cargo Ships)
+**Stack:** GitHub Actions + existing shell scripts. Zero new Dart/npm packages.
 
-**Stack:** New Edge Functions + existing Supabase Realtime. Zero new packages.
+**Why GitHub Actions over alternatives:**
+- Repo already on GitHub (implied by git history); no additional service account needed
+- `subosito/flutter-action@v2` is the canonical Flutter action — maintained by Flutter community, handles SDK caching
+- Supabase CLI available via `npx supabase` — no separate installation action needed
+- Free tier sufficient for a small community project
 
-**Schema:**
-```sql
-CREATE TABLE trade_offers (
-  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  from_city_id    uuid NOT NULL REFERENCES cities(id),
-  to_city_id      uuid NOT NULL REFERENCES cities(id),
-  offered_type    text NOT NULL,
-  offered_amount  numeric NOT NULL,
-  requested_type  text NOT NULL,
-  requested_amount numeric NOT NULL,
-  status          text DEFAULT 'pending',  -- pending | accepted | rejected | cancelled
-  cargo_ships_required integer NOT NULL,
-  created_at      timestamptz DEFAULT NOW()
-);
+**CI pipeline structure (`.github/workflows/ci.yml`):**
+```yaml
+on: [push, pull_request]
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.0'
+          cache: true
+      - name: Install Supabase CLI
+        run: npm install -g supabase
+      - name: Flutter analyze
+        run: flutter analyze
+      - name: Flutter test
+        run: flutter test --reporter expanded
+      - name: Flutter build web
+        run: flutter build web --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
 ```
 
-**Edge Functions:**
-- `create-trade-offer` — validates ships available, reserves cargo ships, inserts row
-- `accept-trade` — atomic: deduct resources from both parties, release ships, mark accepted
-- `cancel-trade` — releases reserved ships
+**Local automation scripts (extend existing `scripts/`):**
+- `scripts/reset_and_seed.sh` — `supabase db reset --local` (already done by `test_all.sh`)
+- `scripts/run_local.sh` — already exists, unchanged
+- `scripts/test_all.sh` — already exists; extend to also run `deno test` for Edge Functions
+- `scripts/lint.sh` — new: runs `flutter analyze` + `dart format --output=none --set-exit-if-changed .`
 
-**Realtime:** `to_city_id` player subscribes to `trade_offers` Postgres Changes (`INSERT`) — uses existing `supabase.channel()` pattern.
-
-**Cargo ships:** Use existing `city_units` table `unit_type = 'cargo_ship'` count as capacity limiter (each cargo ship = 500 capacity, matching v0.1.0 constants).
-
-### 6. Marketplace Order Book
-
-**Stack:** New PostgreSQL table + Supabase Realtime Postgres Changes. Zero new packages.
-
-**Schema:**
-```sql
-CREATE TABLE marketplace_orders (
-  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id       uuid NOT NULL REFERENCES profiles(id),
-  city_id         uuid NOT NULL REFERENCES cities(id),
-  order_type      text NOT NULL CHECK (order_type IN ('buy', 'sell')),
-  resource_type   text NOT NULL,
-  quantity        numeric NOT NULL,
-  price_per_unit  numeric NOT NULL,  -- in gold
-  quantity_filled numeric DEFAULT 0,
-  status          text DEFAULT 'open' CHECK (status IN ('open', 'partial', 'filled', 'cancelled')),
-  created_at      timestamptz DEFAULT NOW()
-);
-CREATE INDEX ON marketplace_orders (resource_type, order_type, price_per_unit);
-```
-
-**Order matching (server-side SQL function):**
-```sql
--- Called by match-market-orders Edge Function (or pg_cron every minute):
--- Simple price-time priority matching:
--- Buy orders matched with lowest sell price <= buy price
--- Transfer resources atomically using FOR UPDATE
-```
-
-**UI:** Flutter `DataTable` or custom `ListView.builder` with two columns (buys/sells) sorted by price. Existing `StreamProvider` pattern watches `marketplace_orders` Postgres Changes. No chart library needed — this is a list, not a chart.
-
-**Realtime:** Subscribe to `marketplace_orders` changes filtered by `resource_type`. Existing `supabase_flutter` Realtime API handles this.
-
-### 7. Pillage Mechanic
-
-**Stack:** PostgreSQL atomic transaction in existing `resolve_battles()` or new `process-pillage` Edge Function. Zero new packages.
-
-**Rule (from Ikariam wiki, adapted for our game):**
-- Attacker wins battle → pillage phase triggers
-- Resources stealable = MAX(0, defender_resource_amount - warehouse_protection)
-- Warehouse protection = `warehouse_level * base_protection_per_level`
-- Cargo ships determine max loot capacity: `attacker_cargo_ships * 500`
-- Gold is NOT pillageable (Ikariam design — only production resources)
-
-**SQL pattern (atomic, no race conditions):**
-```sql
--- Inside SECURITY DEFINER function called after battle resolution:
-UPDATE city_resources
-SET amount = GREATEST(0, amount - pillage_amount)
-WHERE city_id = defender_city_id AND resource_type = target_type;
-
-UPDATE city_resources
-SET amount = LEAST(amount + pillage_amount, warehouse_capacity)
-WHERE city_id = attacker_home_city_id AND resource_type = target_type;
-```
-
-**Battle report extension:** `battle_turns` already exists. Add `pillage_result` JSONB column to `battles` table (not `battle_turns` — pillage is a one-time end-of-battle event).
-
-### 8. Battle Report Visualization
-
-**Stack:** `fl_chart 1.1.1` — specifically `BarChart` with `BarChartRodStackItem`.
-
-**Why fl_chart specifically:**
-- `BarChartRodStackItem(fromY, toY, color)` maps directly to unit type loss per turn
-- Color-coded unit types: each unit type gets a fixed `Color` constant (e.g., hoplite = amber, archer = green, slinger = blue)
-- Stacked segments per rod = unit type breakdown; each rod = one battle turn
-- Separate `BarChart` for attacker casualties and defender casualties
-- No licensing fees (MIT) — Syncfusion requires community license agreement for commercial use
-
-**Implementation pattern:**
-```dart
-// BattleReportChart widget:
-BarChart(
-  BarChartData(
-    barGroups: turns.map((turn) => BarChartGroupData(
-      x: turn.turnNumber,
-      barRods: [
-        BarChartRodData(
-          toY: turn.totalAttackerLosses.toDouble(),
-          rodStackItems: turn.attackerCasualties.entries.map((e) =>
-            BarChartRodStackItem(
-              previousTotal,
-              previousTotal + e.value,
-              UnitColors.forType(e.key),  // color lookup constant map
-            )
-          ).toList(),
-        ),
-      ],
-    )).toList(),
-  ),
-)
-```
-
-**Data source:** Existing `battle_turns` table — `land_attacker_casualties` and `land_defender_casualties` JSONB fields already contain per-unit-type counts. No schema changes needed for the chart data.
+**Supabase CLI version:** 2.79.0 (latest as of 2026-03-17, published daily). No version pin needed for CI — `npm install -g supabase` gets latest, which is backward-compatible with existing migrations.
 
 ---
 
@@ -298,14 +301,16 @@ BarChart(
 
 | Avoid | Why | Use Instead |
 |-------|-----|-------------|
-| syncfusion_flutter_charts | Requires Syncfusion license agreement even for "free" community tier — adds friction, overkill for one chart type | `fl_chart 1.1.1` (MIT, no license required) |
-| charts_flutter (google) | Archived/unmaintained as of 2023; community fork `community_charts_flutter` has lower adoption | `fl_chart 1.1.1` (actively maintained, 6,200+ GitHub stars) |
-| Third-party order book widget packages | No mature Flutter order book packages exist on pub.dev; those found are finance-specific and add unnecessary dependency | Implement with `ListView.builder` + existing Riverpod `StreamProvider` pattern |
-| Client-side marketplace matching | Race conditions inevitable — two clients can both "win" the same order | Server-side SQL function with `FOR UPDATE` row lock, called via Edge Function |
-| Client-side pillage calculation | Attacker could manipulate amount stolen | `SECURITY DEFINER` PostgreSQL function — same pattern as existing battle resolution |
-| Separate `pg_cron` job for happiness | Adds a new scheduled job when happiness can be computed in the existing resource tick | Extend `tick_resources()` to compute happiness/population — single tick, single transaction |
-| `shared_preferences` for tax/wine rate | Game state must be server-authoritative | Store `tax_rate` and `happiness_wine_rate` columns on `cities` table, mutated via Edge Function |
-| Freezed/code-gen for v1.1 models | `riverpod_generator` is still blocked by Dart 3.10.1 analyzer conflict (see PROJECT.md Key Decisions) | Manual model classes matching existing v0.1.0 pattern (handwritten `fromJson`, `==`, `hashCode`) |
+| Edge Functions for bot AI tick | HTTP round-trip per bot per tick adds latency and cold-start overhead; bot logic only needs DB access | PL/pgSQL function called by pg_cron — zero network latency, runs inside DB transaction |
+| Separate bot server / Node.js process | Adds infrastructure outside Supabase; violates project constraint "Supabase only" | pg_cron-scheduled PL/pgSQL — same infrastructure already running |
+| `syncfusion_flutter_datagrid` | Requires Syncfusion license agreement even for community tier; heavy dependency | `data_table_2 ^2.7.2` (MIT, no license agreement) |
+| `advanced_datatable` pub.dev package | Lower adoption (vs data_table_2), no async source support out of box | `data_table_2 ^2.7.2` with `AsyncPaginatedDataTable2` |
+| Jest / Vitest for Edge Function tests | Node.js test runners don't run in Deno's runtime; incompatible with JSR imports | Deno built-in test runner + `jsr:@std/assert` |
+| Mocking Supabase client in Deno tests | ESM module mocking in Deno is unsupported without transpilation tricks; test becomes fragile | Extract pure functions to `_shared/` modules, test them in isolation; integration-test via `supabase.functions.invoke()` |
+| `riverpod_generator` / build_runner for new providers | Still blocked: Dart 3.10.1's analyzer version conflicts with riverpod_generator ^4.0.x (see PROJECT.md Key Decisions) | Manual provider definitions matching existing project pattern |
+| `flutter_driver` integration tests for GodMode | Heavy setup, slow, requires running emulator; overkill for admin screens | Widget tests with `ProviderScope` overrides — covers same screen behavior at 10x speed |
+| CircleCI / Bitrise / Codemagic | Adds new service accounts and billing; GitHub Actions is already available and free | GitHub Actions with `subosito/flutter-action@v2` |
+| `faker` or `factory_bot` style package for seed data | No mature Dart seed/faker packages on pub.dev; adds dependency for a one-file SQL script | PL/pgSQL DO block with hardcoded diverse values — simpler, no dependency, visible in migrations |
 
 ---
 
@@ -313,11 +318,12 @@ BarChart(
 
 | Recommended | Alternative | Why Not |
 |-------------|-------------|---------|
-| fl_chart 1.1.1 (stacked bar) | Flutter CustomPainter (hand-drawn chart) | CustomPainter is 200+ lines of boilerplate for axis labels, tooltips, animation. fl_chart provides all of that out of box. Use CustomPainter only if chart needs are truly unique — stacked bar is not unique. |
-| PostgreSQL SECURITY DEFINER function for pillage | Edge Function (Deno) for pillage | SQL function is faster (no HTTP round-trip), simpler, and can be composed inside `resolve_battles()` existing transaction. Reserve Edge Functions for operations that need external calls or complex TypeScript logic. |
-| Extend existing pg_cron tick for happiness | New pg_cron job for happiness | Happiness depends on population which depends on resources (wine). Running in the same tick as resource production ensures consistency — no window where happiness is stale relative to resources. |
-| Supabase Realtime Postgres Changes for order book | Polling order book every N seconds | Polling adds latency and wastes bandwidth. Realtime WebSocket subscription already established for battle reports — reuse the same connection mechanism. |
-| `marketplace_orders` table with SQL matching | Third-party matching engine / message queue | Overkill for a small-community game. PostgreSQL `FOR UPDATE SKIP LOCKED` is sufficient for order matching at this scale. Adding RabbitMQ or Redis would triple infrastructure complexity. |
+| `data_table_2 ^2.7.2` | Flutter built-in `PaginatedDataTable` | No sticky headers, no row-level tap, no async source. Admin tables with 20+ columns need sticky headers or they're unusable. |
+| `data_table_2 ^2.7.2` | Custom `ListView.builder` table | Would require implementing sort, pagination, sticky header from scratch — 300+ lines. data_table_2 provides all of that in 50 lines. |
+| pg_cron PL/pgSQL for bot tick | Supabase Edge Function scheduled via pg_cron + pg_net | pg_net HTTP invoke adds cold-start latency (50-200ms per function). For a game tick that needs to process 20 bots, PL/pgSQL is 10-100x faster. Reserve Edge Functions for operations needing TypeScript expressiveness or external HTTP calls. |
+| `jsr:@std/assert` (Deno built-in) | `@supabase/functions-js` test helpers | Functions-js is designed for invoking deployed functions, not unit testing internal logic. @std/assert is the correct tool for pure function unit tests. |
+| GitHub Actions | Local-only `scripts/test_all.sh` | test_all.sh exists and is valuable for local dev, but gives no automated gate on PRs/commits. GitHub Actions adds CI without replacing local scripts. |
+| `is_admin` in JWT `app_metadata` | Separate `admin_users` table | JWT claim check in RLS policies requires no extra DB query per request — `auth.jwt()->'app_metadata'` is evaluated in memory. A separate table would require a subquery in every RLS policy. |
 
 ---
 
@@ -325,16 +331,20 @@ BarChart(
 
 | Package | Version | Compatible With | Notes |
 |---------|---------|-----------------|-------|
-| fl_chart | 1.1.1 | Flutter 3.27.4+ (our env: 3.29 — compatible) | Min Flutter SDK 3.27.4 confirmed in changelog. No conflict with existing packages. |
-| fl_chart | 1.1.1 | flame 1.35.1 | No dependency conflict — fl_chart does not depend on any game engine packages. Verify with `flutter pub deps` after adding. |
-| fl_chart | 1.1.1 | flutter_riverpod 3.3.1 | No conflict — fl_chart has no state management dependency. |
+| data_table_2 | ^2.7.2 | Flutter 3.x (our env: 3.29 — compatible) | Only dependency is `async ^2.10.0` + `flutter`. No conflict with existing packages confirmed. |
+| data_table_2 | ^2.7.2 | flutter_riverpod 3.3.1 | No conflict — data_table_2 has no state management dependency. Use with StreamProvider for real-time tables. |
+| data_table_2 | ^2.7.2 | fl_chart 1.2.0 | No conflict — both are pure UI packages. |
+| flutter_riverpod | 3.3.1 | ProviderContainer.test() | Available in Riverpod 3.0+ (released Sept 2025). Already at 3.3.1 in pubspec — no upgrade needed. |
+| mocktail | 1.0.4 | flutter_riverpod 3.3.1 | Compatible — already in pubspec.yaml devDependencies, used in existing tests. |
+| Deno (for Edge Function tests) | 2.0–2.2.x | Supabase Edge Runtime | Supabase currently supports Deno lock file v4 only (Deno 2.0–2.2.x). Deno 2.3+ introduced lock file v5 which Supabase does not yet support as of 2026-03-17. Pin Deno to 2.2.x in CI if running `deno test` in GitHub Actions. |
+| subosito/flutter-action | v2 | GitHub Actions ubuntu-latest | Current canonical Flutter action. `cache: true` reduces CI time significantly. |
 
-Run after adding fl_chart:
+Run after adding data_table_2:
 ```bash
 flutter pub deps
 # Confirm no version conflicts in dependency tree
 flutter analyze
-# Confirm no breaking changes introduced
+# Confirm no breaking changes
 ```
 
 ---
@@ -343,39 +353,37 @@ flutter analyze
 
 | Object | Type | Purpose |
 |--------|------|---------|
-| `cities.happiness` | column (integer) | Current happiness score |
-| `cities.population` | column (integer) | Current citizen count |
-| `cities.tax_rate` | column (numeric 0-1) | Gold income multiplier on population |
-| `cities.happiness_wine_rate` | column (integer) | Wine units per hour sent to tavern |
-| `island_resource_levels` | table | Shared island building levels (wood + luxury) |
-| `trade_offers` | table | Pending/active P2P trades |
-| `marketplace_orders` | table | Global order book (buy + sell orders) |
-| `battles.pillage_result` | column (jsonb) | Resources stolen on victory |
-| `upgrade-island-resource` | Edge Function | Charges player, increments shared level |
-| `create-trade-offer` | Edge Function | Validates ships, creates trade |
-| `accept-trade` | Edge Function | Atomic bilateral resource swap |
-| `cancel-trade` | Edge Function | Releases reserved ships |
-| `place-market-order` | Edge Function | Validates resources/gold, inserts order |
-| `cancel-market-order` | Edge Function | Cancels own open order |
-| `match-market-orders` | Edge Function | Runs order matching (or SQL function via RPC) |
-| `set-wine-rate` | Edge Function | Configures tavern wine spending |
-| `set-tax-rate` | Edge Function | Configures city tax rate |
+| `profiles.is_bot` | column (boolean) | Marks account as AI bot — used in GodMode filter and bot tick targeting |
+| `bot_configs` | table | Per-bot behavior config: behavior type, pause state, last_tick_at |
+| `run_bot_tick()` | PL/pgSQL function | Core bot AI loop — called by pg_cron every 15 minutes |
+| `bot_attack_target(bot_city_id)` | PL/pgSQL function | Finds nearest human city and dispatches attack if army threshold met |
+| `bot_train_units(bot_city_id)` | PL/pgSQL function | Trains most cost-efficient unit if resources sufficient |
+| `bot_upgrade_building(bot_city_id)` | PL/pgSQL function | Upgrades cheapest available building if queue empty |
+| `bot-tick` | pg_cron job | `cron.schedule('bot-tick', '*/15 * * * *', 'SELECT run_bot_tick()')` |
+| `godmode-action` | Edge Function | Admin-only mutations: pause/resume bots, force resource values, trigger actions |
+| `_shared/bot_logic.ts` | Deno module | Pure TypeScript functions extracted for unit testability |
+| `supabase/functions/tests/` | directory | Deno test files for Edge Functions |
+| `.github/workflows/ci.yml` | GitHub Actions | CI pipeline: analyze + test + build |
+| `scripts/lint.sh` | shell script | `flutter analyze` + `dart format` check |
 
 ---
 
 ## Sources
 
-- [pub.dev/packages/fl_chart](https://pub.dev/packages/fl_chart) — Version 1.1.1, min Flutter SDK 3.27.4, MIT license — HIGH confidence
-- [pub.dev/documentation/fl_chart/latest/fl_chart/BarChartRodStackItem-class.html](https://pub.dev/documentation/fl_chart/latest/fl_chart/BarChartRodStackItem-class.html) — `BarChartRodStackItem(fromY, toY, color)` API confirmed — HIGH confidence
-- [pub.dev/packages/fl_chart/changelog](https://pub.dev/packages/fl_chart/changelog) — Min Flutter version upgrade to 3.27.4 in v1.0.0 confirmed — HIGH confidence
-- [ikariam.fandom.com/wiki/Happiness](https://ikariam.fandom.com/wiki/Happiness) — Happiness formula: base 196 + tavern + wine - population; growth rate formula — MEDIUM confidence (reference wiki, values adapted for our simplified model)
-- [ikariam.fandom.com/wiki/Pillaging](https://ikariam.fandom.com/wiki/Pillaging) — Warehouse protects resources; cargo ships determine loot capacity — MEDIUM confidence
-- [ikariam.fandom.com/wiki/Saw_mill](https://ikariam.fandom.com/wiki/Saw_mill) — Island resource buildings are shared upgrades donated by all island inhabitants — HIGH confidence
-- [marmelab.com/blog/2025/12/08/supabase-edge-function-transaction-rls.html](https://marmelab.com/blog/2025/12/08/supabase-edge-function-transaction-rls.html) — Transactions and RLS in Supabase Edge Functions; SQL SECURITY DEFINER pattern — HIGH confidence
-- [supaexplorer.com/best-practices/supabase-postgres/lock-skip-locked/](https://supaexplorer.com/best-practices/supabase-postgres/lock-skip-locked/) — FOR UPDATE SKIP LOCKED for atomic operations in Supabase — HIGH confidence
-- [supabase.com/docs/guides/realtime/realtime-listening-flutter](https://supabase.com/docs/guides/realtime/realtime-listening-flutter) — Supabase Realtime Postgres Changes subscription in Flutter — HIGH confidence
+- [pub.dev/packages/data_table_2](https://pub.dev/packages/data_table_2) — Version 2.7.2, last updated Nov 2025, MIT license — HIGH confidence
+- [supabase.com/docs/guides/functions/unit-test](https://supabase.com/docs/guides/functions/unit-test) — Official Deno test runner pattern for Edge Functions, `supabase/functions/tests/` directory convention — HIGH confidence
+- [docs.deno.com/runtime/reference/std/assert/](https://docs.deno.com/runtime/reference/std/assert/) — `jsr:@std/assert` is current Deno 2.x standard for assertions — HIGH confidence
+- [riverpod.dev/docs/whats_new](https://riverpod.dev/docs/whats_new) — `ProviderContainer.test()` and `WidgetTester.container` confirmed in Riverpod 3.0 (Sept 2025) — HIGH confidence
+- [pub.dev/packages/flutter_riverpod/versions](https://pub.dev/packages/flutter_riverpod/versions) — Latest stable: 3.3.1, requires Dart SDK 3.7 — HIGH confidence
+- [pub.dev/packages/mocktail](https://pub.dev/packages/mocktail) — Latest stable: 1.0.4, published by felangel.dev — HIGH confidence
+- [supabase.com/docs/guides/database/extensions/pg_cron](https://supabase.com/docs/guides/database/extensions/pg_cron) — `cron.schedule()` syntax, pg_cron in migrations pattern — HIGH confidence
+- [github.com/orgs/supabase/discussions/39966](https://github.com/orgs/supabase/discussions/39966) — Deno lock file v5 not yet supported by Supabase Edge Runtime; pin Deno 2.0–2.2.x in CI — MEDIUM confidence (GitHub Discussion, not official docs)
+- [github.com/orgs/supabase/issues/28966](https://github.com/orgs/supabase/issues/28966) — Known issue: `cron.schedule()` fails in seed.sql; use migrations instead — HIGH confidence
+- [npmjs.com/package/supabase](https://www.npmjs.com/package/supabase) — Supabase CLI latest: 2.79.0 as of 2026-03-17 — HIGH confidence
+- [github.com/subosito/flutter-action](https://github.com/subosito/flutter-action) — `subosito/flutter-action@v2` canonical GitHub Action for Flutter; `cache: true` supported — HIGH confidence
+- [medium.com/implementing-role-based-access-control-in-flutter-ui-with-gorouter](https://medium.com/@m.goudjal.y/implementing-role-based-access-control-in-flutter-ui-with-gorouter-df4551c4930f) — go_router redirect guard for admin routes — MEDIUM confidence (community article, pattern verified against go_router docs)
 
 ---
 
-*Stack research for: Ikariam clone v1.1 — Economy & Combat Depth (happiness, population, tax, trading, marketplace, pillage, battle reports)*
-*Researched: 2026-03-13*
+*Stack research for: Ikariam clone v1.3 — Bots, Testing & Automation (AI bot players, GodMode dashboard, seed data, unit tests, CI/CD)*
+*Researched: 2026-03-17*
