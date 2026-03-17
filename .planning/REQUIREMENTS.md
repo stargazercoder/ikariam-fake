@@ -85,29 +85,29 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BOT-01 | TBD | Pending |
-| BOT-02 | TBD | Pending |
-| BOT-03 | TBD | Pending |
-| BOT-04 | TBD | Pending |
-| BOT-05 | TBD | Pending |
-| BOT-06 | TBD | Pending |
-| GOD-01 | TBD | Pending |
-| GOD-02 | TBD | Pending |
-| GOD-03 | TBD | Pending |
-| GOD-04 | TBD | Pending |
-| GOD-05 | TBD | Pending |
-| SEED-01 | TBD | Pending |
-| SEED-02 | TBD | Pending |
-| TEST-01 | TBD | Pending |
-| TEST-02 | TBD | Pending |
-| AUTO-01 | TBD | Pending |
-| AUTO-02 | TBD | Pending |
+| BOT-01 | Phase 18 | Pending |
+| BOT-06 | Phase 18 | Pending |
+| BOT-02 | Phase 19 | Pending |
+| BOT-03 | Phase 19 | Pending |
+| BOT-04 | Phase 19 | Pending |
+| BOT-05 | Phase 19 | Pending |
+| SEED-01 | Phase 20 | Pending |
+| SEED-02 | Phase 20 | Pending |
+| GOD-05 | Phase 21 | Pending |
+| GOD-01 | Phase 22 | Pending |
+| GOD-02 | Phase 22 | Pending |
+| GOD-03 | Phase 22 | Pending |
+| GOD-04 | Phase 22 | Pending |
+| TEST-01 | Phase 23 | Pending |
+| TEST-02 | Phase 23 | Pending |
+| AUTO-01 | Phase 24 | Pending |
+| AUTO-02 | Phase 24 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 17 total
-- Mapped to phases: 0
-- Unmapped: 17 ⚠️
+- Mapped to phases: 17
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-17*
-*Last updated: 2026-03-17 after initial definition*
+*Last updated: 2026-03-17 — traceability populated after roadmap creation*
