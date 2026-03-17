@@ -53,7 +53,7 @@ Full details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 **Milestone Goal:** Populate the world with 20 AI bot players that autonomously build, train, and fight; add a GodMode admin dashboard to observe and control the living world; enrich seed data; add unit tests for critical paths; and provide single-command automation for dev setup and CI/CD.
 
 - [x] **Phase 18: Bot Schema Foundation** — DB migration adding is_bot/is_admin columns and bot_schedules table; updated Profile Dart model (completed 2026-03-17)
-- [ ] **Phase 19: Bot Behavior Engine** — PL/pgSQL run_bot_decisions() + pg_cron bot-think-tick driving attack, retrain, and upgrade behaviors
+- [x] **Phase 19: Bot Behavior Engine** — PL/pgSQL run_bot_decisions() + pg_cron bot-think-tick driving attack, retrain, and upgrade behaviors (completed 2026-03-17)
 - [ ] **Phase 20: Seed Data** — 20 diverse bot accounts with varied buildings, armies, and resources seeded idempotently on db reset
 - [ ] **Phase 21: GodMode Backend** — SECURITY DEFINER RPCs for world-state reads and bot/player controls; go_router admin route guard
 - [ ] **Phase 22: GodMode Flutter Dashboard** — Full-page admin screen with player table, bot pause controls, event feed, and resource edit form
@@ -156,7 +156,7 @@ Plans:
   3. Bots with higher aggression values dispatch attacks more frequently than low-aggression bots across a 100-tick simulation
   4. A bot that loses army units below its target threshold inserts a new training_queue row to retrain within the next tick
   5. Bot actions write directly to the same game tables (training_queue, construction_queue, unit_movements) that Edge Functions write to — existing processing ticks handle bot completions without modification
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 19-01-PLAN.md — Bot helper functions: bot_decide_upgrade() and bot_decide_train() with cost tables and queue logic
 - [ ] 19-02-PLAN.md — Bot attack function, run_bot_decisions() orchestrator, and bot-think-tick pg_cron registration
@@ -240,7 +240,7 @@ Plans:
 | 16. Espionage & City Viewing | v1.2 | 3/3 | Complete | 2026-03-16 |
 | 17. UI Polish | v1.2 | 2/2 | Complete | 2026-03-17 |
 | 18. Bot Schema Foundation | 1/1 | Complete    | 2026-03-17 | - |
-| 19. Bot Behavior Engine | 1/2 | In Progress|  | - |
+| 19. Bot Behavior Engine | 2/2 | Complete   | 2026-03-17 | - |
 | 20. Seed Data | v1.3 | 0/TBD | Not started | - |
 | 21. GodMode Backend | v1.3 | 0/TBD | Not started | - |
 | 22. GodMode Flutter Dashboard | v1.3 | 0/TBD | Not started | - |

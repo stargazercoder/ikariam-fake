@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Bots, Testing & Automation
 status: planning
-stopped_at: Completed 19-01-PLAN.md — bot helper functions
-last_updated: "2026-03-17T14:28:05.012Z"
+stopped_at: Completed 19-02-PLAN.md — bot attack function and run_bot_decisions orchestrator
+last_updated: "2026-03-17T14:34:26.414Z"
 last_activity: 2026-03-17 — v1.3 roadmap created; Phases 18-24 defined; ready to plan Phase 18
 progress:
   total_phases: 12
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State
@@ -60,6 +60,8 @@ v1.3 architecture decisions locked in:
 - [Phase 18]: is_bot/is_admin use NOT NULL DEFAULT false — PostgreSQL backfills existing rows without UPDATE migration
 - [Phase 18]: bot_schedules has RLS enabled with zero policies — deny-all for clients; only SECURITY DEFINER functions access it
 - [Phase 19-01]: Dev speed multiplier hardcoded 0.2 in PL/pgSQL (pg_cron cannot read APP_ENVIRONMENT env var); TODO comment added for game_config parameterization
+- [Phase 19]: bot_decide_attack returns void (fire-and-forget): attack is lowest priority; orchestrator branches on boolean return of upgrade/train, not attack
+- [Phase 19]: Aggression 0 bots never attack: 0/3.0=0.0, random() always >=0.0, so probability gate always returns early
 
 ### Pending Todos
 
@@ -78,7 +80,7 @@ v1.3 design work deferred to planning:
 
 ## Session Continuity
 
-Last session: 2026-03-17T14:28:05.010Z
-Stopped at: Completed 19-01-PLAN.md — bot helper functions
+Last session: 2026-03-17T14:34:26.412Z
+Stopped at: Completed 19-02-PLAN.md — bot attack function and run_bot_decisions orchestrator
 Resume file: None
 Next action: /gsd:plan-phase 18
