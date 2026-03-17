@@ -29,13 +29,15 @@ class GodmodeRepository {
   Future<List<GodmodePlayer>> getWorldState() async {
     try {
       final result = await _client.rpc('godmode_get_world_state');
-      final map = result as Map<String, dynamic>;
-      final players = map['players'] as List<dynamic>;
+      debugPrint('[GodmodeRepository] getWorldState raw type: ${result.runtimeType}');
+      debugPrint('[GodmodeRepository] getWorldState raw: $result');
+      final players = result as List<dynamic>;
       return players
           .map((p) => GodmodePlayer.fromJson(p as Map<String, dynamic>))
           .toList();
-    } catch (e) {
+    } catch (e, s) {
       debugPrint('[GodmodeRepository] getWorldState error: $e');
+      debugPrint('[GodmodeRepository] getWorldState stack: $s');
       rethrow;
     }
   }
@@ -128,12 +130,15 @@ class GodmodeRepository {
       final params = <String, dynamic>{'p_limit': limit};
       if (eventType != null) params['p_event_type'] = eventType;
       final result = await _client.rpc('godmode_get_events', params: params);
+      debugPrint('[GodmodeRepository] getEvents raw type: ${result.runtimeType}');
+      debugPrint('[GodmodeRepository] getEvents raw: $result');
       final list = result as List<dynamic>;
       return list
           .map((e) => GodmodeEvent.fromJson(e as Map<String, dynamic>))
           .toList();
-    } catch (e) {
+    } catch (e, s) {
       debugPrint('[GodmodeRepository] getEvents error: $e');
+      debugPrint('[GodmodeRepository] getEvents stack: $s');
       rethrow;
     }
   }
