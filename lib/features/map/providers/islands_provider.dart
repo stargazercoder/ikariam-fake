@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../features/city/providers/city_provider.dart';
 import '../data/map_repository.dart';
@@ -39,4 +40,29 @@ final playerIslandIdProvider = Provider<String?>((ref) {
   return cityAsync.whenOrNull(
     data: (city) => city?['island_id'] as String?,
   );
+});
+
+/// Returns ownership status per island: 'own', 'enemy', or absent (empty).
+///
+/// Own city takes priority — if the player has ANY city on the island, it
+/// is marked 'own' regardless of other cities present.
+final islandOwnershipProvider = FutureProvider<Map<String, String>>((ref) async {
+  final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+  if (currentUserId == null) return {};
+
+  final rows = await Supabase.instance.client
+      .from('cities')
+      .select('island_id, owner_id');
+
+  final result = <String, String>{};
+  for (final row in rows as List<dynamic>) {
+    final islandId = row['island_id'] as String;
+    final ownerId = row['owner_id'] as String;
+    if (ownerId == currentUserId) {
+      result[islandId] = 'own'; // own takes priority over enemy
+    } else if (!result.containsKey(islandId) || result[islandId] != 'own') {
+      result[islandId] = 'enemy';
+    }
+  }
+  return result;
 });

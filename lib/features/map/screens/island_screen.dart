@@ -13,6 +13,7 @@ import '../../espionage/providers/espionage_providers.dart';
 import '../../espionage/screens/spy_report_dialog.dart';
 import '../../trade/screens/trade_dialog.dart';
 import '../../../core/constants/island_constants.dart';
+import '../../../core/constants/ownership_colors.dart';
 import '../models/island.dart';
 import '../models/island_city_slot.dart';
 import '../providers/island_detail_provider.dart';
@@ -433,17 +434,15 @@ class _CitySlotCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     if (slot == null || !slot!.isOccupied) {
       // Empty slot.
       return GestureDetector(
         onTap: null,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade800.withAlpha(120),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: Colors.grey.shade700, width: 1),
+            color: OwnershipColors.empty.withAlpha(40),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: OwnershipColors.empty, width: 2),
           ),
           child: Center(
             child: Text(
@@ -458,21 +457,21 @@ class _CitySlotCell extends StatelessWidget {
       );
     }
 
-    // Occupied slot.
-    final color = _isPlayerOwned
-        ? theme.colorScheme.primary
-        : theme.colorScheme.secondary;
+    // Occupied slot — color from OwnershipColors.
+    final Color color;
+    if (_isPlayerOwned) {
+      color = OwnershipColors.own;
+    } else {
+      color = OwnershipColors.enemy;
+    }
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: color.withAlpha(200),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(
-            color: _isPlayerOwned ? color : color.withAlpha(150),
-            width: _isPlayerOwned ? 2 : 1,
-          ),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color, width: 2),
         ),
         child: Padding(
           padding: const EdgeInsets.all(2),

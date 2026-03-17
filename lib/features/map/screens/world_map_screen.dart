@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/ownership_colors.dart';
 import '../models/island.dart';
 import '../providers/islands_provider.dart';
 
@@ -67,9 +68,13 @@ class _IslandGrid extends ConsumerWidget {
       for (final island in islands) '${island.gridX},${island.gridY}': island,
     };
 
+    // Watch island ownership: 'own', 'enemy', or absent (empty).
+    final ownershipAsync = ref.watch(islandOwnershipProvider);
+    final ownership = ownershipAsync.whenOrNull(data: (v) => v) ?? <String, String>{};
+
     return InteractiveViewer(
       constrained: false,
-      boundaryMargin: const EdgeInsets.all(80),
+      boundaryMargin: const EdgeInsets.all(double.infinity),
       minScale: 0.3,
       maxScale: 2.5,
       child: SizedBox(
@@ -89,19 +94,26 @@ class _IslandGrid extends ConsumerWidget {
                   top: row * _cellSize + 4,
                   width: _cellSize - 8,
                   height: _cellSize - 8,
-                  child: _IslandCell(
-                    island: islandByPos['$col,$row'],
-                    gridX: col,
-                    gridY: row,
-                    onTap: (island) {
-                      if (island != null) {
-                        ref
-                            .read(selectedIslandIdProvider.notifier)
-                            .select(island.id);
-                      }
-                      context.go('/island');
-                    },
-                  ),
+                  child: Builder(builder: (context) {
+                    final cellIsland = islandByPos['$col,$row'];
+                    final status = cellIsland != null
+                        ? (ownership[cellIsland.id] ?? 'empty')
+                        : 'empty';
+                    return _IslandCell(
+                      island: cellIsland,
+                      gridX: col,
+                      gridY: row,
+                      ownershipStatus: status,
+                      onTap: (island) {
+                        if (island != null) {
+                          ref
+                              .read(selectedIslandIdProvider.notifier)
+                              .select(island.id);
+                        }
+                        context.go('/island');
+                      },
+                    );
+                  }),
                 ),
           ],
         ),
@@ -154,13 +166,29 @@ class _IslandCell extends StatelessWidget {
     required this.island,
     required this.gridX,
     required this.gridY,
+    required this.ownershipStatus,
     required this.onTap,
   });
 
   final Island? island;
   final int gridX;
   final int gridY;
+
+  /// Ownership status for the border color: 'own', 'enemy', or 'empty'.
+  final String ownershipStatus;
   final void Function(Island?) onTap;
+
+  /// Returns border color based on ownership status.
+  Color _ownershipBorderColor() {
+    switch (ownershipStatus) {
+      case 'own':
+        return OwnershipColors.own;
+      case 'enemy':
+        return OwnershipColors.enemy;
+      default:
+        return OwnershipColors.empty;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +211,7 @@ class _IslandCell extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.white.withAlpha(60), width: 1),
+          border: Border.all(color: _ownershipBorderColor(), width: 2),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
