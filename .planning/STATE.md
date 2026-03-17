@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Espionage, Trading & Polish
 status: roadmap_ready
-stopped_at: Phase 17 UI-SPEC approved
-last_updated: "2026-03-17T00:19:25.551Z"
+stopped_at: Completed 17-01-PLAN.md — Phase 17 Plan 01 fully verified and complete
+last_updated: "2026-03-17T00:45:10.615Z"
 last_activity: 2026-03-16 — Roadmap created
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 11
+  completed_plans: 10
   percent: 100
 ---
 
@@ -96,6 +96,8 @@ All decisions logged in PROJECT.md Key Decisions table.
 - [Phase 16-espionage-city-viewing]: spy-city Edge Function uses Supabase aggregate query syntax for army_count and EspionageException mirrors TradeException pattern
 - [Phase 16-espionage-city-viewing]: valueOrNull not in Riverpod 3.x — use whenOrNull(data: (v) => v) for AsyncValue bool checks
 - [Phase 16-espionage-city-viewing]: /city-view top-level GoRoute (hides bottom nav); /spy-log nested in battles branch (bottom nav stays visible)
+- [Phase 17-01]: CityScreen city name uses white color + drop shadow instead of primary color — visible over transparent AppBar
+- [Phase 17-01]: EnemyCityViewScreen banner text updated to include cityName+ownerName since AppBar title removed; body uses Padding not SafeArea for correct Column expansion
 
 ### v1.2 Design Notes
 
@@ -121,7 +123,7 @@ Carried from v1.1 (tech debt):
 
 ## Session Continuity
 
-Last session: 2026-03-17T00:19:25.530Z
-Stopped at: Phase 17 UI-SPEC approved
-Resume file: .planning/phases/17-ui-polish/17-UI-SPEC.md
+Last session: 2026-03-17T00:45:10.613Z
+Stopped at: Completed 17-01-PLAN.md — Phase 17 Plan 01 fully verified and complete
+Resume file: None
 Next action: `/gsd:plan-phase 15` (Resource Trading)

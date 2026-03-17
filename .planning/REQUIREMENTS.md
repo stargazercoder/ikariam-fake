@@ -21,7 +21,7 @@
 
 ### UI Polish
 
-- [ ] **UIPL-01**: City view screen removes the AppBar title for cleaner layout
+- [x] **UIPL-01**: City view screen removes the AppBar title for cleaner layout
 - [ ] **UIPL-02**: Cities on island/world map use distinct colors to differentiate own vs enemy vs ally
 - [ ] **UIPL-03**: Unit types in military screens use subtle color coding consistent with unitTypeColors
 
@@ -75,7 +75,7 @@
 | TRAD-01 | Phase 15 | Complete |
 | ESPY-01 | Phase 16 | Complete |
 | ESPY-02 | Phase 16 | Complete |
-| UIPL-01 | Phase 17 | Pending |
+| UIPL-01 | Phase 17 | Complete |
 | UIPL-02 | Phase 17 | Pending |
 | UIPL-03 | Phase 17 | Pending |
 

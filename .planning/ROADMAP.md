@@ -112,7 +112,7 @@ Plans:
   2. On the island view and world map, each city slot uses a distinct color to differentiate own city (green), allied cities, and enemy cities
   3. Unit type rows in military screens (training queue, battle reports, army lists) render with the matching color from unitTypeColors for that unit type
   4. Color coding is consistent across all screens that display units or city markers
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 17-01-PLAN.md — Constants (ownership colors, unit type icons) and transparent AppBar on city screens
 - [ ] 17-02-PLAN.md — Ownership color borders on maps and CircleAvatar unit icons on military screens
@@ -137,4 +137,4 @@ Plans:
 | 14. Movement Visibility | 2/2 | Complete    | 2026-03-16 | - |
 | 15. Resource Trading | 2/2 | Complete    | 2026-03-16 | - |
 | 16. Espionage & City Viewing | 3/3 | Complete    | 2026-03-16 | - |
-| 17. UI Polish | v1.2 | 0/2 | Not started | - |
+| 17. UI Polish | 1/2 | In Progress|  | - |
