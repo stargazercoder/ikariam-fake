@@ -142,7 +142,9 @@ Plans:
   2. bot_schedules table exists with aggression (0-3), is_paused, and next_action_at columns; RLS is enabled with no client-facing policies
   3. Profile Dart model exposes isBot and isAdmin fields that round-trip correctly through the existing profile provider
   4. A bot profile row (is_bot = true) cannot be read or modified by a non-admin player through any existing RLS policy
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 18-01-PLAN.md — Bot schema migration (profiles columns + bot_schedules table) and Profile Dart model getters
 
 ### Phase 19: Bot Behavior Engine
 **Goal**: Bot players autonomously attack neighboring cities, retrain their armies after losses, and upgrade buildings and island resources on a pg_cron schedule
@@ -234,7 +236,7 @@ Plans:
 | 15. Resource Trading | v1.2 | 2/2 | Complete | 2026-03-16 |
 | 16. Espionage & City Viewing | v1.2 | 3/3 | Complete | 2026-03-16 |
 | 17. UI Polish | v1.2 | 2/2 | Complete | 2026-03-17 |
-| 18. Bot Schema Foundation | v1.3 | 0/TBD | Not started | - |
+| 18. Bot Schema Foundation | v1.3 | 0/1 | Planning | - |
 | 19. Bot Behavior Engine | v1.3 | 0/TBD | Not started | - |
 | 20. Seed Data | v1.3 | 0/TBD | Not started | - |
 | 21. GodMode Backend | v1.3 | 0/TBD | Not started | - |
