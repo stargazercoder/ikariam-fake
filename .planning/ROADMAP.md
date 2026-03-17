@@ -114,8 +114,8 @@ Plans:
   4. Color coding is consistent across all screens that display units or city markers
 **Plans:** 2 plans
 Plans:
-- [ ] 17-01-PLAN.md — [To be planned]
-- [ ] 17-02-PLAN.md — [To be planned]
+- [ ] 17-01-PLAN.md — Constants (ownership colors, unit type icons) and transparent AppBar on city screens
+- [ ] 17-02-PLAN.md — Ownership color borders on maps and CircleAvatar unit icons on military screens
 
 ## Progress
 
@@ -137,4 +137,4 @@ Plans:
 | 14. Movement Visibility | 2/2 | Complete    | 2026-03-16 | - |
 | 15. Resource Trading | 2/2 | Complete    | 2026-03-16 | - |
 | 16. Espionage & City Viewing | 3/3 | Complete    | 2026-03-16 | - |
-| 17. UI Polish | v1.2 | 0/? | Not started | - |
+| 17. UI Polish | v1.2 | 0/2 | Not started | - |
