@@ -144,7 +144,7 @@ Plans:
   4. A bot profile row (is_bot = true) cannot be read or modified by a non-admin player through any existing RLS policy
 **Plans:** 1/1 plans complete
 Plans:
-- [ ] 18-01-PLAN.md — Bot schema migration (profiles columns + bot_schedules table) and Profile Dart model getters
+- [x] 18-01-PLAN.md — Bot schema migration (profiles columns + bot_schedules table) and Profile Dart model getters
 
 ### Phase 19: Bot Behavior Engine
 **Goal**: Bot players autonomously attack neighboring cities, retrain their armies after losses, and upgrade buildings and island resources on a pg_cron schedule
@@ -156,7 +156,10 @@ Plans:
   3. Bots with higher aggression values dispatch attacks more frequently than low-aggression bots across a 100-tick simulation
   4. A bot that loses army units below its target threshold inserts a new training_queue row to retrain within the next tick
   5. Bot actions write directly to the same game tables (training_queue, construction_queue, unit_movements) that Edge Functions write to — existing processing ticks handle bot completions without modification
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 19-01-PLAN.md — Bot helper functions: bot_decide_upgrade() and bot_decide_train() with cost tables and queue logic
+- [ ] 19-02-PLAN.md — Bot attack function, run_bot_decisions() orchestrator, and bot-think-tick pg_cron registration
 
 ### Phase 20: Seed Data
 **Goal**: Running supabase db reset produces a world with 20 diverse bot accounts ready for gameplay testing, and running it twice produces no errors
@@ -237,7 +240,7 @@ Plans:
 | 16. Espionage & City Viewing | v1.2 | 3/3 | Complete | 2026-03-16 |
 | 17. UI Polish | v1.2 | 2/2 | Complete | 2026-03-17 |
 | 18. Bot Schema Foundation | 1/1 | Complete    | 2026-03-17 | - |
-| 19. Bot Behavior Engine | v1.3 | 0/TBD | Not started | - |
+| 19. Bot Behavior Engine | v1.3 | 0/2 | Planning | - |
 | 20. Seed Data | v1.3 | 0/TBD | Not started | - |
 | 21. GodMode Backend | v1.3 | 0/TBD | Not started | - |
 | 22. GodMode Flutter Dashboard | v1.3 | 0/TBD | Not started | - |
