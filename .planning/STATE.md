@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Bots, Testing & Automation
 status: planning
-stopped_at: Phase 21 context gathered
-last_updated: "2026-03-17T15:37:39.569Z"
+stopped_at: Completed 21-01-PLAN.md
+last_updated: "2026-03-17T15:55:34.908Z"
 last_activity: 2026-03-17 — v1.3 roadmap created; Phases 18-24 defined; ready to plan Phase 18
 progress:
   total_phases: 12
-  completed_phases: 8
-  total_plans: 15
-  completed_plans: 15
+  completed_phases: 9
+  total_plans: 16
+  completed_plans: 16
 ---
 
 # Project State
@@ -64,6 +64,8 @@ v1.3 architecture decisions locked in:
 - [Phase 19]: Aggression 0 bots never attack: 0/3.0=0.0, random() always >=0.0, so probability gate always returns early
 - [Phase 20-01]: Bot UUIDs use deterministic pattern b{NN}00000 for easy identification and ON CONFLICT correctness
 - [Phase 20-01]: All seed inserts for bots use ON CONFLICT — seed script survives supabase db reset run twice consecutively (SEED-02)
+- [Phase 21-godmode-backend]: service_role key must not appear in Flutter — GodMode uses SECURITY DEFINER RPCs with is_admin Postgres check
+- [Phase 21-godmode-backend]: godmode_force_action does NOT update next_action_at — forced actions are out-of-band and must not disrupt cron schedule
 
 ### Pending Todos
 
@@ -82,7 +84,7 @@ v1.3 design work deferred to planning:
 
 ## Session Continuity
 
-Last session: 2026-03-17T15:37:39.566Z
-Stopped at: Phase 21 context gathered
-Resume file: .planning/phases/21-godmode-backend/21-CONTEXT.md
+Last session: 2026-03-17T15:55:34.905Z
+Stopped at: Completed 21-01-PLAN.md
+Resume file: None
 Next action: /gsd:plan-phase 18

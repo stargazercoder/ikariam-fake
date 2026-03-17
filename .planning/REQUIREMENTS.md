@@ -22,7 +22,7 @@ Requirements for v1.3 Bots, Testing & Automation. Each maps to roadmap phases.
 - [ ] **GOD-02**: Admin can pause, resume, and adjust speed of bot behaviors
 - [ ] **GOD-03**: Admin sees a live event feed showing battles, trades, and espionage actions
 - [ ] **GOD-04**: Admin can modify any player's resources and army counts
-- [ ] **GOD-05**: GodMode access is secured via is_admin check at Postgres layer — service_role key never reaches Flutter client
+- [x] **GOD-05**: GodMode access is secured via is_admin check at Postgres layer — service_role key never reaches Flutter client
 
 ### Seed Data
 
@@ -93,7 +93,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BOT-05 | Phase 19 | Complete |
 | SEED-01 | Phase 20 | Complete |
 | SEED-02 | Phase 20 | Complete |
-| GOD-05 | Phase 21 | Pending |
+| GOD-05 | Phase 21 | Complete |
 | GOD-01 | Phase 22 | Pending |
 | GOD-02 | Phase 22 | Pending |
 | GOD-03 | Phase 22 | Pending |
