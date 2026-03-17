@@ -56,7 +56,7 @@ Full details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 - [x] **Phase 19: Bot Behavior Engine** — PL/pgSQL run_bot_decisions() + pg_cron bot-think-tick driving attack, retrain, and upgrade behaviors (completed 2026-03-17)
 - [x] **Phase 20: Seed Data** — 20 diverse bot accounts with varied buildings, armies, and resources seeded idempotently on db reset (completed 2026-03-17)
 - [x] **Phase 21: GodMode Backend** — SECURITY DEFINER RPCs for world-state reads and bot/player controls; go_router admin route guard (completed 2026-03-17)
-- [ ] **Phase 22: GodMode Flutter Dashboard** — Full-page admin screen with player table, bot pause controls, event feed, and resource edit form
+- [x] **Phase 22: GodMode Flutter Dashboard** — Full-page admin screen with player table, bot pause controls, event feed, and resource edit form (completed 2026-03-17)
 - [ ] **Phase 23: Unit Tests** — Deno test suite for critical Edge Functions; Flutter widget tests with isolated ProviderContainer
 - [ ] **Phase 24: Automation & CI** — Single-command dev scripts and GitHub Actions CI pipeline running tests, lint, and build on push
 
@@ -197,7 +197,7 @@ Plans:
   3. Admin sees a live event feed panel displaying the last N battles, trades, and espionage actions across all players, refreshing every 30 seconds
   4. Admin can open a resource edit form for any player, enter new resource amounts, and submit — the player's resource display reflects the change within one poll cycle
   5. Bot accounts appear with a distinct visual marker visible only to admin; to all other players they appear as normal human players
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 22-01-PLAN.md — admin_set_army RPC migration, GodMode models, repository, and providers with 30s polling
 - [ ] 22-02-PLAN.md — Dashboard screen with Players table (sort, bot controls, inline edit) and Events feed
@@ -253,6 +253,6 @@ Plans:
 | 19. Bot Behavior Engine | 2/2 | Complete    | 2026-03-17 | - |
 | 20. Seed Data | 1/1 | Complete    | 2026-03-17 | - |
 | 21. GodMode Backend | 1/1 | Complete    | 2026-03-17 | - |
-| 22. GodMode Flutter Dashboard | 1/2 | In Progress|  | - |
+| 22. GodMode Flutter Dashboard | 2/2 | Complete   | 2026-03-17 | - |
 | 23. Unit Tests | v1.3 | 0/TBD | Not started | - |
 | 24. Automation & CI | v1.3 | 0/TBD | Not started | - |

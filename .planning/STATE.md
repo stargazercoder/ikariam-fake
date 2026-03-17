@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Bots, Testing & Automation
 status: planning
-stopped_at: Completed 22-01-PLAN.md
-last_updated: "2026-03-17T19:11:09.825Z"
+stopped_at: "Completed 22-02-PLAN.md — awaiting checkpoint:human-verify"
+last_updated: "2026-03-17T19:16:42.597Z"
 last_activity: 2026-03-17 — v1.3 roadmap created; Phases 18-24 defined; ready to plan Phase 18
 progress:
   total_phases: 12
-  completed_phases: 9
+  completed_phases: 10
   total_plans: 18
-  completed_plans: 17
+  completed_plans: 18
 ---
 
 # Project State
@@ -67,6 +67,9 @@ v1.3 architecture decisions locked in:
 - [Phase 21-godmode-backend]: service_role key must not appear in Flutter — GodMode uses SECURITY DEFINER RPCs with is_admin Postgres check
 - [Phase 21-godmode-backend]: godmode_force_action does NOT update next_action_at — forced actions are out-of-band and must not disrupt cron schedule
 - [Phase 22-01]: StateProvider removed in riverpod 3.x — used NotifierProvider for godmodeEventFilterProvider
+- [Phase 22-02]: GodModeDashboardScreen uses ref.read(notifier) for isRefreshing/lastUpdated snapshot to avoid rebuild loops
+- [Phase 22-02]: EventFeed uses GodmodeEventFilterNotifier.setFilter() method since plan 01 used NotifierProvider not StateProvider
+- [Phase 22-02]: Army edit fields pre-filled with 0 - army counts not in world_state detail; admin enters absolute desired values
 
 ### Pending Todos
 
@@ -85,7 +88,7 @@ v1.3 design work deferred to planning:
 
 ## Session Continuity
 
-Last session: 2026-03-17T19:11:09.823Z
-Stopped at: Completed 22-01-PLAN.md
+Last session: 2026-03-17T19:16:42.595Z
+Stopped at: Completed 22-02-PLAN.md — awaiting checkpoint:human-verify
 Resume file: None
 Next action: /gsd:plan-phase 18
