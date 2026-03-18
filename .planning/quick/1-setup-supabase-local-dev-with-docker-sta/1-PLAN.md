@@ -52,7 +52,7 @@ Current state (verified during planning):
 - Supabase local URLs and keys:
   - API URL: http://127.0.0.1:54321
   - Publishable (anon) key: sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH
-  - Secret (service_role) key: REDACTED_LOCAL_SECRET
+  - Secret (service_role) key: <REDACTED_LOCAL_SECRET>
   - DB URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
 - main.dart reads: `String.fromEnvironment('SUPABASE_URL')` and `String.fromEnvironment('SUPABASE_ANON_KEY')`
 - Supabase CLI available via `npx supabase` (v2.78.1)
@@ -74,7 +74,7 @@ Current state (verified during planning):
 
    SUPABASE_URL=http://127.0.0.1:54321
    SUPABASE_ANON_KEY=sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH
-   SUPABASE_SERVICE_ROLE_KEY=REDACTED_LOCAL_SECRET
+   SUPABASE_SERVICE_ROLE_KEY=<REDACTED_LOCAL_SECRET>
    SUPABASE_DB_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
    ```
 
