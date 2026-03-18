@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Bots, Testing & Automation
 status: planning
-stopped_at: Phase 23 context gathered
-last_updated: "2026-03-18T11:46:05.503Z"
+stopped_at: Completed 23-01-PLAN.md
+last_updated: "2026-03-18T12:07:47.470Z"
 last_activity: 2026-03-17 — v1.3 roadmap created; Phases 18-24 defined; ready to plan Phase 18
 progress:
   total_phases: 12
   completed_phases: 10
-  total_plans: 18
-  completed_plans: 18
+  total_plans: 20
+  completed_plans: 19
 ---
 
 # Project State
@@ -72,6 +72,7 @@ v1.3 architecture decisions locked in:
 - [Phase 22-02]: Army edit fields pre-filled with 0 - army counts not in world_state detail; admin enters absolute desired values
 - [Phase 22-godmode-flutter-dashboard]: godmode_get_world_state and godmode_get_events changed from RETURNS jsonb to RETURNS SETOF json — PostgREST cannot introspect opaque jsonb; SETOF json enables schema discovery
 - [Phase 22-godmode-flutter-dashboard]: GodmodeRepository.getWorldState() parses result as List<dynamic> directly (not Map with 'players' key) after RPC return type fix
+- [Phase 23-01]: calcTrainingDurationMinutes takes devSpeedMultiplier as parameter (not Deno.env) so it remains a pure testable function
 
 ### Pending Todos
 
@@ -90,7 +91,7 @@ v1.3 design work deferred to planning:
 
 ## Session Continuity
 
-Last session: 2026-03-18T11:46:05.499Z
-Stopped at: Phase 23 context gathered
-Resume file: .planning/phases/23-unit-tests/23-CONTEXT.md
+Last session: 2026-03-18T12:07:47.467Z
+Stopped at: Completed 23-01-PLAN.md
+Resume file: None
 Next action: /gsd:plan-phase 18
