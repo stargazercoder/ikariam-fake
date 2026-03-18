@@ -194,11 +194,30 @@ class _BattleTile extends StatelessWidget {
                   ),
                 ],
               )
-            : Text(
-                statusText,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: _statusColor(battle.status, theme.colorScheme),
-                ),
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    statusText,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: _statusColor(battle.status, theme.colorScheme),
+                    ),
+                  ),
+                  if (battle.pillageResult != null &&
+                      battle.pillageResult!.values.any((v) => v > 0))
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        _pillageSummary(battle.pillageResult!, isAttacker),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: isAttacker
+                              ? Colors.green.shade700
+                              : theme.colorScheme.error,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                ],
               ),
         trailing: Icon(
           Icons.chevron_right,
@@ -207,6 +226,18 @@ class _BattleTile extends StatelessWidget {
         onTap: () => context.push('/battle-detail?battleId=${battle.id}'),
       ),
     );
+  }
+
+  String _pillageSummary(Map<String, int> pillage, bool attacker) {
+    final prefix = attacker ? '+' : '-';
+    final parts = <String>[];
+    const order = ['wood', 'marble', 'crystal', 'sulfur'];
+    const labels = {'wood': 'W', 'marble': 'M', 'crystal': 'C', 'sulfur': 'S'};
+    for (final r in order) {
+      final amt = pillage[r] ?? 0;
+      if (amt > 0) parts.add('${labels[r]} $prefix$amt');
+    }
+    return parts.join('  ');
   }
 
   String _shortId(String cityId) {
