@@ -211,9 +211,10 @@ Plans:
   2. Each Deno test file imports only the extracted pure function module — no HTTP server, no Supabase client instantiated
   3. Running flutter test test/ executes GodMode widget tests where each test creates its own isolated ProviderContainer with explicit provider overrides — no test state leaks between runs
   4. All tests pass when run in suite order and in reverse order (proving no inter-test state dependency)
-**Plans**: 1 plan
+**Plans:** 2 plans
 Plans:
-- [ ] 20-01-PLAN.md — 20 bot accounts with tiered buildings, armies, resources, and bot_schedules
+- [ ] 23-01-PLAN.md — Extract pure formulas to _shared/formulas.ts and create Deno unit tests
+- [ ] 23-02-PLAN.md — Flutter GodMode widget tests with ProviderScope overrides
 
 ### Phase 24: Automation & CI
 **Goal**: A developer can set up the full project from scratch with one command, and every push to main automatically runs the full quality gate
@@ -254,5 +255,5 @@ Plans:
 | 20. Seed Data | 1/1 | Complete    | 2026-03-17 | - |
 | 21. GodMode Backend | 1/1 | Complete    | 2026-03-17 | - |
 | 22. GodMode Flutter Dashboard | 2/2 | Complete    | 2026-03-17 | - |
-| 23. Unit Tests | v1.3 | 0/TBD | Not started | - |
+| 23. Unit Tests | v1.3 | 0/2 | Planning | - |
 | 24. Automation & CI | v1.3 | 0/TBD | Not started | - |
