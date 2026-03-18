@@ -225,9 +225,10 @@ Plans:
   2. A GitHub Actions workflow triggers on push to main and runs flutter analyze, flutter test, deno test, and flutter build web — all steps must pass for the workflow to succeed
   3. Deno is pinned to 2.2.x in the CI workflow file with an inline comment referencing the Supabase Edge Runtime lock file constraint
   4. A failed flutter analyze (lint error) or failed deno test causes the CI workflow to exit non-zero and block the push
-**Plans**: 1 plan
+**Plans:** 2 plans
 Plans:
-- [ ] 20-01-PLAN.md — 20 bot accounts with tiered buildings, armies, resources, and bot_schedules
+- [ ] 24-01-PLAN.md — Dev setup scripts (bash + PowerShell) and test runner Deno step integration
+- [ ] 24-02-PLAN.md — GitHub Actions CI workflow with Flutter + Deno quality gate
 
 ## Progress
 
@@ -256,4 +257,4 @@ Plans:
 | 21. GodMode Backend | 1/1 | Complete    | 2026-03-17 | - |
 | 22. GodMode Flutter Dashboard | 2/2 | Complete    | 2026-03-17 | - |
 | 23. Unit Tests | 2/2 | Complete    | 2026-03-18 | - |
-| 24. Automation & CI | v1.3 | 0/TBD | Not started | - |
+| 24. Automation & CI | v1.3 | 0/2 | Not started | - |
