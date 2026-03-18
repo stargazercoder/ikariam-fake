@@ -37,7 +37,7 @@ Requirements for v1.3 Bots, Testing & Automation. Each maps to roadmap phases.
 ### Automation
 
 - [ ] **AUTO-01**: Single command runs DB reset + seed + Edge Functions serve + Flutter build
-- [ ] **AUTO-02**: GitHub Actions CI pipeline runs tests, lint, and build automatically on push
+- [x] **AUTO-02**: GitHub Actions CI pipeline runs tests, lint, and build automatically on push
 
 ## v1.3+ Future Requirements
 
@@ -101,7 +101,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-01 | Phase 23 | Complete |
 | TEST-02 | Phase 23 | Complete |
 | AUTO-01 | Phase 24 | Pending |
-| AUTO-02 | Phase 24 | Pending |
+| AUTO-02 | Phase 24 | Complete |
 
 **Coverage:**
 - v1.3 requirements: 17 total

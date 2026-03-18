@@ -58,7 +58,7 @@ Full details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 - [x] **Phase 21: GodMode Backend** — SECURITY DEFINER RPCs for world-state reads and bot/player controls; go_router admin route guard (completed 2026-03-17)
 - [x] **Phase 22: GodMode Flutter Dashboard** — Full-page admin screen with player table, bot pause controls, event feed, and resource edit form (completed 2026-03-17)
 - [x] **Phase 23: Unit Tests** — Deno test suite for critical Edge Functions; Flutter widget tests with isolated ProviderContainer (completed 2026-03-18)
-- [ ] **Phase 24: Automation & CI** — Single-command dev scripts and GitHub Actions CI pipeline running tests, lint, and build on push
+- [x] **Phase 24: Automation & CI** — Single-command dev scripts and GitHub Actions CI pipeline running tests, lint, and build on push (completed 2026-03-18)
 
 ## Phase Details
 
@@ -225,7 +225,7 @@ Plans:
   2. A GitHub Actions workflow triggers on push to main and runs flutter analyze, flutter test, deno test, and flutter build web — all steps must pass for the workflow to succeed
   3. Deno is pinned to 2.2.x in the CI workflow file with an inline comment referencing the Supabase Edge Runtime lock file constraint
   4. A failed flutter analyze (lint error) or failed deno test causes the CI workflow to exit non-zero and block the push
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 24-01-PLAN.md — Dev setup scripts (bash + PowerShell) and test runner Deno step integration
 - [ ] 24-02-PLAN.md — GitHub Actions CI workflow with Flutter + Deno quality gate
@@ -257,4 +257,4 @@ Plans:
 | 21. GodMode Backend | 1/1 | Complete    | 2026-03-17 | - |
 | 22. GodMode Flutter Dashboard | 2/2 | Complete    | 2026-03-17 | - |
 | 23. Unit Tests | 2/2 | Complete    | 2026-03-18 | - |
-| 24. Automation & CI | v1.3 | 0/2 | Not started | - |
+| 24. Automation & CI | 2/2 | Complete   | 2026-03-18 | - |
