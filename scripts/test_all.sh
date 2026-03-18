@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Unified test automation: reset DB, seed data, run all Flutter tests.
+# Unified test automation: reset DB, seed data, run Deno and Flutter tests.
 # Usage: bash scripts/test_all.sh
 # Exit codes: 0 = all passed, non-zero = failure in any step.
 set -euo pipefail
@@ -14,12 +14,17 @@ echo "  Ikariam Test Suite"
 echo "========================================="
 
 echo ""
-echo "[1/2] Resetting database (migrations + seed)..."
+echo "[1/3] Resetting database (migrations + seed)..."
 npx supabase db reset --local
 echo "  Database reset complete."
 
 echo ""
-echo "[2/2] Running Flutter tests..."
+echo "[2/3] Running Deno unit tests..."
+deno test supabase/functions/tests/
+echo "  Deno tests complete."
+
+echo ""
+echo "[3/3] Running Flutter tests..."
 set +e
 flutter test --reporter expanded
 FLUTTER_EXIT=$?
