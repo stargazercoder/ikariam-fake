@@ -8,59 +8,17 @@
 // client writes directly to game-state tables.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import {
+  UNIT_UNLOCK_LEVELS,
+  calcTrainingCost,
+  calcTrainingDurationMinutes,
+} from '../_shared/formulas.ts';
 
 // CORS headers for browser requests
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
-// Unit type to required building and minimum building level.
-// NOTE: Must stay in sync with lib/core/constants/unit_constants.dart unitUnlockLevels
-const UNIT_UNLOCK_LEVELS: Record<string, { building: string; minLevel: number }> = {
-  // Land units (Barracks)
-  hoplite:  { building: 'barracks', minLevel: 1 },
-  phalanx:  { building: 'barracks', minLevel: 2 },
-  archer:   { building: 'barracks', minLevel: 2 },
-  cavalry:  { building: 'barracks', minLevel: 3 },
-  catapult: { building: 'barracks', minLevel: 4 },
-  mortar:   { building: 'barracks', minLevel: 5 },
-  medic:    { building: 'barracks', minLevel: 3 },
-  cook:     { building: 'barracks', minLevel: 1 },
-  // Naval units (Shipyard)
-  cargo_ship:    { building: 'shipyard', minLevel: 1 },
-  ram_ship:      { building: 'shipyard', minLevel: 2 },
-  catapult_ship: { building: 'shipyard', minLevel: 3 },
-  mortar_ship:   { building: 'shipyard', minLevel: 4 },
-  diving_boat:   { building: 'shipyard', minLevel: 3 },
-};
-
-// Base resource costs per unit (total cost = base_cost * quantity for each resource).
-// NOTE: Must stay in sync with lib/core/constants/unit_constants.dart unitBaseCosts
-const UNIT_BASE_COSTS: Record<string, Record<string, number>> = {
-  hoplite:       { wood: 40, gold: 30 },
-  phalanx:       { wood: 60, marble: 20, gold: 50 },
-  archer:        { wood: 50, crystal: 20, gold: 40 },
-  cavalry:       { wood: 80, gold: 100 },
-  catapult:      { wood: 120, sulfur: 30, gold: 80 },
-  mortar:        { wood: 100, sulfur: 50, gold: 120 },
-  medic:         { wood: 30, crystal: 30, gold: 60 },
-  cook:          { wood: 20, gold: 20 },
-  cargo_ship:    { wood: 200, gold: 100 },
-  ram_ship:      { wood: 250, marble: 100, gold: 150 },
-  catapult_ship: { wood: 300, sulfur: 50, gold: 200 },
-  mortar_ship:   { wood: 350, sulfur: 80, gold: 250 },
-  diving_boat:   { wood: 200, crystal: 80, gold: 180 },
-};
-
-// Base training time in minutes per unit (total time = base_time * quantity).
-// NOTE: Must stay in sync with lib/core/constants/unit_constants.dart unitBaseTimes
-const UNIT_BASE_TIMES: Record<string, number> = {
-  hoplite: 1, phalanx: 1, archer: 1, cavalry: 2,
-  catapult: 2, mortar: 3, medic: 1, cook: 1,
-  cargo_ship: 2, ram_ship: 3, catapult_ship: 4,
-  mortar_ship: 5, diving_boat: 4,
 };
 
 const VALID_UNIT_TYPES = new Set(Object.keys(UNIT_UNLOCK_LEVELS));
@@ -212,9 +170,8 @@ Deno.serve(async (req: Request) => {
   }
 
   // 8. Calculate total cost and deduct resources
-  const baseCosts = UNIT_BASE_COSTS[unit_type];
-  for (const [resourceType, baseAmount] of Object.entries(baseCosts)) {
-    const totalAmount = baseAmount * quantity;
+  const totalCost = calcTrainingCost(unit_type, quantity);
+  for (const [resourceType, totalAmount] of Object.entries(totalCost)) {
     const { error: deductError } = await admin.rpc('deduct_resource', {
       p_city_id: city_id,
       p_resource_type: resourceType,
@@ -227,7 +184,7 @@ Deno.serve(async (req: Request) => {
   }
 
   // 9. Calculate finish_at: NOW() + base_time * quantity minutes (1/5 in dev mode)
-  const durationMinutes = UNIT_BASE_TIMES[unit_type] * quantity * DEV_SPEED_MULTIPLIER;
+  const durationMinutes = calcTrainingDurationMinutes(unit_type, quantity, DEV_SPEED_MULTIPLIER);
   const finishAt = new Date(Date.now() + durationMinutes * 60 * 1000).toISOString();
 
   // 10. Insert into training_queue
