@@ -26,11 +26,11 @@ class Island {
   factory Island.fromJson(Map<String, dynamic> json) {
     return Island(
       id: json['id'] as String? ?? '',
-      gridX: json['grid_x'] as int? ?? 0,
-      gridY: json['grid_y'] as int? ?? 0,
+      gridX: (json['grid_x'] as num?)?.toInt() ?? 0,
+      gridY: (json['grid_y'] as num?)?.toInt() ?? 0,
       luxuryType: json['luxury_type'] as String? ?? 'marble',
-      maxCitySlots: json['max_city_slots'] as int? ?? 16,
-      resourceLevel: json['resource_level'] as int? ?? 0,
+      maxCitySlots: (json['max_city_slots'] as num?)?.toInt() ?? 16,
+      resourceLevel: (json['resource_level'] as num?)?.toInt() ?? 0,
     );
   }
 }

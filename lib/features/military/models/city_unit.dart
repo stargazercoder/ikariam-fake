@@ -29,7 +29,7 @@ class CityUnit {
       id: json['id'] as String,
       cityId: json['city_id'] as String,
       unitType: json['unit_type'] as String,
-      quantity: json['quantity'] as int,
+      quantity: (json['quantity'] as num).toInt(),
       updatedAt: DateTime.parse(json['updated_at'] as String).toUtc(),
     );
   }

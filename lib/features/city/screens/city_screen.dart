@@ -42,7 +42,7 @@ class CityScreen extends ConsumerWidget {
         ) ??
         '';
     final avatarId = (profileAsync.whenOrNull(
-              data: (p) => p?['avatar_id'] as int?,
+              data: (p) => (p?['avatar_id'] as num?)?.toInt(),
             ) ??
             1);
 
@@ -125,8 +125,8 @@ class _CityBody extends ConsumerWidget {
     final cityId = city!['id'] as String;
     final cityName = city!['name'] as String? ?? 'Unknown City';
     final island = city!['islands'] as Map<String, dynamic>?;
-    final gridX = island?['grid_x'] as int? ?? 0;
-    final gridY = island?['grid_y'] as int? ?? 0;
+    final gridX = (island?['grid_x'] as num?)?.toInt() ?? 0;
+    final gridY = (island?['grid_y'] as num?)?.toInt() ?? 0;
     final luxuryType = island?['luxury_type'] as String? ?? 'unknown';
 
     // Watch all economy streams.
@@ -378,14 +378,54 @@ class _ResourcePanel extends ConsumerWidget {
                     ) ??
                     0;
 
-                return Row(
+                final hideoutLevel = buildingsAsync.whenOrNull(
+                  data: (buildings) => buildings
+                      .whereType<CityBuilding>()
+                      .where((b) => b.buildingType == BuildingType.hideout)
+                      .firstOrNull
+                      ?.level,
+                );
+                final protectionFloor =
+                    hideoutProtectionFloor(hideoutLevel);
+
+                return Column(
                   children: [
-                    _HappinessChip(happiness: happiness),
-                    const Spacer(),
-                    _PopulationSummary(
-                      population: population,
-                      happiness: happiness,
-                      totalWorkers: totalWorkers,
+                    Row(
+                      children: [
+                        _HappinessChip(happiness: happiness),
+                        const Spacer(),
+                        _PopulationSummary(
+                          population: population,
+                          happiness: happiness,
+                          totalWorkers: totalWorkers,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.security,
+                          size: 14,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withAlpha(140),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Protected: $protectionFloor per resource'
+                          '${hideoutLevel == null ? ' (no Hideout)' : ' (Lv$hideoutLevel)'}',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withAlpha(140),
+                                    fontSize: 11,
+                                  ),
+                        ),
+                      ],
                     ),
                   ],
                 );

@@ -7,11 +7,13 @@ import 'island.dart';
 class CitySlot {
   const CitySlot({
     required this.slotNumber,
+    this.cityId,
     this.cityName,
     this.ownerId,
   });
 
   final int slotNumber;
+  final String? cityId;
   final String? cityName;
   final String? ownerId;
 
@@ -20,7 +22,8 @@ class CitySlot {
 
   factory CitySlot.fromJson(Map<String, dynamic> json) {
     return CitySlot(
-      slotNumber: json['slot_number'] as int? ?? 0,
+      slotNumber: (json['slot_number'] as num?)?.toInt() ?? 0,
+      cityId: json['id'] as String?,
       cityName: json['name'] as String?,
       ownerId: json['owner_id'] as String?,
     );

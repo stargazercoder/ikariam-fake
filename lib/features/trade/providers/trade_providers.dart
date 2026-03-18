@@ -40,7 +40,7 @@ final recipientCityInfoProvider = FutureProvider.autoDispose
       .eq('building_type', 'warehouse')
       .maybeSingle();
 
-  final warehouseLevel = (warehouseResult?['level'] as int?) ?? 0;
+  final warehouseLevel = (warehouseResult?['level'] as num?)?.toInt() ?? 0;
   // Calculate capacity: 500 * 1.5^level
   final capacity = 500 * _pow(1.5, warehouseLevel);
 

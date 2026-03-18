@@ -27,8 +27,8 @@ class CityBuilding {
       id: json['id'] as String,
       cityId: json['city_id'] as String,
       buildingType: buildingTypeFromDbName(json['building_type'] as String),
-      level: json['level'] as int,
-      assignedWorkers: json['assigned_workers'] as int,
+      level: (json['level'] as num).toInt(),
+      assignedWorkers: (json['assigned_workers'] as num).toInt(),
       updatedAt: DateTime.parse(json['updated_at'] as String).toUtc(),
     );
   }

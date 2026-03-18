@@ -30,7 +30,7 @@ class TrainingQueueEntry {
       id: json['id'] as String,
       cityId: json['city_id'] as String,
       unitType: json['unit_type'] as String,
-      quantity: json['quantity'] as int,
+      quantity: (json['quantity'] as num).toInt(),
       finishAt: DateTime.parse(json['finish_at'] as String).toUtc(),
       createdAt: DateTime.parse(json['created_at'] as String).toUtc(),
     );

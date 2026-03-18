@@ -63,7 +63,7 @@ class BattleTurn {
   /// Returns null when the DB value is null (phase was skipped or blocked).
   static Map<String, int>? _parseUnits(dynamic value) {
     if (value == null) return null;
-    return (value as Map<String, dynamic>).map((k, v) => MapEntry(k, v as int));
+    return (value as Map<String, dynamic>).map((k, v) => MapEntry(k, (v as num).toInt()));
   }
 
   /// Parses a Supabase JSON row into a [BattleTurn] instance.
@@ -71,7 +71,7 @@ class BattleTurn {
     return BattleTurn(
       id: json['id'] as String,
       battleId: json['battle_id'] as String,
-      turnNumber: json['turn_number'] as int,
+      turnNumber: (json['turn_number'] as num).toInt(),
       navalAttackerCasualties: _parseUnits(json['naval_attacker_casualties']),
       navalDefenderCasualties: _parseUnits(json['naval_defender_casualties']),
       navalOutcome: json['naval_outcome'] as String?,
@@ -79,9 +79,9 @@ class BattleTurn {
       landDefenderCasualties: _parseUnits(json['land_defender_casualties']),
       landOutcome: json['land_outcome'] as String?,
       attackerSurvivors: (json['attacker_survivors'] as Map<String, dynamic>)
-          .map((k, v) => MapEntry(k, v as int)),
+          .map((k, v) => MapEntry(k, (v as num).toInt())),
       defenderSurvivors: (json['defender_survivors'] as Map<String, dynamic>)
-          .map((k, v) => MapEntry(k, v as int)),
+          .map((k, v) => MapEntry(k, (v as num).toInt())),
       resolvedAt: DateTime.parse(json['resolved_at'] as String).toUtc(),
     );
   }

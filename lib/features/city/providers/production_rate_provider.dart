@@ -90,8 +90,8 @@ final productionRateProvider =
   final cityData =
       ref.watch(cityProvider).whenOrNull(data: (c) => c);
   final islandLevel =
-      (cityData?['islands'] as Map<String, dynamic>?)?['resource_level']
-          as int? ??
+      ((cityData?['islands'] as Map<String, dynamic>?)?['resource_level']
+          as num?)?.toInt() ??
       0;
   final islandMult = 1.0 + islandLevel * 0.10;
 
@@ -136,8 +136,8 @@ final productionBreakdownProvider = Provider.autoDispose
   final cityData =
       ref.watch(cityProvider).whenOrNull(data: (c) => c);
   final islandLevel =
-      (cityData?['islands'] as Map<String, dynamic>?)?['resource_level']
-          as int? ??
+      ((cityData?['islands'] as Map<String, dynamic>?)?['resource_level']
+          as num?)?.toInt() ??
       0;
   final islandMult = 1.0 + islandLevel * 0.10;
 

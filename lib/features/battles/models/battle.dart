@@ -65,11 +65,11 @@ class Battle {
       attackerId: json['attacker_id'] as String,
       defenderId: json['defender_id'] as String,
       attackerUnits: (json['attacker_units'] as Map<String, dynamic>)
-          .map((k, v) => MapEntry(k, v as int)),
+          .map((k, v) => MapEntry(k, (v as num).toInt())),
       defenderUnits: (json['defender_units'] as Map<String, dynamic>)
-          .map((k, v) => MapEntry(k, v as int)),
+          .map((k, v) => MapEntry(k, (v as num).toInt())),
       status: json['status'] as String,
-      turnNumber: json['turn_number'] as int,
+      turnNumber: (json['turn_number'] as num).toInt(),
       nextTurnAt: DateTime.parse(json['next_turn_at'] as String).toUtc(),
       createdAt: DateTime.parse(json['created_at'] as String).toUtc(),
       pillageResult: json['pillage_result'] == null

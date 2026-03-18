@@ -49,7 +49,7 @@ class UnitMovement {
       destinationCityId: json['destination_city_id'] as String,
       ownerId: json['owner_id'] as String,
       units: (json['units'] as Map<String, dynamic>)
-          .map((k, v) => MapEntry(k, v as int)),
+          .map((k, v) => MapEntry(k, (v as num).toInt())),
       departAt: DateTime.parse(json['depart_at'] as String).toUtc(),
       arriveAt: DateTime.parse(json['arrive_at'] as String).toUtc(),
       createdAt: DateTime.parse(json['created_at'] as String).toUtc(),
