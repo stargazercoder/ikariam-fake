@@ -57,7 +57,7 @@ Full details: [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 - [x] **Phase 20: Seed Data** — 20 diverse bot accounts with varied buildings, armies, and resources seeded idempotently on db reset (completed 2026-03-17)
 - [x] **Phase 21: GodMode Backend** — SECURITY DEFINER RPCs for world-state reads and bot/player controls; go_router admin route guard (completed 2026-03-17)
 - [x] **Phase 22: GodMode Flutter Dashboard** — Full-page admin screen with player table, bot pause controls, event feed, and resource edit form (completed 2026-03-17)
-- [ ] **Phase 23: Unit Tests** — Deno test suite for critical Edge Functions; Flutter widget tests with isolated ProviderContainer
+- [x] **Phase 23: Unit Tests** — Deno test suite for critical Edge Functions; Flutter widget tests with isolated ProviderContainer (completed 2026-03-18)
 - [ ] **Phase 24: Automation & CI** — Single-command dev scripts and GitHub Actions CI pipeline running tests, lint, and build on push
 
 ## Phase Details
@@ -211,7 +211,7 @@ Plans:
   2. Each Deno test file imports only the extracted pure function module — no HTTP server, no Supabase client instantiated
   3. Running flutter test test/ executes GodMode widget tests where each test creates its own isolated ProviderContainer with explicit provider overrides — no test state leaks between runs
   4. All tests pass when run in suite order and in reverse order (proving no inter-test state dependency)
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 23-01-PLAN.md — Extract pure formulas to _shared/formulas.ts and create Deno unit tests
 - [ ] 23-02-PLAN.md — Flutter GodMode widget tests with ProviderScope overrides
@@ -255,5 +255,5 @@ Plans:
 | 20. Seed Data | 1/1 | Complete    | 2026-03-17 | - |
 | 21. GodMode Backend | 1/1 | Complete    | 2026-03-17 | - |
 | 22. GodMode Flutter Dashboard | 2/2 | Complete    | 2026-03-17 | - |
-| 23. Unit Tests | 1/2 | In Progress|  | - |
+| 23. Unit Tests | 2/2 | Complete   | 2026-03-18 | - |
 | 24. Automation & CI | v1.3 | 0/TBD | Not started | - |
