@@ -200,8 +200,10 @@ class _IslandDetailBody extends ConsumerWidget {
                         islandId: island.id,
                         currentLevel: island.resourceLevel,
                         cityId: playerCityId ?? '',
-                        onDonated: () =>
-                            ref.invalidate(islandDetailProvider(island.id)),
+                        onDonated: () {
+                            ref.invalidate(islandDetailProvider(island.id));
+                            ref.invalidate(cityProvider);
+                          },
                       ),
                     );
                   },
