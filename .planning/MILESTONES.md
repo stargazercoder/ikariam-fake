@@ -1,5 +1,19 @@
 # Milestones
 
+## v1.3 Bots, Testing & Automation (Shipped: 2026-03-18)
+
+**Phases completed:** 7 phases (18-24), 11 plans
+
+**Key accomplishments:**
+- Bot AI system: 20 autonomous bot players running on pg_cron with attack, retrain, and upgrade behaviors driven by aggression archetypes
+- GodMode admin dashboard: full-page admin screen with sortable player table, bot pause/resume controls, live event feed, and inline resource/army editing
+- Rich seed data: 20 diverse bot accounts with tiered game states (low/mid/high), idempotent seed script surviving double db reset
+- Security architecture: SECURITY DEFINER RPCs with is_admin Postgres guard; service_role key never reaches Flutter client
+- Test coverage: Deno unit tests for Edge Function formulas + 9 Flutter widget test files with isolated ProviderContainer overrides
+- CI/CD pipeline: single-command dev setup scripts (bash + PowerShell) + GitHub Actions quality gate on every push to main
+
+---
+
 ## v1.1 Economy & Combat Depth (Shipped: 2026-03-15)
 
 **Phases completed:** 3 phases, 8 plans, 4 tasks

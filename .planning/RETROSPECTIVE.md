@@ -92,14 +92,97 @@
 
 ---
 
+## Milestone: v1.2 — Espionage, Trading & Polish
+
+**Shipped:** 2026-03-17
+**Phases:** 5 | **Plans:** 11
+
+### What Was Built
+- Dev acceleration: bulk unit spawn, 5x timer speed, instant complete button
+- Movement visibility: armies and cargo in transit with destinations and ETAs
+- Resource trading: player-to-player resource transfers via cargo ships with travel time
+- Espionage: instant spy action revealing enemy resources, buildings, and army counts
+- Read-only enemy city view with spy log history
+- UI polish: transparent city AppBar, ownership color borders, unit type CircleAvatar icons
+
+### What Worked
+- Movement visibility (Phase 14) built before trading (Phase 15) — cargo display was already proven when trade cargo appeared
+- Dev toolbar enhancements in Phase 13 accelerated testing of all subsequent phases
+- Wave 0 test scaffold in Phase 16 maintained test discipline during rapid feature delivery
+
+### What Was Inefficient
+- 5 phases in 2 days — high velocity but no milestone audit was run before shipping
+- Phase details remained in ROADMAP.md instead of being archived, making it grow large
+
+### Patterns Established
+- `movement_type CHECK IN ('attack','return','trade')` — extensible movement type enum via ALTER
+- Spy action as instant server-side operation (no travel time, no spy unit)
+- ReadOnly mode for city views via `isReadOnly` parameter on BuildingsGrid
+
+### Key Lessons
+1. When milestone velocity is very high, skip audit at your own risk — tech debt accumulates silently
+2. Movement visibility before trading was the right dependency order — proved cargo display worked first
+
+### Cost Observations
+- Model mix: balanced profile
+- Notable: 11 plans across 5 phases in 2 days — highest velocity milestone
+
+---
+
+## Milestone: v1.3 — Bots, Testing & Automation
+
+**Shipped:** 2026-03-18
+**Phases:** 7 | **Plans:** 11
+
+### What Was Built
+- Bot schema: is_bot/is_admin columns, bot_schedules table with RLS deny-all
+- Bot behavior engine: PL/pgSQL run_bot_decisions() with attack, retrain, upgrade on */15 cron
+- Seed data: 20 diverse bot accounts with tiered game states, idempotent ON CONFLICT inserts
+- GodMode backend: 5 SECURITY DEFINER RPCs with is_admin Postgres guard
+- GodMode dashboard: full-page admin screen with sortable player table, bot controls, event feed, inline editing
+- Unit tests: Deno tests for extracted pure formulas, Flutter widget tests with ProviderScope overrides
+- CI/CD: dev setup scripts (bash + PowerShell), GitHub Actions quality gate
+
+### What Worked
+- Single consolidated bot-think-tick cron job — avoided pg_cron worker pool exhaustion
+- SECURITY DEFINER RPCs with Postgres-level is_admin check — service_role key never touches Flutter
+- Pure function extraction for testing — no Supabase client mocks needed for Edge Function tests
+- Deterministic bot UUIDs (b{NN}00000) — made ON CONFLICT and debugging trivial
+- RETURNS SETOF json fix for PostgREST compatibility — resolved opaque jsonb introspection issue
+
+### What Was Inefficient
+- STATE.md fell out of sync during rapid execution — showed "ready to plan" when all phases were done
+- ROADMAP.md plan checkboxes for phases 19-24 showed `[ ]` despite having SUMMARY files — manual checkbox maintenance is fragile
+- No milestone audit was run — skipped directly to completion
+
+### Patterns Established
+- `autoRefreshToken: false` in test Supabase clients to prevent GoTrueClient timer leaks
+- ProviderScope.overrideWith() with stub AsyncNotifier subclasses for widget testing
+- `calcTrainingDurationMinutes(devSpeedMultiplier)` — inject env dependency as parameter for pure testability
+- Dev setup scripts with prerequisite checks before any work
+
+### Key Lessons
+1. STATE.md should be updated by the execution workflow, not just by resume — it drifted significantly during v1.3
+2. ROADMAP.md checkboxes that duplicate SUMMARY file existence are fragile — single source of truth is better
+3. Skipping milestone audit for 2 consecutive milestones (v1.2, v1.3) means accumulated tech debt is unvalidated
+4. RETURNS SETOF json vs RETURNS jsonb is a PostgREST gotcha worth documenting as a constraint
+
+### Cost Observations
+- Model mix: balanced profile
+- Notable: 11 plans across 7 phases in 2 days — sustained high velocity
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
 
-| Milestone | Phases | Plans | Key Change |
-|-----------|--------|-------|------------|
-| v0.1.0 | 9 | 27 | Initial process established: wave-0 scaffolds, Edge Function authority, pg_cron loops |
-| v1.1 | 3 | 8 | Phase verification integrated into execute-phase; milestone audit caught cross-phase bugs |
+| Milestone | Phases | Plans | Days | Key Change |
+|-----------|--------|-------|------|------------|
+| v0.1.0 | 9 | 27 | 2 | Initial process established: wave-0 scaffolds, Edge Function authority, pg_cron loops |
+| v1.1 | 3 | 8 | 3 | Phase verification integrated into execute-phase; milestone audit caught cross-phase bugs |
+| v1.2 | 5 | 11 | 2 | Highest velocity milestone; no audit run; dependency ordering proved valuable |
+| v1.3 | 7 | 11 | 2 | Bot AI + GodMode + CI/CD; pure function extraction for testing; STATE.md drift discovered |
 
 ### Cumulative Quality
 
@@ -107,9 +190,13 @@
 |-----------|-------|----------|-------|
 | v0.1.0 | 75 pass, 12 skip | — | 12 skips are auth/profile stubs needing live DB |
 | v1.1 | 7 new widget tests | — | fl_chart chart rendering + pillage card visibility tests |
+| v1.2 | — | — | No new tests added (high velocity, test discipline maintained via wave-0 scaffolds) |
+| v1.3 | Deno + 9 Flutter test files | — | Pure formula Deno tests + GodMode widget tests with isolated ProviderContainer |
 
 ### Top Lessons (Verified Across Milestones)
 
-1. Milestone audit before shipping catches integration bugs that phase-level verification misses (v0.1.0: dispatch NaN; v1.1: cityProvider staleness)
+1. Milestone audit before shipping catches integration bugs that phase-level verification misses (v0.1.0: dispatch NaN; v1.1: cityProvider staleness) — skipping it in v1.2/v1.3 means unvalidated tech debt
 2. Server-authority contract (Edge Functions only) prevents entire classes of security issues
 3. Always update requirement text when design decisions change scope — docs-code mismatch causes unnecessary rework (v1.1: CMBT-02)
+4. STATE.md must be updated by execution workflows, not just resume — it drifted in v1.3
+5. Pure function extraction enables testing without mocks — proven pattern for Edge Function testing (v1.3)

@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A browser-based multiplayer strategy game inspired by Ikariam. Players build cities on islands, gather resources, train armies, and wage turn-based wars against other players. Features a deep economic loop with happiness/wine mechanics, population-based taxation, cooperative island upgrades, and meaningful combat with pillage rewards. Built with Flutter web frontend and Supabase backend (Auth, PostgreSQL, Edge Functions, pg_cron, Realtime), targeting a small community of players.
+A browser-based multiplayer strategy game inspired by Ikariam. Players build cities on islands, gather resources, train armies, and wage turn-based wars against other players and AI bots. Features a deep economic loop with happiness/wine mechanics, population-based taxation, cooperative island upgrades, meaningful combat with pillage rewards, espionage, and resource trading. Includes 20 autonomous AI bot players, a GodMode admin dashboard, and CI/CD automation. Built with Flutter web frontend and Supabase backend (Auth, PostgreSQL, Edge Functions, pg_cron, Realtime), targeting a small community of players.
 
 ## Core Value
 
@@ -49,16 +49,16 @@ Players can build and manage cities, gather resources, and engage in real-time t
 - ✓ Movement visibility: armies and cargo in transit with destinations and ETAs — v1.2
 - ✓ UI polish: transparent city AppBar, ownership color borders, unit type icons — v1.2
 - ✓ Dev toolbar: bulk unit spawn, instant complete, 5x faster timers — v1.2
+- ✓ AI bot players with periodic pg_cron-driven behaviors (attack, train, upgrade) — v1.3
+- ✓ 20 bot accounts with diverse game states seeded at init — v1.3
+- ✓ GodMode admin dashboard for observing all players and world state — v1.3
+- ✓ GodMode controls for pausing/resuming bots and modifying game state — v1.3
+- ✓ Rich seed data script for realistic test environments — v1.3
+- ✓ Unit tests for critical Edge Functions and Flutter widgets — v1.3
+- ✓ Automation scripts: DB reset, seed, serve, build, test, lint pipeline — v1.3
 
 ### Active
 
-- [ ] AI bot players with periodic pg_cron-driven behaviors (attack, train, upgrade)
-- [ ] 20 bot accounts with diverse game states seeded at init
-- [ ] GodMode admin dashboard for observing all players and world state
-- [ ] GodMode controls for pausing/resuming bots and modifying game state
-- [ ] Rich seed data script for realistic test environments
-- [ ] Unit tests for critical Edge Functions and Flutter widgets
-- [ ] Automation scripts: DB reset, seed, serve, build, test, lint pipeline
 - [ ] Marketplace with buy/sell orders (order book)
 - [ ] Research system with 4 branches: Seafaring, Economy, Science, Military
 - [ ] Research prerequisites (tech tree with dependencies)
@@ -81,7 +81,6 @@ Players can build and manage cities, gather resources, and engage in real-time t
 - Museum building — low priority decorative feature
 - Animated construction effects — visual polish deferred
 - Premium/monetization — no P2W for small community
-- Espionage system — requires stable combat first
 - Barbarian villages (PvE) — requires combat maturity
 - WASM renderer — CanvasKit sufficient
 - Negative happiness causing population loss — anti-feature for small community
@@ -90,13 +89,17 @@ Players can build and manage cities, gather resources, and engage in real-time t
 
 - Shipped v0.1.0 MVP in 2 days (2026-03-11 → 2026-03-12)
 - Shipped v1.1 Economy & Combat Depth in 3 days (2026-03-13 → 2026-03-15)
-- Codebase: ~18,000 LOC (12,700 Dart + 1,044 TypeScript + 4,219 SQL)
+- Shipped v1.2 Espionage, Trading & Polish in 2 days (2026-03-16 → 2026-03-17)
+- Shipped v1.3 Bots, Testing & Automation in 2 days (2026-03-17 → 2026-03-18)
+- Codebase: ~26,800 LOC (17,456 Dart + 1,800 TypeScript + 7,228 SQL + 329 Shell)
 - Tech stack: Flutter web + Supabase (Auth, PostgreSQL, Edge Functions, pg_cron, Realtime) + Riverpod
-- 12 phases, 35 plans completed across 2 milestones
-- 7 test accounts with varied game states for testing
+- 24 phases, 57 plans completed across 4 milestones
+- 20 bot accounts + 7 test accounts with varied game states
+- GodMode admin dashboard for real-time world observation and bot control
 - Dev toolbar for instant game-state manipulation (debug mode only)
+- GitHub Actions CI pipeline with Flutter + Deno quality gate
 - Game balance formulas (costs, rates, unit stats) not yet validated — needs iteration post-launch
-- Known tech debt: cityProvider staleness after island donation, JSONB cast inconsistency, missing cargo-in-transit UI
+- Known tech debt: cityProvider staleness after island donation, JSONB cast inconsistency, bot archetype weights need tuning
 
 ## Constraints
 
@@ -129,19 +132,12 @@ Players can build and manage cities, gather resources, and engage in real-time t
 | Island multiplier uniform for all 4 production resources | Luxury type distinction deferred to v1.2 | ✓ Good — v1.1 |
 | Pillage ratio: LEAST(0.75, total_land_units / 50.0 * 0.10) | Scales with surviving attackers, caps at 75% | ✓ Good — v1.1, needs balance tuning |
 | SELECT FOR UPDATE on defender resources during pillage | Prevents race condition with concurrent resource tick | ✓ Good — v1.1 |
-
-## Current Milestone: v1.3 Bots, Testing & Automation
-
-**Goal:** Populate the world with 20 AI bot players that autonomously build, train, and fight on periodic schedules; add a full-page GodMode admin dashboard to observe and control the living world; enrich seed data for realistic testing; add unit tests for critical paths; and provide automation scripts for dev setup, DB reset, and CI/CD pipeline.
-
-**Target features:**
-- Bot system: 20 AI accounts with varied military, building, and resource levels running on pg_cron schedules
-- Bot behaviors: periodic attacks, army retraining, island resource upgrades
-- GodMode admin dashboard: full-page screen showing all players, armies, battles, resources in real-time
-- GodMode controls: pause/resume bots, force actions, modify player state
-- Rich seed data: project init creates 20 diverse bot accounts with realistic game states
-- Unit tests: critical server-side functions and Flutter widgets covered
-- Automation scripts: DB reset + seed, Edge Functions serve, Flutter build, test runner, lint check — single-command dev setup and CI/CD pipeline
+| Single consolidated bot-think-tick at */15 cron | Avoids pg_cron worker pool exhaustion vs per-behavior cron jobs | ✓ Good — v1.3 |
+| GodMode uses SECURITY DEFINER RPCs with is_admin check | service_role key never reaches Flutter client | ✓ Good — v1.3 |
+| Bot actions write directly to game tables | Same tables as Edge Functions; no pg_net HTTP round-trips from pg_cron | ✓ Good — v1.3 |
+| Deterministic bot UUIDs (b{NN}00000 pattern) | Easy identification and ON CONFLICT correctness for idempotent seeds | ✓ Good — v1.3 |
+| Pure function extraction for Edge Function testing | No Supabase client mock required; import only formula module | ✓ Good — v1.3 |
+| Deno pinned to 2.2.x in CI | Supabase Edge Runtime does not support Deno 2.3+ lock file v5 | ⚠️ Revisit — track supabase/supabase#33093 |
 
 ---
-*Last updated: 2026-03-17 after v1.3 milestone start*
+*Last updated: 2026-03-19 after v1.3 milestone completion*
