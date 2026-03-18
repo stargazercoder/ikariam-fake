@@ -156,7 +156,7 @@ class _PlayerTableState extends ConsumerState<PlayerTable> {
               Expanded(child: _headerCell('Naval', 'navalCount')),
               Expanded(child: _headerCell('Buildings', 'buildingCount')),
               Expanded(child: _headerCell('Battles', 'activeBattleCount')),
-              const SizedBox(width: 120, child: Padding(
+              const SizedBox(width: 160, child: Padding(
                 padding: EdgeInsets.all(8),
                 child: Text(
                   'Actions',

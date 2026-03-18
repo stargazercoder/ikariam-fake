@@ -231,9 +231,10 @@ class _PlayerRowState extends ConsumerState<PlayerRow> {
           Expanded(child: Padding(padding: const EdgeInsets.all(8), child: Text('${player.buildingCount}', style: textStyle))),
           // Battles
           Expanded(child: Padding(padding: const EdgeInsets.all(8), child: Text('${player.activeBattleCount}', style: textStyle))),
-          // Actions
+          // Actions — width 160 to accommodate up to 3 bot buttons (pause,
+          // force, edit) at default Material icon button minimum size 48px.
           SizedBox(
-            width: 120,
+            width: 160,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [

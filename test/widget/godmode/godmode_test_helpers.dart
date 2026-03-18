@@ -211,10 +211,14 @@ class FakeGodmodeRepository extends GodmodeRepository {
 /// Minimal fake SupabaseClient subclass used solely so [FakeGodmodeRepository]
 /// can be instantiated without initialising Supabase. All calls will error —
 /// real methods must never be invoked in tests.
+///
+/// Uses [autoRefreshToken: false] to prevent GoTrueClient from spawning
+/// background timers that would cause "pending timer" test failures.
 class _FakeSupabaseClient extends SupabaseClient {
   _FakeSupabaseClient._()
       : super(
           'https://fake.supabase.co',
           'fake-anon-key',
+          authOptions: const AuthClientOptions(autoRefreshToken: false),
         );
 }
