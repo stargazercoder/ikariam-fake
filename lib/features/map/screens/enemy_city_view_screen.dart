@@ -86,14 +86,6 @@ class EnemyCityViewScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        'City Buildings',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                      ),
-                      const SizedBox(height: 8),
                       buildingsAsync.when(
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),

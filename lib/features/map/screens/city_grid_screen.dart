@@ -90,16 +90,6 @@ class _CityGridBody extends ConsumerWidget {
                 const SizedBox(height: 12),
               ],
 
-              // Building grid section label.
-              Text(
-                'City Buildings',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-              ),
-              const SizedBox(height: 8),
-
               // Spatial building grid.
               buildingsAsync.when(
                 loading: () =>
