@@ -68,7 +68,7 @@ Full details: [milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md)
 
 **Milestone Goal:** Establish consistent visual language across all screens — resource and building icons with canonical colors, unified building detail sheets with dynamic per-building content, battle UI improvements, and removal of redundant title text from city screens.
 
-- [ ] **Phase 25: Visual Constants** — Define and apply resource and building icon/color system across all UI
+- [x] **Phase 25: Visual Constants** — Define and apply resource and building icon/color system across all UI (completed 2026-03-19)
 - [ ] **Phase 26: Building Detail Sheet** — Unified scrollable bottom sheet with dynamic per-building content
 - [ ] **Phase 27: Battle UI Improvements** — Pillage amounts in reports and carry capacity in dispatch dialog
 - [ ] **Phase 28: City Screen Cleanup** — Remove city name and player name title texts from all city screens
@@ -159,7 +159,7 @@ Plans:
 | 22. GodMode Flutter Dashboard | v1.3 | 2/2 | Complete | 2026-03-17 |
 | 23. Unit Tests | v1.3 | 2/2 | Complete | 2026-03-18 |
 | 24. Automation & CI | v1.3 | 2/2 | Complete | 2026-03-18 |
-| 25. Visual Constants | v1.4 | 0/1 | Not started | - |
+| 25. Visual Constants | 1/1 | Complete   | 2026-03-19 | - |
 | 26. Building Detail Sheet | v1.4 | 0/TBD | Not started | - |
 | 27. Battle UI Improvements | v1.4 | 0/TBD | Not started | - |
 | 28. City Screen Cleanup | v1.4 | 0/TBD | Not started | - |

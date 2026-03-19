@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: UI Consistency
-status: ready_to_plan
-stopped_at: Roadmap created — ready to plan Phase 25
+status: in_progress
+stopped_at: Completed 25-01-PLAN.md
 last_updated: "2026-03-19"
-last_activity: 2026-03-19 — v1.4 roadmap created (4 phases, 9 requirements)
+last_activity: 2026-03-19 — Phase 25 Plan 01 complete (visual_constants.dart + ResourceBadge + 6 consumer files updated)
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 1
+  completed_plans: 1
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 ## Current Position
 
 Phase: 25 of 28 (Visual Constants)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-19 — Roadmap created, 4 phases defined for v1.4
+Plan: 1 of 1 in current phase
+Status: In progress
+Last activity: 2026-03-19 — Phase 25 Plan 01 complete (visual_constants.dart + ResourceBadge + 6 consumer files)
 
 ```
-v1.4 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%  (0/4 phases)
+v1.4 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%  (0/4 phases) — Phase 25 Plan 01 done
 ```
 
 ## Performance Metrics
@@ -42,11 +42,21 @@ v1.4 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
 - v1.3: 7 phases, 11 plans in 2 days
 - Total shipped: 24 phases, 57 plans
 
+**v1.4 (current):**
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 25-visual-constants | 01 | 25m | 2 | 10 |
+
 ## Accumulated Context
 
 ### Decisions
 
 All decisions logged in PROJECT.md Key Decisions table.
+
+**Phase 25 Plan 01:**
+- Wine uses Icon(Icons.wine_bar) not CircleAvatar+letter — per locked PROJECT.md decision
+- Wine letter 'V' (Vinum) avoids clash with Wood's 'W'
+- Wine color Color(0xFF8E24AA) = purple.shade600 — matches PROJECT.md locked value
 
 ### Pending Todos
 
@@ -64,6 +74,6 @@ Carried tech debt (pre-v1.4):
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Roadmap created for v1.4 — ready to plan Phase 25
+Stopped at: Completed 25-01-PLAN.md — Phase 25 Plan 01 done
 Resume file: None
-Next action: `/gsd:plan-phase 25`
+Next action: Continue to next plan in Phase 25

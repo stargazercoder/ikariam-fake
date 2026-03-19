@@ -9,9 +9,9 @@ Requirements for v1.4 UI Consistency. Each maps to roadmap phases.
 
 ### Visual Constants
 
-- [ ] **ICON-01**: 5 resource types (Wood, Marble, Crystal, Sulfur, Gold) are displayed with colored circle + letter icons consistently across all UI
-- [ ] **ICON-02**: 10 building types have consistent icon and color defined and used across all UI
-- [ ] **ICON-03**: Resource bar, production breakdown, trade dialog, and all resource-displaying screens use the new resource icons
+- [x] **ICON-01**: 5 resource types (Wood, Marble, Crystal, Sulfur, Gold) are displayed with colored circle + letter icons consistently across all UI
+- [x] **ICON-02**: 10 building types have consistent icon and color defined and used across all UI
+- [x] **ICON-03**: Resource bar, production breakdown, trade dialog, and all resource-displaying screens use the new resource icons
 
 ### Building Detail
 
@@ -65,9 +65,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ICON-01 | Phase 25 | Pending |
-| ICON-02 | Phase 25 | Pending |
-| ICON-03 | Phase 25 | Pending |
+| ICON-01 | Phase 25 | Complete |
+| ICON-02 | Phase 25 | Complete |
+| ICON-03 | Phase 25 | Complete |
 | BLDG-01 | Phase 26 | Pending |
 | BLDG-02 | Phase 26 | Pending |
 | BLDG-03 | Phase 26 | Pending |
