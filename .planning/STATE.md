@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: UI Consistency
-status: planning
-stopped_at: Defining requirements
+status: ready_to_plan
+stopped_at: Roadmap created — ready to plan Phase 25
 last_updated: "2026-03-19"
-last_activity: 2026-03-19 — Milestone v1.4 started
+last_activity: 2026-03-19 — v1.4 roadmap created (4 phases, 9 requirements)
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,22 +20,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Players can build and manage cities, gather resources, and engage in real-time turn-based warfare — the core loop of build, expand, and conquer must feel satisfying and strategically meaningful.
-**Current focus:** v1.4 UI Consistency — defining requirements
+**Current focus:** v1.4 UI Consistency — Phase 25: Visual Constants
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-19 — Milestone v1.4 started
+Phase: 25 of 28 (Visual Constants)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-03-19 — Roadmap created, 4 phases defined for v1.4
 
 ```
-v1.4 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%  (0/? phases)
+v1.4 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%  (0/4 phases)
 ```
 
 ## Performance Metrics
 
-**Cumulative:**
+**Cumulative (prior milestones):**
 - v0.1.0: 9 phases, 27 plans in 2 days
 - v1.1: 3 phases, 8 plans in 3 days
 - v1.2: 5 phases, 11 plans in 2 days
@@ -54,7 +54,7 @@ None.
 
 ### Blockers/Concerns
 
-Carried tech debt:
+Carried tech debt (pre-v1.4):
 - cityProvider not refreshed after island donation — stale island multiplier in production rate labels
 - JSONB cast inconsistency: older models use `v as int`, newer use `(v as num).toInt()`
 - hideoutProtectionFloor() Dart helper not surfaced in any UI
@@ -64,6 +64,6 @@ Carried tech debt:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Defining requirements for v1.4
+Stopped at: Roadmap created for v1.4 — ready to plan Phase 25
 Resume file: None
-Next action: Define requirements → create roadmap
+Next action: `/gsd:plan-phase 25`

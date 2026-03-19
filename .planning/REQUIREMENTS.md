@@ -65,21 +65,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ICON-01 | - | Pending |
-| ICON-02 | - | Pending |
-| ICON-03 | - | Pending |
-| BLDG-01 | - | Pending |
-| BLDG-02 | - | Pending |
-| BLDG-03 | - | Pending |
-| BTUI-01 | - | Pending |
-| BTUI-02 | - | Pending |
-| CLNP-01 | - | Pending |
+| ICON-01 | Phase 25 | Pending |
+| ICON-02 | Phase 25 | Pending |
+| ICON-03 | Phase 25 | Pending |
+| BLDG-01 | Phase 26 | Pending |
+| BLDG-02 | Phase 26 | Pending |
+| BLDG-03 | Phase 26 | Pending |
+| BTUI-01 | Phase 27 | Pending |
+| BTUI-02 | Phase 27 | Pending |
+| CLNP-01 | Phase 28 | Pending |
 
 **Coverage:**
 - v1.4 requirements: 9 total
-- Mapped to phases: 0
-- Unmapped: 9 ⚠️
+- Mapped to phases: 9
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-19*
-*Last updated: 2026-03-19 after initial definition*
+*Last updated: 2026-03-19 — traceability mapped after roadmap creation*
