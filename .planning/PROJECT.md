@@ -139,5 +139,17 @@ Players can build and manage cities, gather resources, and engage in real-time t
 | Pure function extraction for Edge Function testing | No Supabase client mock required; import only formula module | ✓ Good — v1.3 |
 | Deno pinned to 2.2.x in CI | Supabase Edge Runtime does not support Deno 2.3+ lock file v5 | ⚠️ Revisit — track supabase/supabase#33093 |
 
+## Current Milestone: v1.4 UI Consistency
+
+**Goal:** Establish consistent visual language across all screens — resource/building icons and colors, unified building detail sheets, battle report improvements, and clean up city screen titles.
+
+**Target features:**
+- Resource icons & colors: renkli daire + harf ikonları (W, M, C, S, G) for all 5 resource types, used consistently everywhere
+- Building icons & colors: consistent icon/color for each of 10 building types
+- Unified building detail bottom sheet: large scrollable sheet with building-specific content (upgrade, tavern happiness, barracks training, shipyard building, resource production)
+- Battle report pillage amounts: show pillaged resource amounts in battle reports
+- Dispatch dialog carry capacity: show max lootable (carryable) amount live as units are selected
+- Remove city/player name titles: strip all city name and player name text from city screens
+
 ---
-*Last updated: 2026-03-19 after v1.3 milestone completion*
+*Last updated: 2026-03-19 after v1.4 milestone start*

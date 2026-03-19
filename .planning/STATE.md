@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: Bots, Testing & Automation
-status: completed
-stopped_at: v1.3 milestone archived
+milestone: v1.4
+milestone_name: UI Consistency
+status: planning
+stopped_at: Defining requirements
 last_updated: "2026-03-19"
-last_activity: 2026-03-19 — v1.3 milestone completed and archived
+last_activity: 2026-03-19 — Milestone v1.4 started
 progress:
-  total_phases: 24
-  completed_phases: 24
-  total_plans: 57
-  completed_plans: 57
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -20,16 +20,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Players can build and manage cities, gather resources, and engage in real-time turn-based warfare — the core loop of build, expand, and conquer must feel satisfying and strategically meaningful.
-**Current focus:** Planning next milestone
+**Current focus:** v1.4 UI Consistency — defining requirements
 
 ## Current Position
 
-Milestone: v1.3 completed
-Status: All milestones shipped, ready for next milestone
-Last activity: 2026-03-19 — v1.3 milestone archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-19 — Milestone v1.4 started
 
 ```
-Overall Progress: [████████████████████] 100%  (24/24 phases across 4 milestones)
+v1.4 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%  (0/? phases)
 ```
 
 ## Performance Metrics
@@ -63,6 +64,6 @@ Carried tech debt:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: v1.3 milestone completed and archived
+Stopped at: Defining requirements for v1.4
 Resume file: None
-Next action: /gsd:new-milestone
+Next action: Define requirements → create roadmap
