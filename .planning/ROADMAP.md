@@ -84,10 +84,10 @@ Full details: [milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md)
   2. Every screen that displays resources (production breakdown, trade dialog, battle report) uses the same resource icons
   3. Each of the 10 building types displays the same icon and color wherever it appears in the UI
   4. No screen uses ad-hoc resource or building representations that differ from the canonical set
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 25-01: Define resource and building icon/color constants and apply to all resource-displaying UI
+- [ ] 25-01-PLAN.md — Define visual constants, ResourceBadge widget, and replace all ad-hoc icon/color usage
 
 ### Phase 26: Building Detail Sheet
 **Goal**: Tapping any building opens a large, scrollable bottom sheet with building-specific information and actions, using a consistent layout structure throughout.
@@ -159,7 +159,7 @@ Plans:
 | 22. GodMode Flutter Dashboard | v1.3 | 2/2 | Complete | 2026-03-17 |
 | 23. Unit Tests | v1.3 | 2/2 | Complete | 2026-03-18 |
 | 24. Automation & CI | v1.3 | 2/2 | Complete | 2026-03-18 |
-| 25. Visual Constants | v1.4 | 0/TBD | Not started | - |
+| 25. Visual Constants | v1.4 | 0/1 | Not started | - |
 | 26. Building Detail Sheet | v1.4 | 0/TBD | Not started | - |
 | 27. Battle UI Improvements | v1.4 | 0/TBD | Not started | - |
 | 28. City Screen Cleanup | v1.4 | 0/TBD | Not started | - |
