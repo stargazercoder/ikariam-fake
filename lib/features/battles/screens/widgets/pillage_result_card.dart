@@ -3,6 +3,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/constants/building_constants.dart';
+import '../../../../shared/widgets/resource_badge.dart';
+
 /// Shows a breakdown of pillaged resources for a completed battle.
 ///
 /// Renders nothing when [pillageResult] is null or empty.
@@ -118,31 +121,15 @@ class _ResourceRow extends StatelessWidget {
   final Color valueColor;
   final ThemeData theme;
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          _iconForResource(resourceKey),
-          size: 16,
-          color: _colorForResource(resourceKey),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          _displayName(resourceKey),
-          style: theme.textTheme.bodySmall,
-        ),
-        const SizedBox(width: 4),
-        Text(
-          '$amount',
-          style: theme.textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: valueColor,
-          ),
-        ),
-      ],
-    );
+  /// Returns a ResourceBadge for the given DB name string.
+  /// Falls back to a help icon if the key is unrecognised.
+  Widget _resourceBadge(String key) {
+    try {
+      final type = resourceTypeFromDbName(key);
+      return ResourceBadge(type: type, radius: 10);
+    } catch (_) {
+      return const Icon(Icons.help_outline, size: 16);
+    }
   }
 
   String _displayName(String key) {
@@ -160,33 +147,26 @@ class _ResourceRow extends StatelessWidget {
     }
   }
 
-  IconData _iconForResource(String key) {
-    switch (key) {
-      case 'wood':
-        return Icons.forest;
-      case 'marble':
-        return Icons.domain;
-      case 'crystal':
-        return Icons.diamond;
-      case 'sulfur':
-        return Icons.whatshot;
-      default:
-        return Icons.inventory_2;
-    }
-  }
-
-  Color _colorForResource(String key) {
-    switch (key) {
-      case 'wood':
-        return Colors.brown.shade600;
-      case 'marble':
-        return Colors.blueGrey.shade600;
-      case 'crystal':
-        return Colors.lightBlue.shade600;
-      case 'sulfur':
-        return Colors.orange.shade700;
-      default:
-        return Colors.grey;
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _resourceBadge(resourceKey),
+        const SizedBox(width: 4),
+        Text(
+          _displayName(resourceKey),
+          style: theme.textTheme.bodySmall,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '$amount',
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: valueColor,
+          ),
+        ),
+      ],
+    );
   }
 }

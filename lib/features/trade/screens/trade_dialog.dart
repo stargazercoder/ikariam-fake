@@ -6,7 +6,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/building_constants.dart';
 import '../../../core/constants/unit_constants.dart';
+import '../../../shared/widgets/resource_badge.dart';
 import '../../city/providers/resources_provider.dart';
 import '../data/trade_repository.dart';
 import '../providers/trade_providers.dart';
@@ -303,15 +305,6 @@ class _TradeDialogContentState extends ConsumerState<_TradeDialogContent> {
   }
 }
 
-/// Resource icon helper.
-IconData _resourceIcon(String type) => switch (type) {
-      'wood' => Icons.forest,
-      'marble' => Icons.square,
-      'crystal' => Icons.diamond,
-      'sulfur' => Icons.local_fire_department,
-      _ => Icons.inventory_2,
-    };
-
 /// A single resource slider row widget.
 class _ResourceSliderRow extends StatelessWidget {
   const _ResourceSliderRow({
@@ -334,6 +327,16 @@ class _ResourceSliderRow extends StatelessWidget {
   final bool isLoading;
   final ValueChanged<double>? onChanged;
 
+  /// Returns a ResourceBadge for the given resource DB name string.
+  Widget _tradeResourceBadge(String resourceDbName) {
+    try {
+      final resourceType = resourceTypeFromDbName(resourceDbName);
+      return ResourceBadge(type: resourceType, radius: 10);
+    } catch (_) {
+      return const Icon(Icons.inventory_2, size: 18);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -347,8 +350,7 @@ class _ResourceSliderRow extends StatelessWidget {
         // Label row: icon + name + Spacer + value / available.
         Row(
           children: [
-            Icon(_resourceIcon(type), size: 18,
-                color: theme.colorScheme.primary),
+            _tradeResourceBadge(type),
             const SizedBox(width: 6),
             Text(displayName, style: theme.textTheme.labelLarge),
             const Spacer(),

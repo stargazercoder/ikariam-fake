@@ -9,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/building_constants.dart';
+import '../../../core/constants/visual_constants.dart';
+import '../../../shared/widgets/resource_badge.dart';
 import '../data/espionage_repository.dart';
 import '../models/spy_report.dart';
 import '../providers/espionage_providers.dart';
@@ -247,9 +250,8 @@ class _SpyReportDialogContentState
     for (final key in order) {
       final amount = resources[key];
       if (amount == null) continue;
-      rows.add(_InfoRow(
-        icon: _resourceIcon(key),
-        iconColor: _resourceColor(key),
+      rows.add(_ResourceBadgeRow(
+        resourceKey: key,
         label: _capitalise(key),
         trailing: _formatNumber(amount),
       ));
@@ -274,8 +276,15 @@ class _SpyReportDialogContentState
 
   List<Widget> _buildingRows(Map<String, int> buildings) {
     return buildings.entries.map((e) {
+      IconData icon;
+      try {
+        final buildingType = buildingTypeFromDbName(e.key);
+        icon = buildingTypeIcon[buildingType] ?? Icons.home;
+      } catch (_) {
+        icon = Icons.home;
+      }
       return _InfoRow(
-        icon: _buildingIcon(e.key),
+        icon: icon,
         iconColor: Theme.of(context).colorScheme.secondary,
         label: _buildingDisplayName(e.key),
         trailing: 'Lv ${e.value}',
@@ -286,48 +295,6 @@ class _SpyReportDialogContentState
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
-
-  IconData _resourceIcon(String type) {
-    switch (type) {
-      case 'wood':
-        return Icons.forest;
-      case 'marble':
-        return Icons.square;
-      case 'crystal':
-        return Icons.diamond;
-      case 'sulfur':
-        return Icons.local_fire_department;
-      case 'gold':
-        return Icons.monetization_on;
-      default:
-        return Icons.circle;
-    }
-  }
-
-  Color _resourceColor(String type) {
-    switch (type) {
-      case 'wood':
-        return Colors.green.shade700;
-      case 'marble':
-        return Colors.grey.shade600;
-      case 'crystal':
-        return Colors.blue.shade400;
-      case 'sulfur':
-        return Colors.orange.shade700;
-      case 'gold':
-        return Colors.amber.shade700;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  IconData _buildingIcon(String buildingType) {
-    // Production buildings get a factory icon; others get a home icon.
-    const productionTypes = {
-      'sawmill', 'quarry', 'glassblower', 'sulfur_pit',
-    };
-    return productionTypes.contains(buildingType) ? Icons.factory : Icons.home;
-  }
 
   String _buildingDisplayName(String dbName) {
     // Convert snake_case to Title Case for display.
@@ -383,6 +350,52 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, size: 16, color: iconColor),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          ),
+          Text(
+            trailing,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Resource badge row widget (uses ResourceBadge instead of IconData)
+// ---------------------------------------------------------------------------
+
+class _ResourceBadgeRow extends StatelessWidget {
+  const _ResourceBadgeRow({
+    required this.resourceKey,
+    required this.label,
+    required this.trailing,
+  });
+
+  final String resourceKey;
+  final String label;
+  final String trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget badge;
+    try {
+      final type = resourceTypeFromDbName(resourceKey);
+      badge = ResourceBadge(type: type, radius: 10);
+    } catch (_) {
+      badge = const Icon(Icons.circle, size: 16, color: Colors.grey);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        children: [
+          badge,
           const SizedBox(width: 8),
           Expanded(
             child: Text(label, style: Theme.of(context).textTheme.bodyMedium),

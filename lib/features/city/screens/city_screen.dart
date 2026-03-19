@@ -6,8 +6,10 @@ import '../../../features/city/providers/city_provider.dart';
 import '../../../features/map/screens/city_grid_screen.dart';
 import '../../../features/profile/providers/profile_provider.dart';
 import '../../../shared/widgets/avatar_widget.dart';
+import '../../../shared/widgets/resource_badge.dart';
 import '../../../core/constants/building_constants.dart';
 import '../../../core/constants/resource_constants.dart';
+import '../../../core/constants/visual_constants.dart';
 import '../models/city_building.dart';
 import '../models/city_resource.dart';
 import '../models/construction_queue_entry.dart';
@@ -464,11 +466,7 @@ class _ResourceChip extends StatelessWidget {
     final chip = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          _icon(type),
-          size: 16,
-          color: _color(context, type),
-        ),
+        ResourceBadge(type: type, radius: 10),
         const SizedBox(width: 4),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,40 +498,6 @@ class _ResourceChip extends StatelessWidget {
 
     if (onTap == null) return chip;
     return GestureDetector(onTap: onTap, child: chip);
-  }
-
-  IconData _icon(ResourceType type) {
-    switch (type) {
-      case ResourceType.wood:
-        return Icons.forest;
-      case ResourceType.marble:
-        return Icons.square;
-      case ResourceType.crystal:
-        return Icons.diamond;
-      case ResourceType.sulfur:
-        return Icons.local_fire_department;
-      case ResourceType.gold:
-        return Icons.monetization_on;
-      case ResourceType.wine:
-        return Icons.wine_bar;
-    }
-  }
-
-  Color _color(BuildContext context, ResourceType type) {
-    switch (type) {
-      case ResourceType.wood:
-        return Colors.green.shade700;
-      case ResourceType.marble:
-        return Colors.grey.shade600;
-      case ResourceType.crystal:
-        return Colors.blue.shade400;
-      case ResourceType.sulfur:
-        return Colors.orange.shade700;
-      case ResourceType.gold:
-        return Colors.amber.shade700;
-      case ResourceType.wine:
-        return Colors.purple.shade600;
-    }
   }
 
   String _label(ResourceType type) {
@@ -587,7 +551,7 @@ class _ProductionBreakdownSheet extends ConsumerWidget {
             Row(
               children: [
                 Icon(
-                  _resourceIcon(resourceType),
+                  resourceTypeIcon[resourceType] ?? Icons.help_outline,
                   size: 22,
                   color: Theme.of(context).colorScheme.primary,
                 ),
@@ -642,21 +606,6 @@ class _ProductionBreakdownSheet extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  IconData _resourceIcon(ResourceType type) {
-    switch (type) {
-      case ResourceType.wood:
-        return Icons.forest;
-      case ResourceType.marble:
-        return Icons.square;
-      case ResourceType.crystal:
-        return Icons.diamond;
-      case ResourceType.sulfur:
-        return Icons.local_fire_department;
-      default:
-        return Icons.help_outline;
-    }
   }
 
   String _resourceLabel(ResourceType type) {

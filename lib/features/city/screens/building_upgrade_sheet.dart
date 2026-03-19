@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/building_constants.dart';
 import '../../../core/constants/resource_constants.dart';
+import '../../../core/constants/visual_constants.dart';
+import '../../../shared/widgets/resource_badge.dart';
 import '../data/buildings_repository.dart';
 import '../data/city_repository.dart';
 import '../models/city_building.dart';
@@ -164,9 +166,7 @@ class _BuildingUpgradeContentState
             Row(
               children: [
                 Icon(
-                  building.buildingType.isProductionBuilding
-                      ? Icons.factory
-                      : Icons.home,
+                  buildingTypeIcon[building.buildingType] ?? Icons.home,
                   size: 32,
                   color: theme.colorScheme.primary,
                 ),
@@ -238,13 +238,7 @@ class _BuildingUpgradeContentState
                   padding: const EdgeInsets.symmetric(vertical: 3),
                   child: Row(
                     children: [
-                      Icon(
-                        _resourceIcon(entry.key),
-                        size: 18,
-                        color: sufficient
-                            ? Colors.green.shade700
-                            : theme.colorScheme.error,
-                      ),
+                      ResourceBadge(type: entry.key, radius: 10),
                       const SizedBox(width: 8),
                       Text(
                         _resourceName(entry.key),
@@ -353,23 +347,6 @@ class _BuildingUpgradeContentState
         ),
       ),
     );
-  }
-
-  IconData _resourceIcon(ResourceType type) {
-    switch (type) {
-      case ResourceType.wood:
-        return Icons.forest;
-      case ResourceType.marble:
-        return Icons.square;
-      case ResourceType.crystal:
-        return Icons.diamond;
-      case ResourceType.sulfur:
-        return Icons.local_fire_department;
-      case ResourceType.gold:
-        return Icons.monetization_on;
-      case ResourceType.wine:
-        return Icons.wine_bar;
-    }
   }
 
   String _resourceName(ResourceType type) {

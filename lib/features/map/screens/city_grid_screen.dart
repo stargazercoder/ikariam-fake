@@ -16,8 +16,10 @@ import '../../../features/city/providers/city_provider.dart';
 import '../../../features/city/providers/resources_provider.dart';
 import '../../../features/city/providers/construction_provider.dart';
 import '../../../features/city/screens/building_upgrade_sheet.dart';
+import '../../../shared/widgets/resource_badge.dart';
 import '../../../core/constants/building_constants.dart';
 import '../../../core/constants/resource_constants.dart';
+import '../../../core/constants/visual_constants.dart';
 import '../constants/building_positions.dart';
 
 /// City grid screen — displays buildings on a spatial 2D grid.
@@ -259,10 +261,8 @@ class BuildingCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isProduction = building.buildingType.isProductionBuilding;
-    final color = isProduction
-        ? theme.colorScheme.tertiary
-        : theme.colorScheme.primary;
+    final color = buildingTypeColor[building.buildingType]
+        ?? theme.colorScheme.primary;
 
     return GestureDetector(
       onTap: readOnly
@@ -304,7 +304,7 @@ class BuildingCell extends StatelessWidget {
               const Icon(Icons.construction, size: 14, color: Colors.orange)
             else
               Icon(
-                isProduction ? Icons.factory : Icons.home,
+                buildingTypeIcon[building.buildingType] ?? Icons.home,
                 size: 14,
                 color: Colors.white.withAlpha(220),
               ),
@@ -433,11 +433,7 @@ class _ResourceChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          _icon(resource.resourceType),
-          size: 16,
-          color: _color(resource.resourceType),
-        ),
+        ResourceBadge(type: resource.resourceType, radius: 10),
         const SizedBox(width: 4),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -458,40 +454,6 @@ class _ResourceChip extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  IconData _icon(ResourceType type) {
-    switch (type) {
-      case ResourceType.wood:
-        return Icons.forest;
-      case ResourceType.marble:
-        return Icons.square;
-      case ResourceType.crystal:
-        return Icons.diamond;
-      case ResourceType.sulfur:
-        return Icons.local_fire_department;
-      case ResourceType.gold:
-        return Icons.monetization_on;
-      case ResourceType.wine:
-        return Icons.wine_bar;
-    }
-  }
-
-  Color _color(ResourceType type) {
-    switch (type) {
-      case ResourceType.wood:
-        return Colors.green.shade700;
-      case ResourceType.marble:
-        return Colors.grey.shade600;
-      case ResourceType.crystal:
-        return Colors.blue.shade400;
-      case ResourceType.sulfur:
-        return Colors.orange.shade700;
-      case ResourceType.gold:
-        return Colors.amber.shade700;
-      case ResourceType.wine:
-        return Colors.purple.shade600;
-    }
   }
 
   String _label(ResourceType type) {
