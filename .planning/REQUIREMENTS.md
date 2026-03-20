@@ -15,9 +15,9 @@ Requirements for v1.4 UI Consistency. Each maps to roadmap phases.
 
 ### Building Detail
 
-- [ ] **BLDG-01**: Tapping any building opens a large scrollable bottom sheet showing building information
+- [x] **BLDG-01**: Tapping any building opens a large scrollable bottom sheet showing building information
 - [ ] **BLDG-02**: Bottom sheet shows dynamic content per building type (upgrade/downgrade, tavern→happiness boost, barracks→unit training, shipyard→ship building, resource spots→production rates)
-- [ ] **BLDG-03**: All building detail sheets use the same layout structure (header, stats, actions)
+- [x] **BLDG-03**: All building detail sheets use the same layout structure (header, stats, actions)
 
 ### Battle UI
 
@@ -68,9 +68,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ICON-01 | Phase 25 | Complete |
 | ICON-02 | Phase 25 | Complete |
 | ICON-03 | Phase 25 | Complete |
-| BLDG-01 | Phase 26 | Pending |
+| BLDG-01 | Phase 26 | Complete |
 | BLDG-02 | Phase 26 | Pending |
-| BLDG-03 | Phase 26 | Pending |
+| BLDG-03 | Phase 26 | Complete |
 | BTUI-01 | Phase 27 | Pending |
 | BTUI-02 | Phase 27 | Pending |
 | CLNP-01 | Phase 28 | Pending |

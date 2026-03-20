@@ -160,6 +160,6 @@ Plans:
 | 23. Unit Tests | v1.3 | 2/2 | Complete | 2026-03-18 |
 | 24. Automation & CI | v1.3 | 2/2 | Complete | 2026-03-18 |
 | 25. Visual Constants | 1/1 | Complete    | 2026-03-19 | - |
-| 26. Building Detail Sheet | v1.4 | 0/2 | Not started | - |
+| 26. Building Detail Sheet | 1/2 | In Progress|  | - |
 | 27. Battle UI Improvements | v1.4 | 0/TBD | Not started | - |
 | 28. City Screen Cleanup | v1.4 | 0/TBD | Not started | - |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: UI Consistency
 status: executing
-stopped_at: Phase 26 context gathered
-last_updated: "2026-03-20T19:49:21.188Z"
+stopped_at: Completed 26-01-PLAN.md
+last_updated: "2026-03-20T20:16:59.800Z"
 last_activity: 2026-03-19 — Phase 25 Plan 01 complete (visual_constants.dart + ResourceBadge + 6 consumer files)
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  total_plans: 3
+  completed_plans: 2
 ---
 
 # Project State
@@ -46,6 +46,7 @@ v1.4 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 25-visual-constants | 01 | 25m | 2 | 10 |
+| Phase 26-building-detail-sheet P01 | 4m | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -57,6 +58,8 @@ All decisions logged in PROJECT.md Key Decisions table.
 - Wine uses Icon(Icons.wine_bar) not CircleAvatar+letter — per locked PROJECT.md decision
 - Wine letter 'V' (Vinum) avoids clash with Wood's 'W'
 - Wine color Color(0xFF8E24AA) = purple.shade600 — matches PROJECT.md locked value
+- [Phase 26-01]: Sheet stays open after upgrade (SnackBar feedback only, no Navigator.pop) — preserves context for the player
+- [Phase 26-01]: go_router removed from city_grid_screen.dart after barracks/shipyard context.push replaced by showBuildingDetailSheet
 
 ### Pending Todos
 
@@ -73,7 +76,7 @@ Carried tech debt (pre-v1.4):
 
 ## Session Continuity
 
-Last session: 2026-03-20T19:49:21.184Z
-Stopped at: Phase 26 context gathered
-Resume file: .planning/phases/26-building-detail-sheet/26-CONTEXT.md
+Last session: 2026-03-20T20:16:59.798Z
+Stopped at: Completed 26-01-PLAN.md
+Resume file: None
 Next action: Continue to next plan in Phase 25
