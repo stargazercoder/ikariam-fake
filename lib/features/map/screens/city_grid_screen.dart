@@ -6,7 +6,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../features/city/models/city_building.dart';
 import '../../../features/city/models/city_resource.dart';
@@ -15,7 +14,7 @@ import '../../../features/city/providers/buildings_provider.dart';
 import '../../../features/city/providers/city_provider.dart';
 import '../../../features/city/providers/resources_provider.dart';
 import '../../../features/city/providers/construction_provider.dart';
-import '../../../features/city/screens/building_upgrade_sheet.dart';
+import '../../../features/city/screens/building_detail_sheet.dart';
 import '../../../shared/widgets/resource_badge.dart';
 import '../../../core/constants/building_constants.dart';
 import '../../../core/constants/resource_constants.dart';
@@ -268,17 +267,7 @@ class BuildingCell extends StatelessWidget {
       onTap: readOnly
           ? null
           : () {
-              // Barracks and Shipyard navigate to their dedicated military screens.
-              if (building.buildingType == BuildingType.barracks) {
-                context.push('/barracks?cityId=$cityId');
-                return;
-              }
-              if (building.buildingType == BuildingType.shipyard) {
-                context.push('/shipyard?cityId=$cityId');
-                return;
-              }
-              // All other buildings show the upgrade bottom sheet.
-              showBuildingUpgradeSheet(
+              showBuildingDetailSheet(
                 context,
                 building: building,
                 cityId: cityId,
