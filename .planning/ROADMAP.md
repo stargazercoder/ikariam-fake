@@ -99,11 +99,11 @@ Plans:
   3. Tavern sheet shows happiness boost and wine consumption controls
   4. Barracks sheet shows unit training queue and train-unit controls; Shipyard sheet shows ship building equivalents
   5. Resource production buildings show current production rate; all buildings show upgrade/downgrade options
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 26-01: Implement shared bottom sheet scaffold (header, stats, actions layout)
-- [ ] 26-02: Implement dynamic content per building type (tavern, barracks, shipyard, resource spots, upgrade)
+- [ ] 26-01-PLAN.md — Shared bottom sheet scaffold (header, stats, actions layout) + simple building stats + BuildingCell wiring
+- [ ] 26-02-PLAN.md — Dynamic content per building type (tavern, warehouse, production, barracks, shipyard) + downgrade backend + cleanup
 
 ### Phase 27: Battle UI Improvements
 **Goal**: Battle reports show what resources were pillaged, and the dispatch dialog shows how much loot the selected army can carry.
@@ -160,6 +160,6 @@ Plans:
 | 23. Unit Tests | v1.3 | 2/2 | Complete | 2026-03-18 |
 | 24. Automation & CI | v1.3 | 2/2 | Complete | 2026-03-18 |
 | 25. Visual Constants | 1/1 | Complete    | 2026-03-19 | - |
-| 26. Building Detail Sheet | v1.4 | 0/TBD | Not started | - |
+| 26. Building Detail Sheet | v1.4 | 0/2 | Not started | - |
 | 27. Battle UI Improvements | v1.4 | 0/TBD | Not started | - |
 | 28. City Screen Cleanup | v1.4 | 0/TBD | Not started | - |
