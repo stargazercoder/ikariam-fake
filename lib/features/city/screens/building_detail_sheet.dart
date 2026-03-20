@@ -16,11 +16,16 @@ import '../models/construction_queue_entry.dart';
 import '../widgets/building_sheet_header.dart';
 import '../widgets/building_sheet_section.dart';
 import '../widgets/building_sheet_upgrade_actions.dart';
+import '../widgets/building_stats/barracks_stats.dart';
 import '../widgets/building_stats/hideout_stats.dart';
 import '../widgets/building_stats/placeholder_stats.dart';
+import '../widgets/building_stats/production_building_stats.dart';
+import '../widgets/building_stats/shipyard_stats.dart';
+import '../widgets/building_stats/tavern_stats.dart';
 import '../widgets/building_stats/town_hall_stats.dart';
 import '../widgets/building_stats/town_wall_stats.dart';
 import '../widgets/building_stats/trading_port_stats.dart';
+import '../widgets/building_stats/warehouse_stats.dart';
 
 /// Opens the unified building detail bottom sheet for any of the 14 building types.
 ///
@@ -137,20 +142,34 @@ class _BuildingDetailSheetContentState
         return const PlaceholderStats(featureName: 'Research');
       case BuildingType.embassy:
         return const PlaceholderStats(featureName: 'Alliance');
-      // Complex types — Plan 02 will replace these with full implementations:
       case BuildingType.warehouse:
-        return const Text('Storage details loading...');
+        return WarehouseStats(
+          cityId: widget.cityId,
+          level: widget.building.level,
+        );
       case BuildingType.tavern:
-        return const Text('Wine controls loading...');
+        return TavernStats(
+          cityId: widget.cityId,
+          tavernLevel: widget.building.level,
+        );
       case BuildingType.barracks:
-        return const Text('Unit training loading...');
+        return BarracksStats(
+          cityId: widget.cityId,
+          barracksLevel: widget.building.level,
+        );
       case BuildingType.shipyard:
-        return const Text('Ship building loading...');
+        return ShipyardStats(
+          cityId: widget.cityId,
+          shipyardLevel: widget.building.level,
+        );
       case BuildingType.sawmill:
       case BuildingType.quarry:
       case BuildingType.glassblower:
       case BuildingType.sulfurPit:
-        return const Text('Production details loading...');
+        return ProductionBuildingStats(
+          cityId: widget.cityId,
+          buildingType: widget.building.buildingType,
+        );
     }
   }
 }
