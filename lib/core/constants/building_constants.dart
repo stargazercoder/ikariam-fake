@@ -224,6 +224,16 @@ int upgradeDurationMinutes(BuildingType type, int currentLevel) {
   return (baseTime * pow(timeGrowthFactor, currentLevel)).ceil();
 }
 
+/// Calculates the resource refund for downgrading [type] from [currentLevel].
+///
+/// Returns 50% (floored) of the cost to upgrade from (currentLevel-1) to
+/// currentLevel. Asserts that currentLevel > 1.
+Map<ResourceType, int> downgradeRefund(BuildingType type, int currentLevel) {
+  assert(currentLevel > 1, 'Cannot downgrade below level 1');
+  final fullCost = upgradeCost(type, currentLevel - 1);
+  return fullCost.map((r, v) => MapEntry(r, (v * 0.5).floor()));
+}
+
 /// Calculates the resource protection floor provided by a Hideout at [level].
 /// Each of the 4 pillageable resources (wood, marble, crystal, sulfur) is
 /// independently protected up to this amount.

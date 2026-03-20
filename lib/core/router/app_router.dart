@@ -13,10 +13,8 @@ import '../../features/map/screens/main_shell_screen.dart';
 import '../../features/map/screens/world_map_screen.dart';
 import '../../features/battles/screens/battle_detail_screen.dart';
 import '../../features/battles/screens/battles_screen.dart';
-import '../../features/military/screens/barracks_screen.dart';
 import '../../features/movements/screens/movements_screen.dart';
 import '../../features/military/screens/dispatch_screen.dart';
-import '../../features/military/screens/shipyard_screen.dart';
 import '../../features/map/screens/enemy_city_view_screen.dart';
 import '../../features/espionage/screens/spy_log_screen.dart';
 import '../../features/godmode/screens/godmode_dashboard_screen.dart';
@@ -187,18 +185,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/city',
                 builder: (context, state) => const CityScreen(),
-              ),
-              GoRoute(
-                path: '/barracks',
-                builder: (context, state) => BarracksScreen(
-                  cityId: state.uri.queryParameters['cityId'] ?? '',
-                ),
-              ),
-              GoRoute(
-                path: '/shipyard',
-                builder: (context, state) => ShipyardScreen(
-                  cityId: state.uri.queryParameters['cityId'] ?? '',
-                ),
               ),
               GoRoute(
                 path: '/dispatch',

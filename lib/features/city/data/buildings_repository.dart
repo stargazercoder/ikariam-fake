@@ -1,5 +1,5 @@
 // Repository for streaming real-time city building data and invoking the
-// upgrade-building Edge Function.
+// upgrade-building and downgrade-building Edge Functions.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,10 +16,10 @@ class BuildingUpgradeException implements Exception {
   String toString() => 'BuildingUpgradeException: $message';
 }
 
-/// Repository for city building data access and upgrade mutations.
+/// Repository for city building data access and upgrade/downgrade mutations.
 ///
-/// Reads use Supabase Realtime streams; writes go through the
-/// upgrade-building Edge Function (never direct client mutations).
+/// Reads use Supabase Realtime streams; writes go through Edge Functions
+/// (never direct client mutations — INFR-02).
 class BuildingsRepository {
   const BuildingsRepository();
 
@@ -59,6 +59,38 @@ class BuildingsRepository {
     if (response.status != 200) {
       final data = response.data;
       String errorMessage = 'Upgrade failed';
+      if (data is Map<String, dynamic>) {
+        errorMessage = (data['error'] as String?) ?? errorMessage;
+      }
+      throw BuildingUpgradeException(errorMessage);
+    }
+
+    return (response.data as Map<String, dynamic>?) ?? {};
+  }
+
+  /// Invokes the downgrade-building Edge Function to reduce a building level
+  /// by 1 and refund 50% of the upgrade cost.
+  ///
+  /// On success (HTTP 200) returns the response data map (contains new_level
+  /// and refund map).
+  ///
+  /// On non-200 status, parses the error JSON and throws a
+  /// [BuildingUpgradeException] with the server's error message.
+  Future<Map<String, dynamic>> downgradeBuilding({
+    required String cityId,
+    required String buildingType,
+  }) async {
+    final response = await supabaseClient.functions.invoke(
+      'downgrade-building',
+      body: {
+        'city_id': cityId,
+        'building_type': buildingType,
+      },
+    );
+
+    if (response.status != 200) {
+      final data = response.data;
+      String errorMessage = 'Downgrade failed';
       if (data is Map<String, dynamic>) {
         errorMessage = (data['error'] as String?) ?? errorMessage;
       }

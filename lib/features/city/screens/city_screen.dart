@@ -9,7 +9,6 @@ import '../../../shared/widgets/avatar_widget.dart';
 import '../../../shared/widgets/resource_badge.dart';
 import '../../../core/constants/building_constants.dart';
 import '../../../core/constants/resource_constants.dart';
-import '../../../core/constants/visual_constants.dart';
 import '../models/city_building.dart';
 import '../models/city_resource.dart';
 import '../models/construction_queue_entry.dart';
@@ -345,16 +344,7 @@ class _ResourcePanel extends ConsumerWidget {
                     type: type,
                     amount: amount,
                     hourlyRate: hourlyRate,
-                    onTap: isProduction
-                        ? () => showModalBottomSheet<void>(
-                              context: context,
-                              builder: (_) => _ProductionBreakdownSheet(
-                                cityId: cityId,
-                                resourceTypeName: type.value,
-                                resourceType: type,
-                              ),
-                            )
-                        : null,
+                    onTap: null,
                   );
                 }).toList(),
               ),
@@ -515,139 +505,6 @@ class _ResourceChip extends StatelessWidget {
       case ResourceType.wine:
         return 'Wine';
     }
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Production breakdown sheet
-// ---------------------------------------------------------------------------
-
-/// Bottom sheet showing a breakdown of hourly production for one resource.
-class _ProductionBreakdownSheet extends ConsumerWidget {
-  const _ProductionBreakdownSheet({
-    required this.cityId,
-    required this.resourceTypeName,
-    required this.resourceType,
-  });
-
-  final String cityId;
-  final String resourceTypeName;
-  final ResourceType resourceType;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final breakdown = ref.watch(
-      productionBreakdownProvider((cityId, resourceTypeName)),
-    );
-
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title row.
-            Row(
-              children: [
-                Icon(
-                  resourceTypeIcon[resourceType] ?? Icons.help_outline,
-                  size: 22,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '${_resourceLabel(resourceType)} Production Breakdown',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // Breakdown rows.
-            _BreakdownRow(
-              label: 'Base Rate',
-              value: '+${breakdown.baseRate.toStringAsFixed(1)}/hr',
-            ),
-            _BreakdownRow(
-              label: 'Building Level Bonus',
-              value: '+${breakdown.buildingBonus.toStringAsFixed(1)}/hr',
-            ),
-            _BreakdownRow(
-              label: 'Island Level Bonus',
-              value: '+${breakdown.islandBonus.toStringAsFixed(1)}/hr',
-            ),
-            _BreakdownRow(
-              label: 'Research Bonus',
-              value: '+${breakdown.researchBonus.toStringAsFixed(1)}/hr',
-            ),
-            const Divider(height: 20),
-            // Total row.
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                Text(
-                  '+${breakdown.total.toStringAsFixed(1)}/hr',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _resourceLabel(ResourceType type) {
-    switch (type) {
-      case ResourceType.wood:
-        return 'Wood';
-      case ResourceType.marble:
-        return 'Marble';
-      case ResourceType.crystal:
-        return 'Crystal';
-      case ResourceType.sulfur:
-        return 'Sulfur';
-      default:
-        return type.name;
-    }
-  }
-}
-
-/// A simple label + value row used in the breakdown sheet.
-class _BreakdownRow extends StatelessWidget {
-  const _BreakdownRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: Theme.of(context).textTheme.bodyMedium),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.green.shade700,
-                ),
-          ),
-        ],
-      ),
-    );
   }
 }
 

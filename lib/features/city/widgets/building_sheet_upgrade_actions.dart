@@ -45,6 +45,7 @@ class BuildingSheetUpgradeActions extends ConsumerStatefulWidget {
 class _BuildingSheetUpgradeActionsState
     extends ConsumerState<BuildingSheetUpgradeActions> {
   bool _isLoading = false;
+  bool _isDowngrading = false;
 
   /// Map from ResourceType to current amount for quick lookup.
   late Map<ResourceType, double> _currentAmounts;
@@ -128,6 +129,83 @@ class _BuildingSheetUpgradeActionsState
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _startDowngrade() async {
+    // Calculate refund to show in confirmation dialog.
+    final refund = downgradeRefund(
+      widget.building.buildingType,
+      widget.building.level,
+    );
+    final refundText = refund.entries
+        .map((e) => '${e.value} ${_resourceName(e.key)}')
+        .join('\n');
+
+    // Show confirmation dialog.
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Downgrade Building?'),
+        content: Text(
+          'Reduce ${widget.building.buildingType.displayName} to '
+          'Level ${widget.building.level - 1}.\n\nRefund:\n$refundText',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Confirm Downgrade'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    if (!mounted) return;
+    setState(() => _isDowngrading = true);
+    try {
+      await ref.read(buildingsRepositoryProvider).downgradeBuilding(
+            cityId: widget.cityId,
+            buildingType: widget.building.buildingType.dbName,
+          );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${widget.building.buildingType.displayName} downgraded to '
+              'Level ${widget.building.level - 1}.',
+            ),
+            backgroundColor: Colors.green.shade700,
+          ),
+        );
+      }
+    } on BuildingUpgradeException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Downgrade failed: ${e.toString()}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isDowngrading = false);
       }
     }
   }
@@ -265,6 +343,26 @@ class _BuildingSheetUpgradeActionsState
               : const Icon(Icons.build),
           label: Text(_isLoading ? 'Starting...' : 'Start Upgrade'),
         ),
+
+        // Downgrade button — only shown when level > 1.
+        if (widget.building.level > 1) ...[
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: (_isDowngrading || _isLoading) ? null : _startDowngrade,
+            icon: _isDowngrading
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.arrow_downward),
+            label: Text(
+              _isDowngrading
+                  ? 'Downgrading...'
+                  : 'Downgrade to Level ${widget.building.level - 1}',
+            ),
+          ),
+        ],
       ],
     );
   }
