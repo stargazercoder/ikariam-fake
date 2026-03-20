@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: UI Consistency
 status: executing
-stopped_at: Completed 26-01-PLAN.md
-last_updated: "2026-03-20T20:16:59.800Z"
+stopped_at: Completed 26-02-PLAN.md
+last_updated: "2026-03-20T20:30:18.045Z"
 last_activity: 2026-03-19 — Phase 25 Plan 01 complete (visual_constants.dart + ResourceBadge + 6 consumer files)
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -47,6 +47,7 @@ v1.4 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
 |-------|------|----------|-------|-------|
 | 25-visual-constants | 01 | 25m | 2 | 10 |
 | Phase 26-building-detail-sheet P01 | 4m | 2 tasks | 10 files |
+| Phase 26-building-detail-sheet P02 | 9m | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -60,6 +61,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - Wine color Color(0xFF8E24AA) = purple.shade600 — matches PROJECT.md locked value
 - [Phase 26-01]: Sheet stays open after upgrade (SnackBar feedback only, no Navigator.pop) — preserves context for the player
 - [Phase 26-01]: go_router removed from city_grid_screen.dart after barracks/shipyard context.push replaced by showBuildingDetailSheet
+- [Phase 26-02]: downgradeRefund uses floor(50%) — player loses fractional resources on downgrade
+- [Phase 26-02]: Downgrade is instant — not gated by construction queue
+- [Phase 26-02]: Refund via negative p_amount to deduct_resource (adds resources)
 
 ### Pending Todos
 
@@ -76,7 +80,7 @@ Carried tech debt (pre-v1.4):
 
 ## Session Continuity
 
-Last session: 2026-03-20T20:16:59.798Z
-Stopped at: Completed 26-01-PLAN.md
+Last session: 2026-03-20T20:30:18.043Z
+Stopped at: Completed 26-02-PLAN.md
 Resume file: None
 Next action: Continue to next plan in Phase 25
