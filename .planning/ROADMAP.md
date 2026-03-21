@@ -113,10 +113,10 @@ Plans:
   1. A battle report for a victorious attack shows the pillaged amount for each resource type
   2. The dispatch dialog shows a live total carry capacity that updates as the player adds or removes units
   3. A player can see at a glance whether their army can carry their desired loot before dispatching
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 27-01: Add pillage resource breakdown to battle report UI and dispatch carry capacity indicator
+- [ ] 27-01-PLAN.md — Add cargoCapacityPerShip constant, _CargoCapacityRow widget in dispatch screen, and Wave 0 test stubs for BTUI-01/BTUI-02
 
 ### Phase 28: City Screen Cleanup
 **Goal**: City screens present only gameplay content — city name and player name title texts are removed from all city screen views.
@@ -161,5 +161,5 @@ Plans:
 | 24. Automation & CI | v1.3 | 2/2 | Complete | 2026-03-18 |
 | 25. Visual Constants | 1/1 | Complete    | 2026-03-19 | - |
 | 26. Building Detail Sheet | 2/2 | Complete    | 2026-03-20 | - |
-| 27. Battle UI Improvements | v1.4 | 0/TBD | Not started | - |
+| 27. Battle UI Improvements | v1.4 | 0/1 | Not started | - |
 | 28. City Screen Cleanup | v1.4 | 0/TBD | Not started | - |
