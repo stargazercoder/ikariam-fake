@@ -23,7 +23,7 @@ import '../widgets/countdown_timer_widget.dart';
 /// progress.
 ///
 /// Replaces the Phase 2 placeholder with full economy content:
-/// - AppBar: city name title, player avatar + display name, sign-out button
+/// - AppBar: player avatar icon, sign-out button
 /// - Island info card (unchanged from Phase 1)
 /// - Resource panel: 5 resource types with live amounts (Supabase Realtime)
 /// - Construction queue banner (if a building is upgrading)
@@ -37,11 +37,7 @@ class CityScreen extends ConsumerWidget {
     final cityAsync = ref.watch(cityProvider);
     final profileAsync = ref.watch(profileProvider);
 
-    // Derive display name and avatar id from the profile.
-    final displayName = profileAsync.whenOrNull(
-          data: (p) => p?['display_name'] as String?,
-        ) ??
-        '';
+    // Derive avatar id from the profile.
     final avatarId = (profileAsync.whenOrNull(
               data: (p) => (p?['avatar_id'] as num?)?.toInt(),
             ) ??
@@ -62,26 +58,10 @@ class CityScreen extends ConsumerWidget {
           shadows: [Shadow(blurRadius: 4, color: Colors.black54)],
         ),
         actions: [
-          // Player avatar + display name.
+          // Player avatar.
           Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AvatarWidget(avatarId: avatarId, size: 32),
-                const SizedBox(width: 6),
-                if (displayName.isNotEmpty)
-                  Text(
-                    displayName,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      shadows: [Shadow(blurRadius: 4, color: Colors.black54)],
-                    ),
-                  ),
-                const SizedBox(width: 4),
-              ],
-            ),
+            padding: const EdgeInsets.only(right: 8),
+            child: AvatarWidget(avatarId: avatarId, size: 32),
           ),
           // Sign-out button.
           IconButton(
@@ -99,7 +79,7 @@ class CityScreen extends ConsumerWidget {
             style: const TextStyle(color: Colors.red),
           ),
         ),
-        data: (city) => _CityBody(city: city, displayName: displayName),
+        data: (city) => _CityBody(city: city),
       ),
     );
   }
@@ -109,11 +89,9 @@ class CityScreen extends ConsumerWidget {
 class _CityBody extends ConsumerWidget {
   const _CityBody({
     required this.city,
-    required this.displayName,
   });
 
   final Map<String, dynamic>? city;
-  final String displayName;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -124,7 +102,6 @@ class _CityBody extends ConsumerWidget {
     }
 
     final cityId = city!['id'] as String;
-    final cityName = city!['name'] as String? ?? 'Unknown City';
     final island = city!['islands'] as Map<String, dynamic>?;
     final gridX = (island?['grid_x'] as num?)?.toInt() ?? 0;
     final gridY = (island?['grid_y'] as num?)?.toInt() ?? 0;
@@ -156,27 +133,6 @@ class _CityBody extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // City name header.
-              Text(
-                cityName,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      shadows: const [
-                        Shadow(blurRadius: 4, color: Colors.black54),
-                      ],
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 4),
-              if (displayName.isNotEmpty)
-                Text(
-                  'Governor: $displayName',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  textAlign: TextAlign.center,
-                ),
-              const SizedBox(height: 16),
-
               // Island info card.
               Card(
                 child: Padding(
