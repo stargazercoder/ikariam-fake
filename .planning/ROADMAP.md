@@ -126,10 +126,10 @@ Plans:
   1. No city name or player name text appears as a standalone title on any city screen (own or foreign)
   2. The city grid screen has no AppBar title text showing city or player names
   3. Removing the titles does not break navigation, ownership color borders, or any other UI element
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 28-01: Remove city and player name title text from all city screen widgets
+- [ ] 28-01-PLAN.md � Remove city and player name title texts from own city screen and enemy city view
 
 ## Progress
 
@@ -162,4 +162,4 @@ Plans:
 | 25. Visual Constants | 1/1 | Complete    | 2026-03-19 | - |
 | 26. Building Detail Sheet | 2/2 | Complete    | 2026-03-20 | - |
 | 27. Battle UI Improvements | 1/1 | Complete    | 2026-03-21 | - |
-| 28. City Screen Cleanup | v1.4 | 0/TBD | Not started | - |
+| 28. City Screen Cleanup | v1.4 | 0/1 | Not started | - |
