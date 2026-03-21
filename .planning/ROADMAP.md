@@ -70,7 +70,7 @@ Full details: [milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md)
 
 - [x] **Phase 25: Visual Constants** — Define and apply resource and building icon/color system across all UI (completed 2026-03-19)
 - [x] **Phase 26: Building Detail Sheet** — Unified scrollable bottom sheet with dynamic per-building content (completed 2026-03-20)
-- [ ] **Phase 27: Battle UI Improvements** — Pillage amounts in reports and carry capacity in dispatch dialog
+- [x] **Phase 27: Battle UI Improvements** — Pillage amounts in reports and carry capacity in dispatch dialog (completed 2026-03-21)
 - [ ] **Phase 28: City Screen Cleanup** — Remove city name and player name title texts from all city screens
 
 ## Phase Details
@@ -161,5 +161,5 @@ Plans:
 | 24. Automation & CI | v1.3 | 2/2 | Complete | 2026-03-18 |
 | 25. Visual Constants | 1/1 | Complete    | 2026-03-19 | - |
 | 26. Building Detail Sheet | 2/2 | Complete    | 2026-03-20 | - |
-| 27. Battle UI Improvements | v1.4 | 0/1 | Not started | - |
+| 27. Battle UI Improvements | 1/1 | Complete   | 2026-03-21 | - |
 | 28. City Screen Cleanup | v1.4 | 0/TBD | Not started | - |

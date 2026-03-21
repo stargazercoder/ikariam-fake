@@ -21,8 +21,8 @@ Requirements for v1.4 UI Consistency. Each maps to roadmap phases.
 
 ### Battle UI
 
-- [ ] **BTUI-01**: Battle report shows pillaged resource amounts broken down by resource type
-- [ ] **BTUI-02**: Dispatch dialog shows total carry capacity (max lootable amount) of selected units, updating live as units are selected
+- [x] **BTUI-01**: Battle report shows pillaged resource amounts broken down by resource type
+- [x] **BTUI-02**: Dispatch dialog shows total carry capacity (max lootable amount) of selected units, updating live as units are selected
 
 ### Cleanup
 
@@ -71,8 +71,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BLDG-01 | Phase 26 | Complete |
 | BLDG-02 | Phase 26 | Complete |
 | BLDG-03 | Phase 26 | Complete |
-| BTUI-01 | Phase 27 | Pending |
-| BTUI-02 | Phase 27 | Pending |
+| BTUI-01 | Phase 27 | Complete |
+| BTUI-02 | Phase 27 | Complete |
 | CLNP-01 | Phase 28 | Pending |
 
 **Coverage:**
