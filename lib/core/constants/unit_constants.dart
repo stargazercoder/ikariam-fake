@@ -177,6 +177,10 @@ const Map<UnitType, int> unitBaseTimes = {
 /// NOTE: Must stay in sync with BASE_MINUTES_PER_GRID_UNIT in supabase/functions/dispatch-units/index.ts
 const int baseMinutesPerGridUnit = 2;
 
+/// Carry capacity per cargo ship (resources).
+/// Keep in sync with v_cargo_cap := v_surviving_cs * 500 in pillage SQL.
+const int cargoCapacityPerShip = 500;
+
 /// Attack power per unit type.
 /// Keep in sync with resolve_battles() constants in battle_functions.sql (Phase 05-01).
 const Map<UnitType, int> unitAttackStats = {

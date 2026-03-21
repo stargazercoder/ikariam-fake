@@ -207,7 +207,15 @@ class _DispatchScreenState extends ConsumerState<DispatchScreen> {
                         ),
                       ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
+
+                // Carry capacity indicator (only visible when roster has cargo ships)
+                _CargoCapacityRow(
+                  controllers: _dispatchControllers,
+                  roster: roster,
+                ),
+
+                const SizedBox(height: 16),
 
                 // Dispatch button.
                 ElevatedButton.icon(
@@ -367,6 +375,99 @@ class _UnitDispatchRow extends StatelessWidget {
     }
   }
 
+}
+
+// ---------------------------------------------------------------------------
+// Cargo capacity indicator
+// ---------------------------------------------------------------------------
+
+class _CargoCapacityRow extends StatelessWidget {
+  const _CargoCapacityRow({
+    required this.controllers,
+    required this.roster,
+  });
+
+  final Map<String, TextEditingController> controllers;
+  final List<CityUnit> roster;
+
+  int get _selectedCargoShips {
+    final ctrl = controllers[UnitType.cargoShip.dbName];
+    return int.tryParse(ctrl?.text ?? '0') ?? 0;
+  }
+
+  int get _maxCargoShips {
+    try {
+      return roster
+          .firstWhere((u) => u.unitType == UnitType.cargoShip.dbName)
+          .quantity;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = _selectedCargoShips;
+    final maxShips = _maxCargoShips;
+
+    // Hide entirely when player has no cargo ships in roster
+    if (maxShips == 0) return const SizedBox.shrink();
+
+    final capacity = selected * cargoCapacityPerShip;
+    final maxCapacity = maxShips * cargoCapacityPerShip;
+    final hasNoShips = selected == 0;
+
+    final theme = Theme.of(context);
+    final capacityColor = hasNoShips
+        ? Colors.grey.shade600
+        : Colors.green.shade700;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.directions_boat,
+                  size: 18,
+                  color: Color(0xFF607D8B),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Carry Capacity',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '$capacity / $maxCapacity',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: capacityColor,
+                  ),
+                ),
+              ],
+            ),
+            if (hasNoShips) ...[
+              const SizedBox(height: 6),
+              Text(
+                'No cargo ships \u2014 army cannot carry loot',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: Colors.orange.shade700,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------

@@ -80,6 +80,19 @@ void main() {
     });
   });
 
+  group('cargo capacity', () {
+    test('cargoCapacityPerShip equals 500', () {
+      expect(cargoCapacityPerShip, equals(500));
+    });
+
+    test('cargo ship capacity calculation', () {
+      // 3 cargo ships * 500 = 1500 carry capacity
+      expect(3 * cargoCapacityPerShip, equals(1500));
+      // 0 cargo ships = 0 capacity
+      expect(0 * cargoCapacityPerShip, equals(0));
+    });
+  });
+
   group('travel time formula', () {
     test('same coordinates returns minimum 1 minute', () {
       expect(calcTravelMinutes(0, 0, 0, 0), equals(1));
