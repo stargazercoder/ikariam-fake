@@ -162,4 +162,4 @@ Plans:
 | 25. Visual Constants | 1/1 | Complete    | 2026-03-19 | - |
 | 26. Building Detail Sheet | 2/2 | Complete    | 2026-03-20 | - |
 | 27. Battle UI Improvements | 1/1 | Complete    | 2026-03-21 | - |
-| 28. City Screen Cleanup | 1/1 | Complete   | 2026-03-21 | - |
+| 28. City Screen Cleanup | 1/1 | Complete    | 2026-03-21 | - |
