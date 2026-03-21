@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: UI Consistency
 status: executing
-stopped_at: Completed 26-02-PLAN.md
-last_updated: "2026-03-20T20:37:47.477Z"
+stopped_at: Phase 27 context gathered
+last_updated: "2026-03-21T12:08:07.785Z"
 last_activity: 2026-03-19 — Phase 25 Plan 01 complete (visual_constants.dart + ResourceBadge + 6 consumer files)
 progress:
   total_phases: 4
@@ -80,7 +80,7 @@ Carried tech debt (pre-v1.4):
 
 ## Session Continuity
 
-Last session: 2026-03-20T20:30:18.043Z
-Stopped at: Completed 26-02-PLAN.md
-Resume file: None
+Last session: 2026-03-21T12:08:07.780Z
+Stopped at: Phase 27 context gathered
+Resume file: .planning/phases/27-battle-ui-improvements/27-CONTEXT.md
 Next action: Continue to next plan in Phase 25
