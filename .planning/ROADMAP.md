@@ -161,5 +161,5 @@ Plans:
 | 24. Automation & CI | v1.3 | 2/2 | Complete | 2026-03-18 |
 | 25. Visual Constants | 1/1 | Complete    | 2026-03-19 | - |
 | 26. Building Detail Sheet | 2/2 | Complete    | 2026-03-20 | - |
-| 27. Battle UI Improvements | 1/1 | Complete   | 2026-03-21 | - |
+| 27. Battle UI Improvements | 1/1 | Complete    | 2026-03-21 | - |
 | 28. City Screen Cleanup | v1.4 | 0/TBD | Not started | - |
