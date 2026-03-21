@@ -15,7 +15,7 @@ import 'city_grid_screen.dart';
 
 /// Read-only view of an enemy city.
 ///
-/// Displays a red AppBar with "CityName (OwnerName)", a read-only notice banner,
+/// Displays a transparent AppBar, a read-only notice banner,
 /// an optional construction banner, and the city's building grid with all taps disabled.
 class EnemyCityViewScreen extends ConsumerWidget {
   const EnemyCityViewScreen({
@@ -64,7 +64,7 @@ class EnemyCityViewScreen extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Viewing $cityName ($ownerName) — read only',
+                      'Viewing enemy city \u2014 read only',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Colors.red.shade800,
                           ),
