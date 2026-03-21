@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: UI Consistency
 status: executing
-stopped_at: Phase 28 context gathered
-last_updated: "2026-03-21T13:48:35.314Z"
+stopped_at: Completed 28-01-PLAN.md
+last_updated: "2026-03-21T14:12:09.277Z"
 last_activity: 2026-03-19 — Phase 25 Plan 01 complete (visual_constants.dart + ResourceBadge + 6 consumer files)
 progress:
   total_phases: 4
-  completed_phases: 3
-  total_plans: 4
-  completed_plans: 4
+  completed_phases: 4
+  total_plans: 5
+  completed_plans: 5
 ---
 
 # Project State
@@ -49,6 +49,7 @@ v1.4 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
 | Phase 26-building-detail-sheet P01 | 4m | 2 tasks | 10 files |
 | Phase 26-building-detail-sheet P02 | 9m | 2 tasks | 15 files |
 | Phase 27-battle-ui-improvements P01 | 15m | 2 tasks | 5 files |
+| Phase 28-city-screen-cleanup P01 | 10m | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,8 @@ All decisions logged in PROJECT.md Key Decisions table.
 - [Phase 26-02]: Refund via negative p_amount to deduct_resource (adds resources)
 - [Phase 27-01]: cargoCapacityPerShip=500 constant in unit_constants.dart synced with SQL v_cargo_cap formula
 - [Phase 27-01]: _CargoCapacityRow hides entirely when maxShips==0, shows orange warning when 0 selected but ships available in roster
+- [Phase 28-01]: Keep cityName/ownerName params on EnemyCityViewScreen for router compatibility even though no longer displayed
+- [Phase 28-01]: displayName derivation removed entirely from CityScreen.build() since no widget consumes it after AppBar cleanup
 
 ### Pending Todos
 
@@ -83,7 +86,7 @@ Carried tech debt (pre-v1.4):
 
 ## Session Continuity
 
-Last session: 2026-03-21T13:48:35.308Z
-Stopped at: Phase 28 context gathered
-Resume file: .planning/phases/28-city-screen-cleanup/28-CONTEXT.md
+Last session: 2026-03-21T14:12:09.269Z
+Stopped at: Completed 28-01-PLAN.md
+Resume file: None
 Next action: Continue to next plan in Phase 25

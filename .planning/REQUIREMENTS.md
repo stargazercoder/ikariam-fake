@@ -26,7 +26,7 @@ Requirements for v1.4 UI Consistency. Each maps to roadmap phases.
 
 ### Cleanup
 
-- [ ] **CLNP-01**: All city screens have city name and player name title texts removed
+- [x] **CLNP-01**: All city screens have city name and player name title texts removed
 
 ## v1.4+ Future Requirements
 
@@ -73,7 +73,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BLDG-03 | Phase 26 | Complete |
 | BTUI-01 | Phase 27 | Complete |
 | BTUI-02 | Phase 27 | Complete |
-| CLNP-01 | Phase 28 | Pending |
+| CLNP-01 | Phase 28 | Complete |
 
 **Coverage:**
 - v1.4 requirements: 9 total
