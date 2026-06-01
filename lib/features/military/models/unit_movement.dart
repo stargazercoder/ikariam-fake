@@ -41,7 +41,7 @@ class UnitMovement {
   final String movementType; // 'attack' | 'return'
 
   /// Parses a Supabase JSON row into a [UnitMovement] instance.
-  /// The 'units' JSONB field is parsed from Map<String, dynamic> to Map<String, int>.
+  /// The 'units' JSONB field is parsed from `Map<String, dynamic>` to `Map<String, int>`.
   factory UnitMovement.fromJson(Map<String, dynamic> json) {
     return UnitMovement(
       id: json['id'] as String,

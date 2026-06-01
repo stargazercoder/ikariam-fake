@@ -9,7 +9,6 @@ import 'dart:math';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ikariam/core/constants/unit_constants.dart';
-import 'package:ikariam/features/battles/models/battle_turn.dart';
 
 void main() {
   group('unitAttackStats and unitDefenseStats', () {

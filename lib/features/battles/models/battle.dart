@@ -56,7 +56,7 @@ class Battle {
 
   /// Parses a Supabase JSON row into a [Battle] instance.
   /// The 'attacker_units' and 'defender_units' JSONB fields are parsed from
-  /// Map<String, dynamic> to Map<String, int>.
+  /// `Map<String, dynamic>` to `Map<String, int>`.
   factory Battle.fromJson(Map<String, dynamic> json) {
     return Battle(
       id: json['id'] as String,

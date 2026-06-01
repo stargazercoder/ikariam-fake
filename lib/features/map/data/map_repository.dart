@@ -32,7 +32,7 @@ class MapRepository {
         .eq('id', islandId)
         .single();
 
-    final island = Island.fromJson(islandRow as Map<String, dynamic>);
+    final island = Island.fromJson(islandRow);
 
     final cityRows = await supabaseClient
         .from('cities')

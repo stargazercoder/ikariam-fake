@@ -59,7 +59,7 @@ class BattleTurn {
   /// UTC time when this turn was resolved by resolve_battles().
   final DateTime resolvedAt;
 
-  /// Parses a nullable JSONB casualties field into Map<String, int>?.
+  /// Parses a nullable JSONB casualties field into `Map<String, int>?`.
   /// Returns null when the DB value is null (phase was skipped or blocked).
   static Map<String, int>? _parseUnits(dynamic value) {
     if (value == null) return null;
