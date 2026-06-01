@@ -28,7 +28,6 @@ jobs:
         run: flutter pub get
 
       - name: Flutter analyze
-        continue-on-error: true
         run: flutter analyze
 
       - name: Deno test
