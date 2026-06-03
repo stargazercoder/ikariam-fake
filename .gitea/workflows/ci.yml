@@ -1,10 +1,11 @@
-name: CI
+name: CI & Deploy
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch: {}
 
 jobs:
   quality-gate:
@@ -14,10 +15,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v1
+        uses: subosito/flutter-action@v2.16.0
         with:
+          flutter-version: '3.41.5'
           channel: stable
-          cache: true
+          cache: false
 
       - name: Set up Deno
         uses: denoland/setup-deno@v1
@@ -41,6 +43,30 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          flutter build web \
+          flutter build web --release --base-href / \
             --dart-define=SUPABASE_URL=$SUPABASE_URL \
             --dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
+
+      - name: Prepare SSH
+        if: github.event_name != 'pull_request'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq rsync openssh-client
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p 22 -H 100.101.118.70 >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy via rsync
+        if: github.event_name != 'pull_request'
+        run: |
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
+            build/web/ \
+            hermes@100.101.118.70:/var/www/ikariam-fake/
+
+      - name: Summary
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "Deployed to https://ikariam-fake.hermes.bilalarikan.com"
+          echo "Commit: ${{ gitea.sha }}"
+
