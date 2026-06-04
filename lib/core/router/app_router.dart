@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -20,8 +19,8 @@ import '../../features/map/screens/enemy_city_view_screen.dart';
 import '../../features/espionage/screens/spy_log_screen.dart';
 import '../../features/godmode/screens/godmode_dashboard_screen.dart';
 import '../../features/profile/providers/profile_provider.dart';
-import '../../features/profile/screens/create_profile_screen.dart';
-import '../debug/log_store.dart';
+import '../../../shared/widgets/loading_overlay.dart';
+import '../../../core/debug/log_store.dart' as debug;
 
 // Navigator keys for each StatefulShellBranch — must be file-level constants
 // so they are created once per app lifetime (not recreated on rebuilds).

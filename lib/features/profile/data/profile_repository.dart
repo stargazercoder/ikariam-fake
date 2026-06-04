@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/debug/log_store.dart';
 import '../../../core/supabase/supabase_provider.dart';
 
 /// Thrown when a chosen display_name already exists in the profiles table

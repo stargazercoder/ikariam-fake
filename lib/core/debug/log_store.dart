@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// In-memory log store for debugging.
 /// Filled by [log] calls throughout the app and displayed on /debug-logs.
@@ -6,11 +7,11 @@ class LogStore {
   static final LogStore instance = LogStore._();
   LogStore._();
 
-  final List<_LogEntry> _entries = [];
+  final List<LogEntry> _entries = [];
   static const int maxEntries = 500;
 
   void add(String level, String message) {
-    _entries.add(_LogEntry(
+    _entries.add(LogEntry(
       timestamp: DateTime.now(),
       level: level,
       message: message,
@@ -20,17 +21,17 @@ class LogStore {
     }
   }
 
-  List<_LogEntry> get entries => List.unmodifiable(_entries);
+  List<LogEntry> get entries => List.unmodifiable(_entries);
 
   void clear() => _entries.clear();
 }
 
-class _LogEntry {
+class LogEntry {
   final DateTime timestamp;
   final String level;
   final String message;
 
-  _LogEntry({
+  LogEntry({
     required this.timestamp,
     required this.level,
     required this.message,
@@ -132,7 +133,7 @@ class DebugLogsOverlayState extends State<DebugLogsOverlay> {
                       final logs = LogStore.instance.entries
                           .map((e) => '[${e.timestamp}] ${e.level.toUpperCase()}: ${e.message}')
                           .join('\n');
-                      // Copy to clipboard handled below
+                      Clipboard.setData(ClipboardData(text: logs));
                     },
                     tooltip: 'Copy all',
                   ),
