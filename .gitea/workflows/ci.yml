@@ -15,16 +15,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2.16.0
+        uses: subosito/flutter-action@v1
         with:
           flutter-version: '3.41.5'
           channel: stable
-          cache: false
+          cache: true
+          cache-dependency-path: pubspec.lock
 
       - name: Set up Deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
+          cache: true
 
       - name: Install Flutter dependencies
         run: flutter pub get
@@ -38,6 +40,24 @@ jobs:
       - name: Flutter test
         run: flutter test
 
+  build:
+    needs: quality-gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.41.5'
+          channel: stable
+          cache: true
+          cache-dependency-path: pubspec.lock
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
       - name: Flutter build web
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -50,8 +70,6 @@ jobs:
       - name: Prepare SSH
         if: github.event_name != 'pull_request'
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq rsync openssh-client
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
@@ -69,4 +87,3 @@ jobs:
         run: |
           echo "Deployed to https://ikariam-fake.hermes.bilalarikan.com"
           echo "Commit: ${{ gitea.sha }}"
-
