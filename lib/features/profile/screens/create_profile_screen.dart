@@ -64,9 +64,11 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
             avatarId: _selectedAvatarId,
           );
 
-      // Invalidate profile to re-fetch without triggering loading state
-      // which would cause a redirect loop via _RouterNotifier.
+      // Invalidate profile and wait for the new data to be fetched.
+      // This ensures _RouterNotifier sees hasCompletedProfile=true
+      // before redirect logic runs again.
       ref.invalidate(profileProvider);
+      await Future.delayed(const Duration(milliseconds: 500));
 
       if (mounted) {
         context.go('/city');
