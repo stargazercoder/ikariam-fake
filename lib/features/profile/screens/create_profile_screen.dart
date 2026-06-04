@@ -8,6 +8,7 @@ import '../../../features/profile/data/profile_repository.dart';
 import '../../../features/profile/providers/profile_provider.dart';
 import '../../../features/profile/widgets/avatar_picker.dart';
 import '../../../shared/widgets/loading_overlay.dart';
+import '../../../core/debug/log_store.dart';
 
 /// Profile creation screen — mandatory gate between sign-up and gameplay.
 ///
@@ -34,6 +35,12 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    log('CreateProfileScreen: initState, state=${LogStore.instance.entries.length} logs');
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
@@ -50,11 +57,18 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      log('CreateProfile: form validation failed', level: 'warning');
+      return;
+    }
 
     final user = ref.read(currentUserProvider);
-    if (user == null) return;
+    if (user == null) {
+      log('CreateProfile: no current user (auth state issue)', level: 'error');
+      return;
+    }
 
+    log('CreateProfile.submit: userId=${user.id}, name="${_nameController.text.trim()}", avatarId=$_selectedAvatarId');
     setState(() => _isLoading = true);
 
     try {
@@ -64,16 +78,19 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
             avatarId: _selectedAvatarId,
           );
 
+      log('CreateProfile.submit: updateProfile succeeded, invalidating profileProvider');
       // Invalidate profile and wait for the new data to be fetched.
       // This ensures _RouterNotifier sees hasCompletedProfile=true
       // before redirect logic runs again.
       ref.invalidate(profileProvider);
       await Future.delayed(const Duration(milliseconds: 500));
 
+      log('CreateProfile.submit: navigating to /city');
       if (mounted) {
         context.go('/city');
       }
     } on DisplayNameTakenException {
+      log('CreateProfile.submit: DisplayNameTakenException', level: 'warning');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -83,6 +100,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
         );
       }
     } catch (e) {
+      log('CreateProfile.submit: error: $e', level: 'error');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
@@ -91,6 +109,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
+        log('CreateProfile.submit: finished, _isLoading=false');
       }
     }
   }

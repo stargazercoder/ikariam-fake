@@ -41,12 +41,17 @@ class ProfileRepository {
     required String displayName,
     required int avatarId,
   }) async {
+    log('ProfileRepository.updateProfile: userId=$userId, displayName=$displayName, avatarId=$avatarId', level: 'info');
     try {
-      await supabaseClient
+      final result = await supabaseClient
           .from('profiles')
           .update({'display_name': displayName, 'avatar_id': avatarId})
-          .eq('id', userId);
+          .eq('id', userId)
+          .select()
+          .maybeSingle();
+      log('ProfileRepository.updateProfile: result=$result', level: 'debug');
     } on PostgrestException catch (e) {
+      log('ProfileRepository.updateProfile: PostgrestException code=${e.code}', level: 'error');
       if (e.code == '23505') {
         throw const DisplayNameTakenException();
       }
