@@ -19,6 +19,7 @@ import '../../features/map/screens/enemy_city_view_screen.dart';
 import '../../features/espionage/screens/spy_log_screen.dart';
 import '../../features/godmode/screens/godmode_dashboard_screen.dart';
 import '../../features/profile/providers/profile_provider.dart';
+import '../../features/profile/screens/create_profile_screen.dart';
 import '../../../shared/widgets/loading_overlay.dart';
 import '../../../core/debug/log_store.dart' as debug;
 
