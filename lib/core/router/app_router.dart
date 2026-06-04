@@ -161,7 +161,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/debug-logs',
-        builder: (context, state) => const DebugLogsPage(),
+        builder: (context, state) => const debug.DebugLogsPage(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
