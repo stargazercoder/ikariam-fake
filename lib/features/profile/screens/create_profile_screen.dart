@@ -64,8 +64,9 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
             avatarId: _selectedAvatarId,
           );
 
-      // Refresh profile so GoRouter guard sees the completed profile.
-      await ref.read(profileProvider.notifier).refresh();
+      // Invalidate profile to re-fetch without triggering loading state
+      // which would cause a redirect loop via _RouterNotifier.
+      ref.invalidate(profileProvider);
 
       if (mounted) {
         context.go('/city');
