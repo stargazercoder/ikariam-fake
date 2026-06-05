@@ -91,7 +91,8 @@ Players can build and manage cities, gather resources, and engage in real-time t
 - Shipped v1.1 Economy & Combat Depth in 3 days (2026-03-13 → 2026-03-15)
 - Shipped v1.2 Espionage, Trading & Polish in 2 days (2026-03-16 → 2026-03-17)
 - Shipped v1.3 Bots, Testing & Automation in 2 days (2026-03-17 → 2026-03-18)
-- Codebase: ~26,800 LOC (17,456 Dart + 1,800 TypeScript + 7,228 SQL + 329 Shell)
+- Shipped v1.4 UI Consistency in 3 days (2026-03-19 → 2026-03-21)
+- Codebase: ~28,500 LOC (est. after v1.4 additions)
 - Tech stack: Flutter web + Supabase (Auth, PostgreSQL, Edge Functions, pg_cron, Realtime) + Riverpod
 - 24 phases, 57 plans completed across 4 milestones
 - 20 bot accounts + 7 test accounts with varied game states
@@ -139,17 +140,36 @@ Players can build and manage cities, gather resources, and engage in real-time t
 | Pure function extraction for Edge Function testing | No Supabase client mock required; import only formula module | ✓ Good — v1.3 |
 | Deno pinned to 2.2.x in CI | Supabase Edge Runtime does not support Deno 2.3+ lock file v5 | ⚠️ Revisit — track supabase/supabase#33093 |
 
-## Current Milestone: v1.4 UI Consistency
+## Current State: v1.4 Shipped
 
-**Goal:** Establish consistent visual language across all screens — resource/building icons and colors, unified building detail sheets, battle report improvements, and clean up city screen titles.
+**Shipped:** 2026-03-21
+**Total shipped:** 28 phases, 62 plans across 5 milestones
 
-**Target features:**
-- Resource icons & colors: renkli daire + harf ikonları (W, M, C, S, G) for all 5 resource types, used consistently everywhere
-- Building icons & colors: consistent icon/color for each of 10 building types
-- Unified building detail bottom sheet: large scrollable sheet with building-specific content (upgrade, tavern happiness, barracks training, shipyard building, resource production)
-- Battle report pillage amounts: show pillaged resource amounts in battle reports
-- Dispatch dialog carry capacity: show max lootable (carryable) amount live as units are selected
-- Remove city/player name titles: strip all city name and player name text from city screens
+**v1.4 shipped features:**
+- Canonical visual system: `visual_constants.dart` + `ResourceBadge` widget, consistent resource/building icons and colors across all UI
+- Unified building detail sheet: DraggableScrollableSheet for all 14 building types with dynamic content per building
+- Building downgrade: instant 50% refund via `downgrade-building` Edge Function
+- Dispatch carry capacity: live X/Y cargo capacity indicator in dispatch dialog
+- City screen cleanup: city/player name title texts removed from all screens
+- Deprecated code removed: barracks_screen, shipyard_screen, building_upgrade_card, old routes
+
+**Tech debt carried to v1.5:**
+- `cityProvider` not refreshed after island donation — stale island multiplier in production rate labels
+- JSONB cast inconsistency: older models use `v as int`, newer use `(v as num).toInt()`
+- `hideoutProtectionFloor()` Dart helper not surfaced in any UI
+- Bot archetype weight values need balance tuning
+- Deno pinned to 2.2.x — track supabase/supabase#33093 for upgrade
+
+## Next Milestone Goals
+
+Run `/gsd-new-milestone` to define v1.5 requirements and roadmap.
+
+Candidate features for v1.5:
+- Research system (4 branches: Seafaring, Economy, Science, Military)
+- Marketplace with buy/sell orders (order book)
+- Alliance system (create/join, Embassy, roles)
+- Ranking system (building + research + military + gold scores)
+- Reinforcements during ongoing battles
 
 ---
-*Last updated: 2026-03-19 after v1.4 milestone start*
+*Last updated: 2026-06-05 after v1.4 milestone archive*

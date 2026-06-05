@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: UI Consistency
-status: executing
-stopped_at: Completed 28-01-PLAN.md
-last_updated: "2026-03-21T14:16:41.059Z"
-last_activity: 2026-03-19 — Phase 25 Plan 01 complete (visual_constants.dart + ResourceBadge + 6 consumer files)
+status: complete
+stopped_at: Milestone archived
+last_updated: "2026-06-05T00:00:00Z"
+last_activity: 2026-06-05 — v1.4 milestone archived, git tag v1.4 created
 progress:
   total_phases: 4
   completed_phases: 4
@@ -17,39 +17,39 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-19)
+See: .planning/PROJECT.md (updated 2026-06-05)
 
 **Core value:** Players can build and manage cities, gather resources, and engage in real-time turn-based warfare — the core loop of build, expand, and conquer must feel satisfying and strategically meaningful.
-**Current focus:** v1.4 UI Consistency — Phase 25: Visual Constants
+**Current focus:** v1.4 COMPLETE — archived 2026-06-05. Start v1.5 with `/gsd-new-milestone`.
 
 ## Current Position
 
-Phase: 25 of 28 (Visual Constants)
-Plan: 1 of 1 in current phase
-Status: In progress
-Last activity: 2026-03-19 — Phase 25 Plan 01 complete (visual_constants.dart + ResourceBadge + 6 consumer files)
+**Milestone:** v1.4 UI Consistency — SHIPPED
+**Status:** All 4 phases complete, milestone archived
+**Next:** `/gsd-new-milestone` to define v1.5
 
 ```
-v1.4 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%  (0/4 phases) — Phase 25 Plan 01 done
+v1.4 Progress: [████████████████████] 100%  (4/4 phases complete)
 ```
 
 ## Performance Metrics
 
-**Cumulative (prior milestones):**
+**Cumulative (all milestones):**
 - v0.1.0: 9 phases, 27 plans in 2 days
 - v1.1: 3 phases, 8 plans in 3 days
 - v1.2: 5 phases, 11 plans in 2 days
 - v1.3: 7 phases, 11 plans in 2 days
-- Total shipped: 24 phases, 57 plans
+- v1.4: 4 phases, 5 plans in 3 days
+- **Total shipped: 28 phases, 62 plans**
 
-**v1.4 (current):**
+**v1.4 (archived):**
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 25-visual-constants | 01 | 25m | 2 | 10 |
-| Phase 26-building-detail-sheet P01 | 4m | 2 tasks | 10 files |
-| Phase 26-building-detail-sheet P02 | 9m | 2 tasks | 15 files |
-| Phase 27-battle-ui-improvements P01 | 15m | 2 tasks | 5 files |
-| Phase 28-city-screen-cleanup P01 | 10m | 2 tasks | 2 files |
+| 26-building-detail-sheet | 01 | 4m | 2 | 10 |
+| 26-building-detail-sheet | 02 | 9m | 2 | 15 |
+| 27-battle-ui-improvements | 01 | 15m | 2 | 5 |
+| 28-city-screen-cleanup | 01 | 10m | 2 | 2 |
 
 ## Accumulated Context
 
@@ -57,19 +57,19 @@ v1.4 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
 
 All decisions logged in PROJECT.md Key Decisions table.
 
-**Phase 25 Plan 01:**
+**v1.4 Key Decisions:**
 - Wine uses Icon(Icons.wine_bar) not CircleAvatar+letter — per locked PROJECT.md decision
 - Wine letter 'V' (Vinum) avoids clash with Wood's 'W'
-- Wine color Color(0xFF8E24AA) = purple.shade600 — matches PROJECT.md locked value
-- [Phase 26-01]: Sheet stays open after upgrade (SnackBar feedback only, no Navigator.pop) — preserves context for the player
-- [Phase 26-01]: go_router removed from city_grid_screen.dart after barracks/shipyard context.push replaced by showBuildingDetailSheet
-- [Phase 26-02]: downgradeRefund uses floor(50%) — player loses fractional resources on downgrade
-- [Phase 26-02]: Downgrade is instant — not gated by construction queue
-- [Phase 26-02]: Refund via negative p_amount to deduct_resource (adds resources)
-- [Phase 27-01]: cargoCapacityPerShip=500 constant in unit_constants.dart synced with SQL v_cargo_cap formula
-- [Phase 27-01]: _CargoCapacityRow hides entirely when maxShips==0, shows orange warning when 0 selected but ships available in roster
-- [Phase 28-01]: Keep cityName/ownerName params on EnemyCityViewScreen for router compatibility even though no longer displayed
-- [Phase 28-01]: displayName derivation removed entirely from CityScreen.build() since no widget consumes it after AppBar cleanup
+- Wine color Color(0xFF8E24AA) = purple.shade600
+- Sheet stays open after upgrade (SnackBar feedback only, no Navigator.pop)
+- go_router removed from city_grid_screen.dart after barracks/shipyard context.push replaced
+- downgradeRefund uses floor(50%) — player loses fractional resources on downgrade
+- Downgrade is instant — not gated by construction queue
+- Refund via negative p_amount to deduct_resource (adds resources)
+- cargoCapacityPerShip=500 constant in unit_constants.dart synced with SQL v_cargo_cap formula
+- _CargoCapacityRow hides entirely when maxShips==0; orange warning when 0 selected but ships available
+- Keep cityName/ownerName params on EnemyCityViewScreen for router compatibility even though no longer displayed
+- displayName derivation removed entirely from CityScreen.build() since no widget consumes it
 
 ### Pending Todos
 
@@ -77,7 +77,7 @@ None.
 
 ### Blockers/Concerns
 
-Carried tech debt (pre-v1.4):
+Carried tech debt (pre-v1.5):
 - cityProvider not refreshed after island donation — stale island multiplier in production rate labels
 - JSONB cast inconsistency: older models use `v as int`, newer use `(v as num).toInt()`
 - hideoutProtectionFloor() Dart helper not surfaced in any UI
@@ -86,7 +86,7 @@ Carried tech debt (pre-v1.4):
 
 ## Session Continuity
 
-Last session: 2026-03-21T14:12:09.269Z
-Stopped at: Completed 28-01-PLAN.md
+Last session: 2026-06-05T00:00:00Z
+Stopped at: Milestone v1.4 archived
 Resume file: None
-Next action: Continue to next plan in Phase 25
+Next action: `/gsd-new-milestone` to start v1.5
