@@ -48,3 +48,6 @@ app.*.map.json
 .env
 .env.*
 !.env.example
+
+# GSD planning internals
+.planning/telemetry.jsonl
