@@ -164,7 +164,7 @@ class DebugLogsOverlayState extends State<DebugLogsOverlay> {
                           width: 50,
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.2),
+                            color: color.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text(
@@ -268,7 +268,7 @@ class _DebugLogsPageState extends State<DebugLogsPage> {
                   width: 50,
                   padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                   decoration: BoxDecoration(
-                    color: _levelColor(entry.level).withOpacity(0.2),
+                    color: _levelColor(entry.level).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(3),
                   ),
                   child: Text(
